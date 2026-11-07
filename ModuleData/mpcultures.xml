@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<BasicCultures>
+	<Culture
+	  id="dwdn"
+	  name="Daewden"
+	  is_main_culture="true"
+	  color="FF0B0C11"
+	  color2="FFF4CA14"
+	  cloth_alternative_color1="FF0B0C11"
+	  cloth_alternative_color2="FFF4CA14"
+	  banner_background_color1="FF0B0C11"
+	  banner_foreground_color1="FFF4CA14"
+	  banner_background_color2="FFF4CA14"
+	  banner_foreground_color2="FF0B0C11"
+	  faction_banner_key="11.116.116.1536.1536.764.764.1.0.0.340.143.143.303.303.764.545.1.0.0.138.143.143.480.480.764.873.1.0.0" />
+</BasicCultures>

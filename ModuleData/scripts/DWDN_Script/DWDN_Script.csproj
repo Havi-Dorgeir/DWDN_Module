@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5703A164-6F2F-4EB5-B1D7-5026949BE712}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DWDN_Script</RootNamespace>
+    <AssemblyName>DWDN_Script</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\bin\Win64_Shipping_Client\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\..\bin\Win64_Shipping_Client\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Server|AnyCPU' ">
+    <AssemblyName>DWDN_Script.Server</AssemblyName>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\..\bin\Win64_Shipping_Server\</OutputPath>
+    <IntermediateOutputPath>obj\Server\</IntermediateOutputPath>
+    <DefineConstants>SERVER;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+
+  <!-- Общие референсы (присутствуют и на Клиенте, и на Выделенном Сервере) -->
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Numerics.Vectors">
+      <HintPath>..\..\..\..\..\bin\Win64_Shipping_Client\System.Numerics.Vectors.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Core">
+      <HintPath>..\..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.DotNet">
+      <HintPath>..\..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.DotNet.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Engine">
+      <HintPath>..\..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.Engine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.InputSystem">
+      <HintPath>..\..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.InputSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Library">
+      <HintPath>..\..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.Library.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Localization">
+      <HintPath>..\..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.Localization.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.MountAndBlade">
+      <HintPath>..\..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.MountAndBlade.Diamond">
+      <HintPath>..\..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.Diamond.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.MountAndBlade.Multiplayer">
+      <HintPath>..\..\..\..\..\Modules\Multiplayer\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.Multiplayer.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Network">
+      <HintPath>..\..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.Network.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.ObjectSystem">
+      <HintPath>..\..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.ObjectSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.ScreenSystem">
+      <HintPath>..\..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.ScreenSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- Клиентские UI-референсы (ТОЛЬКО для Клиента, отсутствуют на Dedicated Server) -->
+  <ItemGroup Condition=" '$(Configuration)' != 'Server' ">
+    <Reference Include="TaleWorlds.Core.ViewModelCollection">
+      <HintPath>..\..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.Core.ViewModelCollection.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Engine.GauntletUI">
+      <HintPath>..\..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.Engine.GauntletUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.GauntletUI">
+      <HintPath>..\..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.GauntletUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.GauntletUI.Data">
+      <HintPath>..\..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.GauntletUI.Data.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.GauntletUI.PrefabSystem">
+      <HintPath>..\..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.GauntletUI.PrefabSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.MountAndBlade.GauntletUI.Widgets">
+      <HintPath>..\..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.GauntletUI.Widgets.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.MountAndBlade.View">
+      <HintPath>..\..\..\..\..\Modules\Native\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.View.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.MountAndBlade.ViewModelCollection">
+      <HintPath>..\..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.ViewModelCollection.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.TwoDimension">
+      <HintPath>..\..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.TwoDimension.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.MountAndBlade.Multiplayer.GauntletUI">
+      <HintPath>..\..\..\..\..\Modules\Multiplayer\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.Multiplayer.GauntletUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- Общие и серверные исходники -->
+  <ItemGroup>
+    <Compile Include="DWDN_FirearmsBehavior.cs" />
+    <Compile Include="SubModule.cs" />
+    <Compile Include="Common\Duchies\DWDN_Duchy.cs" />
+    <Compile Include="Common\Duchies\DWDN_ClassDefinition.cs" />
+    <Compile Include="Common\Duchies\DWDN_LoadoutSelection.cs" />
+    <Compile Include="Common\Duchies\DWDN_DuchyManager.cs" />
+    <Compile Include="Common\Network\DWDN_NetworkMessages.cs" />
+    <Compile Include="Common\Network\DWDN_NetworkHelper.cs" />
+    <Compile Include="Server\Behaviors\DWDN_ServerLoadoutBehavior.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <!-- Клиентские исходники (UI, виджеты, клиентское поведение) -->
+  <ItemGroup Condition=" '$(Configuration)' != 'Server' ">
+    <Compile Include="DWDN_InputBehavior.cs" />
+    <Compile Include="Client\Behaviors\DWDN_ClientMissionComponent.cs" />
+    <Compile Include="Client\UI\DWDN_PreviewInputs.cs" />
+    <Compile Include="Client\UI\DWDN_PreviewBuilder.cs" />
+    <Compile Include="Client\UI\DWDN_CharacterPreview.cs" />
+    <Compile Include="Client\UI\DWDN_SelectionMissionView.cs" />
+    <Compile Include="Client\UI\DWDN_DuchyItemVM.cs" />
+    <Compile Include="Client\UI\DWDN_ClassItemVM.cs" />
+    <Compile Include="Client\UI\DWDN_EquipmentSlotVM.cs" />
+    <Compile Include="Client\UI\DWDN_ItemOptionVM.cs" />
+    <Compile Include="Client\UI\DWDN_ClassSelectionVM.cs" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
+  <!-- Пост-билд для Клиентской сборки (автоматически собирает Серверную) -->
+  <Target Name="PostBuildClient" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)' != 'Server' ">
+    <MSBuild Projects="$(MSBuildProjectFile)" Properties="Configuration=Server;Platform=$(Platform)" Targets="Build" />
+  </Target>
+
+  <!-- Пост-билд для Серверной сборки (копирует чистую серверную DLL и SubModule.xml на Dedicated Server) -->
+  <Target Name="PostBuildServer" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)' == 'Server' ">
+    <Exec Command="
+      if exist &quot;..\..\..\bin\Win64_Shipping_Server\DWDN_Script.dll&quot; del /F /Q &quot;..\..\..\bin\Win64_Shipping_Server\DWDN_Script.dll&quot;
+      xcopy /Y /I &quot;$(TargetPath)&quot; &quot;..\..\..\bin\Win64_Shipping_Client\&quot;
+      xcopy /Y /I &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;..\..\..\bin\Win64_Shipping_Client\&quot;
+      if exist &quot;E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Dedicated Server\Modules\DaewdenM\bin\Win64_Shipping_Server\&quot; (
+        if exist &quot;E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Dedicated Server\Modules\DaewdenM\bin\Win64_Shipping_Server\DWDN_Script.dll&quot; del /F /Q &quot;E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Dedicated Server\Modules\DaewdenM\bin\Win64_Shipping_Server\DWDN_Script.dll&quot;
+        xcopy /Y /I &quot;$(TargetPath)&quot; &quot;E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Dedicated Server\Modules\DaewdenM\bin\Win64_Shipping_Server\&quot;
+        xcopy /Y /I &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Dedicated Server\Modules\DaewdenM\bin\Win64_Shipping_Server\&quot;
+        xcopy /Y /I &quot;$(TargetPath)&quot; &quot;E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Dedicated Server\Modules\DaewdenM\bin\Win64_Shipping_Client\&quot;
+        xcopy /Y /I &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Dedicated Server\Modules\DaewdenM\bin\Win64_Shipping_Client\&quot;
+        xcopy /Y &quot;..\..\..\SubModule.xml&quot; &quot;E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Dedicated Server\Modules\DaewdenM\&quot;
+      )
+    " />
+  </Target>
+</Project>

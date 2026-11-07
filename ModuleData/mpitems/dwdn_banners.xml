@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Items>
+	<Item
+		id="dwdn_banner1"
+		name="Daewden Banner"
+		is_merchandise="true"
+		multiplayer_item="true"
+		body_name="bo_mace_a"
+		recalculate_body="false"
+		mesh="dwdn_banner1"
+		culture="Culture.dwdn"
+		value="4"
+		weight="2.1"
+		Type="Banner"
+		item_holsters="throwing_stone_2">
+		<ItemComponent>
+			<Banner
+				banner_level="1"
+				effect="IncreasedMeleeDamage"
+				weapon_class="Banner"
+				item_usage="banner"
+				weapon_balance="100"
+				thrust_speed="78"
+				speed_rating="97"
+				missile_speed="0"
+				weapon_length="150"
+				swing_damage="15"
+				swing_damage_type="Blunt"
+				physics_material="metal_weapon"
+				position="0.0, 0.0, 0.0" />
+		</ItemComponent>
+		<Flags
+			DropOnWeaponChange="false"
+			ForceAttachOffHandPrimaryItemBone="true"
+			HeldInOffHand="true"
+			HasToBeHeldUp="true"
+			CanBePickedUpFromCorpse="false" />
+	</Item>
+</Items>

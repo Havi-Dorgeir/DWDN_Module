@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MPClassDivisions>
+	<!-- DWDN -->
+	<!-- Inf -->
+	<!-- Ratay -->
+	<MPClassDivision id="mp_Ratay" hero="mp_Ratay_hero" troop="mp_Ratay_troop" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.92" cost="80" icon="Infantry_Light" melee_ai="35" ranged_ai="30" armor="10" movement_speed="0.82" combat_movement_speed="0.9" acceleration="2.2" hitpoints="100">
+		<Perks>
+			<!-- Слот 1: Баффы -->
+			<Perk game_mode="All" name="Agility" description="+7% Movement Speed" icon="PerkFleetFooted" perk_list="1">
+				<Effect type="DrivenProperty" driven_property="MaxSpeedMultiplier" value="0.07" />
+			</Perk>
+			<Perk game_mode="All" name="Combat Mobility" description="+10% Combat Movement Speed" icon="PerkBrawny" perk_list="1">
+				<Effect type="DrivenProperty" driven_property="CombatMaxSpeedMultiplier" value="0.10" />
+			</Perk>
+			<!-- Слот 2: Оружие -->
+			<Perk game_mode="All" name="Axe" description=" " icon="PerkHeavyAxe" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_sturgia_axe" />
+			</Perk>
+			<Perk game_mode="All" name="Sword" description=" " icon="PerkSword" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_vlandian_short_sword" />
+			</Perk>
+			<Perk game_mode="All" name="Mace" description=" " icon="PerkMaces" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_vlandian_hammer" />
+			</Perk>
+		</Perks>
+	</MPClassDivision>
+	<!-- Banobranny -->
+	<MPClassDivision id="mp_Banobranny" hero="mp_Banobranny_hero" troop="mp_Banobranny_troop" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.70" cost="130" icon="Infantry_Heavy" melee_ai="50" ranged_ai="40" armor="25" movement_speed="0.80" combat_movement_speed="0.9" acceleration="2.2" hitpoints="100">
+		<Perks>
+			<!-- Слот 1: Баффы -->
+			<Perk game_mode="All" name="Iron Hide" description="+10 Armor" icon="PerkToughness" perk_list="1">
+				<OnSpawnEffect type="ArmorOnSpawn" value="10" />
+			</Perk>
+			<Perk game_mode="All" name="Conditioning" description="+5% Movement Speed" icon="PerkFleetFooted" perk_list="1">
+				<Effect type="DrivenProperty" driven_property="MaxSpeedMultiplier" value="0.05" />
+			</Perk>
+			<!-- Слот 2: Оружие -->
+			<Perk game_mode="All" name="Axe" description=" " icon="PerkHeavyAxe" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_sturgia_axe" />
+			</Perk>
+			<Perk game_mode="All" name="Sword" description=" " icon="PerkBetterSwords" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_vlandian_arming_sword" />
+			</Perk>
+			<Perk game_mode="All" name="Mace" description=" " icon="PerkMaces" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_vlandian_mace" />
+			</Perk>
+			<Perk game_mode="all" name="Spear" description="{=eMd39oQf}Grants Long Spear." icon="PerkSpears" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_western_spear" />
+			</Perk>
+		</Perks>
+	</MPClassDivision>
+	<!-- Pikeman-->
+	<MPClassDivision id="mp_Pikeman" hero="mp_Pikeman_hero" troop="mp_Pikeman_troop" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.64" cost="130" icon="Infantry_Heavy" melee_ai="50" ranged_ai="30" armor="18" movement_speed="0.81" combat_movement_speed="0.85" acceleration="2.3" hitpoints="100">
+		<Perks>
+			<!-- Слот 1: Баффы + железная выдача кастомной пики pike1 в Item0 -->
+			<Perk game_mode="All" name="Reinforced Torso" description="+10 Armor" icon="PerkArmorUpgrade" perk_list="1">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="pike1" />
+				<OnSpawnEffect type="ArmorOnSpawn" value="10" />
+			</Perk>
+			<Perk game_mode="All" name="Long March" description="+6% Movement Speed" icon="PerkFleetFooted" perk_list="1">
+				<Effect type="DrivenProperty" driven_property="MaxSpeedMultiplier" value="0.06" />
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="pike1" />
+			</Perk>
+			<!-- Слот 2: Выбор вторичного оружия ближнего боя -->
+			<Perk game_mode="All" name="Axe" description=" " icon="PerkHeavyAxe" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="mp_sturgia_axe" />
+			</Perk>
+			<Perk game_mode="All" name="Sword" description=" " icon="PerkBetterSwords" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="mp_vlandian_arming_sword" />
+			</Perk>
+			<Perk game_mode="All" name="Mace" description=" " icon="PerkMaces" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="mp_vlandian_mace" />
+			</Perk>
+		</Perks>
+	</MPClassDivision>
+	<!-- Zbroyniy -->
+	<MPClassDivision id="mp_Zbroyniy" hero="mp_Zbroyniy_hero" troop="mp_Zbroyniy_troop" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.61" cost="160" icon="Infantry_Heavy" melee_ai="60" ranged_ai="40" armor="40" movement_speed="0.79" combat_movement_speed="0.9" acceleration="2.4" hitpoints="100">
+		<Perks>
+			<!-- Слот 1: Баффы -->
+			<Perk game_mode="All" name="Heavy Plating" description="+12 Armor" icon="PerkToughness" perk_list="1">
+				<OnSpawnEffect type="ArmorOnSpawn" value="12" />
+			</Perk>
+			<Perk game_mode="All" name="Athletics" description="+5% Movement Speed" icon="PerkFleetFooted" perk_list="1">
+				<Effect type="DrivenProperty" driven_property="MaxSpeedMultiplier" value="0.05" />
+			</Perk>
+			<!-- Слот 2: Оружие -->
+			<Perk game_mode="All" name="Axe" description=" " icon="PerkHeavyAxe" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_sturgia_heavy_axe" />
+			</Perk>
+			<Perk game_mode="All" name="Sword" description=" " icon="PerkBetterSwords" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_battania_noble_sword" />
+			</Perk>
+			<Perk game_mode="All" name="Mace" description=" " icon="PerkMaces" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_battnia_heavy_mace" />
+			</Perk>
+			<Perk game_mode="all" name="Long Spear" description="{=eMd39oQf}Grants Long Spear." icon="PerkLongSpear" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_western_long_spear" />
+			</Perk>
+		</Perks>
+	</MPClassDivision>
+	<!-- Officer (Десятник) -->
+	<MPClassDivision id="mp_Officer" hero="mp_Officer_hero" troop="mp_Officer_troop" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.50" cost="170" icon="Infantry_Heavy" melee_ai="70" ranged_ai="50" armor="42" movement_speed="0.79" combat_movement_speed="0.9" acceleration="2.4" hitpoints="100">
+		<Perks>
+			<!-- Слот 1: Баффы -->
+			<Perk game_mode="All" name="Heavy Plating" description="+12 Armor" icon="PerkToughness" perk_list="1">
+				<OnSpawnEffect type="ArmorOnSpawn" value="12" />
+			</Perk>
+			<Perk game_mode="All" name="Athletics" description="+5% Movement Speed" icon="PerkFleetFooted" perk_list="1">
+				<Effect type="DrivenProperty" driven_property="MaxSpeedMultiplier" value="0.05" />
+			</Perk>
+			<!-- Слот 2: Оружие -->
+			<Perk game_mode="All" name="Axe" description=" " icon="PerkHeavyAxe" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_sturgia_heavy_axe" />
+			</Perk>
+			<Perk game_mode="All" name="Sword" description=" " icon="PerkBetterSwords" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_battania_noble_sword" />
+			</Perk>
+			<Perk game_mode="All" name="Mace" description=" " icon="PerkMaces" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_battnia_heavy_mace" />
+			</Perk>
+			<Perk game_mode="all" name="Long Spear" description="{=eMd39oQf}Grants Long Spear." icon="PerkLongSpear" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_western_long_spear" />
+			</Perk>
+		</Perks>
+	</MPClassDivision>
+	<!-- Sotnik (Сотник) -->
+	<MPClassDivision id="mp_Sotnik" hero="mp_Sotnik_hero" troop="mp_Sotnik_troop" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.45" cost="190" icon="Infantry_Heavy" melee_ai="75" ranged_ai="50" armor="48" movement_speed="0.77" combat_movement_speed="0.88" acceleration="2.4" hitpoints="100">
+		<Perks>
+			<!-- Слот 1: Баффы -->
+			<Perk game_mode="All" name="Heavy Plating" description="+12 Armor" icon="PerkToughness" perk_list="1">
+				<OnSpawnEffect type="ArmorOnSpawn" value="12" />
+			</Perk>
+			<Perk game_mode="All" name="Athletics" description="+5% Movement Speed" icon="PerkFleetFooted" perk_list="1">
+				<Effect type="DrivenProperty" driven_property="MaxSpeedMultiplier" value="0.05" />
+			</Perk>
+			<!-- Слот 2: Оружие -->
+			<Perk game_mode="All" name="Axe" description=" " icon="PerkHeavyAxe" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_sturgia_heavy_axe" />
+			</Perk>
+			<Perk game_mode="All" name="Sword" description=" " icon="PerkBetterSwords" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_battania_noble_sword" />
+			</Perk>
+			<!-- Слот 3: Копье / Щит -->
+			<Perk game_mode="All" name="Long Spear" description=" " icon="PerkLongSpear" perk_list="3">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item2" item="mp_western_long_spear" />
+			</Perk>
+			<Perk game_mode="All" name="Heavy Shield" description=" " icon="PerkShield" perk_list="3">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="zbroyniy_shield_silver1" />
+			</Perk>
+		</Perks>
+	</MPClassDivision>
+	<!-- Bannerman -->
+	<MPClassDivision id="mp_Bannerman" hero="mp_Bannerman_hero" troop="mp_Bannerman_troop" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.60" cost="140" icon="Infantry_Heavy" melee_ai="55" ranged_ai="40" armor="35" movement_speed="0.80" combat_movement_speed="0.9" acceleration="2.2" hitpoints="100">
+		<Perks>
+			<!-- Слот 1: Баффы -->
+			<Perk game_mode="All" name="Heavy Plating" description="+12 Armor" icon="PerkToughness" perk_list="1">
+				<OnSpawnEffect type="ArmorOnSpawn" value="12" />
+			</Perk>
+			<Perk game_mode="All" name="Athletics" description="+5% Movement Speed" icon="PerkFleetFooted" perk_list="1">
+				<Effect type="DrivenProperty" driven_property="MaxSpeedMultiplier" value="0.05" />
+			</Perk>
+			<!-- Слот 2: Оружие + Знамя -->
+			<Perk game_mode="All" name="Axe" description="Heavy axe and clan banner" icon="PerkHeavyAxe" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_sturgia_heavy_axe" />
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="dwdn_banner1" />
+			</Perk>
+			<Perk game_mode="All" name="Sword" description="Noble sword and clan banner" icon="PerkBetterSwords" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_battania_noble_sword" />
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="dwdn_banner1" />
+			</Perk>
+			<Perk game_mode="All" name="Mace" description="Heavy mace and clan banner" icon="PerkMaces" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_battnia_heavy_mace" />
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="dwdn_banner1" />
+			</Perk>
+		</Perks>
+	</MPClassDivision>
+	<!--item="mp_sturgia_heavy_axe" /> -->
+	<!-- Ranged -->
+	<MPClassDivision id="mp_DWDN_Archer" hero="mp_DWDN_Archer_hero" troop="mp_DWDN_Archer_troop" hero_idle_anim="act_empire_mp_archer_militia_idle" troop_idle_anim="act_idle_bow_1" multiplier="0.65" cost="120" icon="Archer_Light" melee_ai="40" ranged_ai="90" armor="8" movement_speed="0.76" combat_movement_speed="0.75" acceleration="3.0" hitpoints="100">
+		<Perks>
+			<!-- Слот 1: Баффы -->
+			<Perk game_mode="All" name="Steady Aim" description="Faster and steadier aiming with reduced movement penalty" icon="PerkMarksman" perk_list="1">
+				<Effect type="DrivenProperty" value="-0.8" driven_property="WeaponWorstMobileAccuracyPenalty" is_ratio="true" />
+				<Effect type="DrivenProperty" value="2.0" driven_property="WeaponUnsteadyBeginTime" is_ratio="true" />
+				<Effect type="DrivenProperty" value="2.0" driven_property="WeaponUnsteadyEndTime" is_ratio="true" />
+				<Effect type="DrivenProperty" value="-0.25" driven_property="WeaponRotationalAccuracyPenaltyInRadians" is_ratio="true" />
+			</Perk>
+			<Perk game_mode="All" name="Nimble" description="+6% Movement Speed" icon="PerkFleetFooted" perk_list="1">
+				<Effect type="DrivenProperty" driven_property="MaxSpeedMultiplier" value="0.06" />
+			</Perk>
+			<!-- Слот 2: Стрелковое + холодное оружие ближнего боя -->
+			<!-- Праща отключена
+			<Perk game_mode="All" name="Sling" description="Sling with stone ammo and a sidearm axe" icon="PerkGeneral" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="sling_stoneammo" />
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="sling_wool" />
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item2" item="mp_sturgia_axe" />
+			</Perk>
+			-->
+			<Perk game_mode="All" name="Longbow" description="Woodland Longbow with arrows and a sidearm sword" icon="PerkLongRangeBow" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_woodland_long_bow" />
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="mp_arrows_steppe_extra" />
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item2" item="mp_vlandian_short_sword" />
+			</Perk>
+			<Perk game_mode="All" name="Superior Bow" description="Steppe Superior Bow with arrows and a sidearm axe" icon="PerkFasterRelease" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_steppe_superior_bow" />
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="mp_arrows_steppe_extra" />
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item2" item="mp_sturgia_axe" />
+			</Perk>
+			<!-- Огнестрел только у арбалетчика
+			<Perk game_mode="All" name="Prototype Gun" description="Prototype arquebus with lead bullets and a sidearm sword" icon="PerkSharpshooters" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_bullets" />
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="mp_gun_prototype" />
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item2" item="mp_vlandian_short_sword" />
+			</Perk>
+			-->
+		</Perks>
+	</MPClassDivision>
+	<!-- Crossbowman -->
+	<MPClassDivision id="mp_DWDN_Crossbowman" hero="mp_DWDN_Crossbowman_hero" troop="mp_DWDN_Crossbowman_troop" hero_idle_anim="act_empire_mp_archer_militia_idle" troop_idle_anim="act_idle_bow_1" multiplier="0.52" cost="150" icon="Archer_Light" melee_ai="50" ranged_ai="100" armor="20" movement_speed="0.74" combat_movement_speed="0.70" acceleration="3.0" hitpoints="100">
+		<Perks>
+			<!-- Слот 1: Баффы -->
+			<Perk game_mode="All" name="Drill / Fast Reload" description="+20% Reload Speed" icon="PerkFasterRelease" perk_list="1">
+				<Effect type="DrivenProperty" driven_property="ReloadSpeed" value="0.20" />
+			</Perk>
+			<Perk game_mode="All" name="Reinforced Gambeson" description="+8 Armor" icon="PerkArmorPadding" perk_list="1">
+				<OnSpawnEffect type="ArmorOnSpawn" value="8" />
+			</Perk>
+			<!-- Слот 2: Оружие + Болты + Сайдарм -->
+			<Perk game_mode="all" name="{=0e17RZrZ}Arbalest" description="Replaces Crossbow with Arbalest. Grants strong bolts and a sidearm sword." icon="PerkLongRangeCrossbow" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_heavier_crossbow" />
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="mp_bolts_strong" />
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item2" item="mp_vlandian_short_sword" />
+			</Perk>
+			<Perk game_mode="All" name="Hand Cannon" description="Early siege hand cannon, bullets and a sidearm sword" icon="PerkHeavyCrossbows" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_bullets" />
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="hand_cannon" />
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item2" item="mp_vlandian_short_sword" />
+			</Perk>
+			<Perk game_mode="all" name="{=yRTNfCfm}Faster Crossbow" description="Replaces Crossbow with Heavy Crossbow. Grants extra bolts and a sidearm sword." icon="PerkFasterRelease" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_heavier_crossbow_faster_draw" />
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="mp_bolts_western_extra" />
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item2" item="mp_vlandian_short_sword" />
+			</Perk>
+		</Perks>
+	</MPClassDivision>
+	<!-- Cav -->
+	<!-- Cav -->
+	<MPClassDivision id="mp_DWDN_Cav" hero="mp_DWDN_Cav_hero" troop="mp_DWDN_Cav_troop" hero_mount_idle_anim="act_vlandia_mp_vanguard_mount_idle" troop_mount_idle_anim="act_horse_idle_1" multiplier="0.42" cost="160" icon="Cavalry_Heavy" melee_ai="60" ranged_ai="40" armor="32" movement_speed="0.74" combat_movement_speed="0.65" acceleration="2.8" hitpoints="100">
+		<Perks>
+			<!-- Слот 1: Баффы -->
+			<Perk game_mode="All" name="Cuirassier" description="+10 Armor" icon="PerkArmorUpgrade" perk_list="1">
+				<OnSpawnEffect type="ArmorOnSpawn" value="10" />
+			</Perk>
+			<Perk game_mode="All" name="Spurs" description="+5% Movement Speed" icon="PerkFasterHorses" perk_list="1">
+				<Effect type="DrivenProperty" driven_property="MaxSpeedMultiplier" value="0.05" />
+			</Perk>
+			<!-- Слот 2: Оружие (Копьё сохраняется ВСЕГДА) -->
+			<Perk game_mode="all" name="Heavy Lance" description="Heavy couched lance and sidearm sword" icon="PerkCouchedHeavySpears" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_vlandian_heavy_lance" />
+			</Perk>
+			<Perk game_mode="all" name="Battanian Spear" description="Replaces Heavy Lance with agile Battanian Cavalry Spear" icon="PerkCavalrySpear" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_battania_cavalry_spear" />
+			</Perk>
+			<Perk game_mode="All" name="Axe &amp; Lance" description="Replaces sidearm sword with cavalry axe (keeps lance)" icon="PerkAxes" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="mp_sturgia_cavalry_axe" />
+			</Perk>
+			<Perk game_mode="All" name="Mace &amp; Lance" description="Replaces sidearm sword with cavalry mace (keeps lance)" icon="PerkMaces" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="mp_vlandian_cavalry_mace" />
+			</Perk>
+		</Perks>
+	</MPClassDivision>
+	<!-- Knight -->
+	<MPClassDivision id="mp_Knight" hero="mp_Knight_hero" troop="mp_Knight_troop" hero_mount_idle_anim="act_vlandia_mp_vanguard_mount_idle" troop_mount_idle_anim="act_horse_idle_1" multiplier="0.30" cost="200" icon="Cavalry_Heavy" melee_ai="70" ranged_ai="40" armor="38" movement_speed="0.72" combat_movement_speed="0.60" acceleration="2.8" hitpoints="100">
+		<Perks>
+			<!-- Слот 1: Конный / Пеший бой -->
+			<Perk game_mode="All" name="Warhorse" description="Spawns with an armored warhorse" icon="PerkCharger" perk_list="1">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Horse" item="mp_vlandia_horse" />
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="HorseHarness" item="mp_chain_barding" />
+			</Perk>
+			<Perk game_mode="All" name="Foot Knight" description="Fights on foot with increased mobility (+5% Speed)" icon="PerkFleetFooted" perk_list="1">
+				<Effect type="DrivenProperty" driven_property="MaxSpeedMultiplier" value="0.05" />
+			</Perk>
+			<!-- Слот 2: Оружие (Копьё сохраняется ВСЕГДА) -->
+			<Perk game_mode="all" name="Heavy Lance" description="Heavy couched lance and sidearm sword" icon="PerkCouchedHeavySpears" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_vlandian_heavy_lance" />
+			</Perk>
+			<Perk game_mode="all" name="Battanian Spear" description="Replaces Heavy Lance with agile Battanian Cavalry Spear" icon="PerkCavalrySpear" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_battania_cavalry_spear" />
+			</Perk>
+			<Perk game_mode="All" name="Axe &amp; Lance" description="Replaces sidearm sword with cavalry axe (keeps lance)" icon="PerkAxes" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="mp_sturgia_cavalry_axe" />
+			</Perk>
+			<Perk game_mode="All" name="Mace &amp; Lance" description="Replaces sidearm sword with cavalry mace (keeps lance)" icon="PerkMaces" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="mp_vlandian_cavalry_mace" />
+			</Perk>
+		</Perks>
+	</MPClassDivision>
+	<!-- Barons -->
+	<MPClassDivision id="mp_Bergen_Klaus" hero="mp_Bergen_Klaus_hero" troop="mp_Bergen_Klaus_troop" hero_mount_idle_anim="act_vlandia_mp_vanguard_mount_idle" troop_mount_idle_anim="act_horse_idle_1" multiplier="0.30" cost="200" icon="Cavalry_Heavy" melee_ai="70" ranged_ai="50" armor="38" movement_speed="0.73" combat_movement_speed="0.65" acceleration="2.8" hitpoints="100">
+		<Perks>
+			<Perk game_mode="All" name="Light Armor" description="+5 Armor" icon="PerkArmorPadding" perk_list="1">
+				<OnSpawnEffect type="ArmorOnSpawn" value="5" />
+			</Perk>
+			<Perk game_mode="All" name="Reinforced Armor" description="+12 Armor" icon="PerkToughness" perk_list="1">
+				<OnSpawnEffect type="ArmorOnSpawn" value="12" />
+			</Perk>
+		</Perks>
+	</MPClassDivision>
+	<MPClassDivision id="mp_Finnard_Valerian" hero="mp_Finnard_Valerian_hero" troop="mp_Finnard_Valerian_troop" hero_mount_idle_anim="act_vlandia_mp_vanguard_mount_idle" troop_mount_idle_anim="act_horse_idle_1" multiplier="0.30" cost="200" icon="Cavalry_Heavy" melee_ai="70" ranged_ai="50" armor="38" movement_speed="0.73" combat_movement_speed="0.65" acceleration="2.8" hitpoints="100">
+		<Perks>
+			<Perk game_mode="All" name="Light Armor" description="+5 Armor" icon="PerkArmorPadding" perk_list="1">
+				<OnSpawnEffect type="ArmorOnSpawn" value="5" />
+			</Perk>
+			<Perk game_mode="All" name="Reinforced Armor" description="+12 Armor" icon="PerkToughness" perk_list="1">
+				<OnSpawnEffect type="ArmorOnSpawn" value="12" />
+			</Perk>
+		</Perks>
+	</MPClassDivision>
+	<!-- ALberic Devald-->
+	<MPClassDivision id="mp_ALberic_Devald_hero" hero="mp_ALberic_Devald_hero" troop="mp_ALberic_Devald_troop" hero_mount_idle_anim="act_vlandia_mp_vanguard_mount_idle" troop_mount_idle_anim="act_horse_idle_1" multiplier="0.30" cost="200" icon="Cavalry_Heavy" melee_ai="75" ranged_ai="50" armor="40" movement_speed="0.73" combat_movement_speed="0.65" acceleration="2.8" hitpoints="100">
+		<Perks>
+			<Perk game_mode="All" name="Light Armor" description="+5 Armor" icon="PerkArmorPadding" perk_list="1">
+				<OnSpawnEffect type="ArmorOnSpawn" value="5" />
+			</Perk>
+			<Perk game_mode="All" name="Reinforced Armor" description="+12 Armor" icon="PerkToughness" perk_list="1">
+				<OnSpawnEffect type="ArmorOnSpawn" value="12" />
+			</Perk>
+		</Perks>
+	</MPClassDivision>
+</MPClassDivisions>

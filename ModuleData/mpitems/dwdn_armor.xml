@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Items>
+	<!--DWDN ARMOR HEAD-->
+	<Item multiplayer_item="true" id="archer_kettle_1_bare" name="Banobranny Helmet" subtype="head_armor" mesh="archer_kettle_1_bare" culture="Culture.dwdn" weight="1.8" appearance="1.4" Type="HeadArmor">
+		<ItemComponent>
+			<Armor head_armor="25" has_gender_variations="false" hair_cover_type="all" beard_cover_type="none" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="officer_dwdn_bacinet" name="Officer Bacinet" subtype="head_armor" mesh="officer_dwdn_bacinet" culture="Culture.dwdn" weight="3.4" appearance="1.4" Type="HeadArmor">
+		<ItemComponent>
+			<Armor head_armor="46" has_gender_variations="false" hair_cover_type="all" beard_cover_type="none" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="knight_klappvisor" name="Knight Klappvisor" subtype="head_armor" mesh="knight_klappvisor" culture="Culture.dwdn" weight="3.8" appearance="1.4" Type="HeadArmor">
+		<ItemComponent>
+			<Armor head_armor="48" has_gender_variations="false" hair_cover_type="all" beard_cover_type="none" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="banerman_bascinet" name="Bannerman Bascinet" subtype="head_armor" mesh="banerman_bascinet" culture="Culture.dwdn" weight="3.0" appearance="1.4" Type="HeadArmor">
+		<ItemComponent>
+			<Armor head_armor="40" has_gender_variations="false" hair_cover_type="all" beard_cover_type="none" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="crossbowman_kettle_1" name="Banobranny Helmet" subtype="head_armor" mesh="crossbowman_kettle_1" culture="Culture.dwdn" weight="2.0" appearance="1.4" Type="HeadArmor">
+		<ItemComponent>
+			<Armor head_armor="28" has_gender_variations="false" hair_cover_type="all" beard_cover_type="none" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="dwdn_pikeman_kettlehad" name="Banobranny Helmet" subtype="head_armor" mesh="dwdn_pikeman_kettlehad" culture="Culture.dwdn" weight="2.5" appearance="1.4" Type="HeadArmor">
+		<ItemComponent>
+			<Armor head_armor="35" has_gender_variations="false" hair_cover_type="all" beard_cover_type="none" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="Banobranny_helmet" name="Banobranny Helmet" subtype="head_armor" mesh="Banobranny_helmet" culture="Culture.dwdn" weight="2.2" appearance="1.4" Type="HeadArmor">
+		<ItemComponent>
+			<Armor head_armor="28" has_gender_variations="false" hair_cover_type="all" beard_cover_type="all" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="armeds_bacinet_with_facemask" name="armeds_bacinet_with_facemask" subtype="head_armor" mesh="armeds_bacinet_with_facemask" culture="Culture.dwdn" weight="3.5" appearance="1.4" Type="HeadArmor">
+		<ItemComponent>
+			<Armor head_armor="45" has_gender_variations="false" hair_cover_type="all" beard_cover_type="all" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="ratay_kettle_bare" name="ratay_kettle_bare" subtype="head_armor" mesh="ratay_kettle_bare" culture="Culture.dwdn" weight="1.5" appearance="1.4" Type="HeadArmor">
+		<ItemComponent>
+			<Armor head_armor="20" has_gender_variations="false" hair_cover_type="all" beard_cover_type="none" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="bannreich_cav_helmet_visor" name="Bannreich Cavalry Helmet with Visor" subtype="head_armor" mesh="bannreich_cav_helmet_visor" culture="Culture.dwdn" weight="3.5" appearance="1.4" Type="HeadArmor">
+		<ItemComponent>
+			<Armor head_armor="46" has_gender_variations="false" hair_cover_type="all" beard_cover_type="all" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="baron_roondalt_vendelhelmet_1" name="baron_roondalt_vendelhelmet_1" subtype="head_armor" mesh="baron_roondalt_vendelhelmet_1" culture="Culture.dwdn" weight="3.5" appearance="1.4" Type="HeadArmor">
+		<ItemComponent>
+			<Armor head_armor="48" has_gender_variations="false" hair_cover_type="all" beard_cover_type="all" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="bergen_bascinet_hounskull" name="bergen_bascinet_hounskull" subtype="head_armor" mesh="bergen_bascinet_hounskull" culture="Culture.dwdn" weight="3.8" appearance="1.4" Type="HeadArmor">
+		<ItemComponent>
+			<Armor head_armor="50" has_gender_variations="false" hair_cover_type="all" beard_cover_type="none" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="finnard_helmet" name="Finnard Helmet" subtype="head_armor" mesh="finnard_armer" culture="Culture.dwdn" weight="3.8" appearance="1.4" Type="HeadArmor">
+		<ItemComponent>
+			<Armor head_armor="50" has_gender_variations="false" hair_cover_type="all" beard_cover_type="all" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<!--DWDN ARMOR BODY-->
+	<Item multiplayer_item="true" id="arch_bannreich_gambeson" name="Bannreich Archer Gambeson" subtype="body_armor" mesh="arch_bannreich_gambeson" culture="Culture.dwdn" weight="6.0" difficulty="0" appearance="1.4" Type="BodyArmor">
+		<ItemComponent>
+			<Armor body_armor="14" leg_armor="6" arm_armor="4" has_gender_variations="false" modifier_group="plate" covers_body="true" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="dwdn_pikeman_cuirass_v1" name="DWDN Pikeman Cuirass v1" subtype="body_armor" mesh="dwdn_pikeman_cuirass_v1" culture="Culture.dwdn" weight="17.0" difficulty="0" appearance="1.4" Type="BodyArmor">
+		<ItemComponent>
+			<Armor body_armor="32" leg_armor="14" arm_armor="10" has_gender_variations="false" modifier_group="plate" covers_body="true" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="knight_cuirass" name="DWDN Knight Cuirass" subtype="body_armor" mesh="knight_cuirass" culture="Culture.dwdn" weight="24.0" difficulty="0" appearance="1.4" Type="BodyArmor">
+		<ItemComponent>
+			<Armor body_armor="44" leg_armor="18" arm_armor="14" has_gender_variations="false" modifier_group="plate" covers_body="true" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="bannerman_cuirass" name="DWDN Bannerman Cuirass" subtype="body_armor" mesh="bannerman_cuirass" culture="Culture.dwdn" weight="18.0" difficulty="0" appearance="1.4" Type="BodyArmor">
+		<ItemComponent>
+			<Armor body_armor="34" leg_armor="14" arm_armor="10" has_gender_variations="false" modifier_group="plate" covers_body="true" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="officer_brigantine" name="DWDN Officer Brigantine" subtype="body_armor" mesh="officer_brigantine" culture="Culture.dwdn" weight="21.0" difficulty="0" appearance="1.4" Type="BodyArmor">
+		<ItemComponent>
+			<Armor body_armor="40" leg_armor="16" arm_armor="14" has_gender_variations="false" modifier_group="plate" covers_body="true" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="king_daewden_covered_cuirass" name="king_daewden_covered_cuirass" subtype="body_armor" mesh="devald_tabard_belt" culture="Culture.dwdn" weight="25.0" difficulty="0" appearance="1.4" Type="BodyArmor">
+		<ItemComponent>
+			<Armor body_armor="45" leg_armor="18" arm_armor="15" has_gender_variations="false" modifier_group="plate" covers_body="true" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="crossbowman_surcoat_gambeson" name="Bannreich Crossbowman Surcoat Gambeson" subtype="body_armor" mesh="crossbowman_surcoat_gambeson" culture="Culture.dwdn" weight="9.0" difficulty="0" appearance="1.4" Type="BodyArmor">
+		<ItemComponent>
+			<Armor body_armor="20" leg_armor="8" arm_armor="6" has_gender_variations="false" modifier_group="plate" covers_body="true" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="Banobranny_surcoat" name="Banobranny Surcoat" subtype="body_armor" mesh="banobraniy_surcoat_gambeson_heraldry" culture="Culture.dwdn" weight="13.0" difficulty="0" appearance="1.4" Type="BodyArmor">
+		<ItemComponent>
+			<Armor body_armor="25" leg_armor="10" arm_armor="8" has_gender_variations="false" modifier_group="plate" covers_body="true" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="armeds_striped_cuirass" name="Armeds Striped Cuirass" subtype="body_armor" mesh="armeds_striped_cuirass" culture="Culture.dwdn" weight="21.0" difficulty="0" appearance="1.4" Type="BodyArmor">
+		<ItemComponent>
+			<Armor body_armor="38" leg_armor="16" arm_armor="12" has_gender_variations="false" modifier_group="plate" covers_body="true" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="ratay_overcoat" name="Ratay Overcoat" subtype="body_armor" mesh="ratay_overcoat" culture="Culture.dwdn" weight="4.0" difficulty="0" appearance="1.4" Type="BodyArmor">
+		<ItemComponent>
+			<Armor body_armor="10" leg_armor="4" arm_armor="2" has_gender_variations="false" modifier_group="plate" covers_body="true" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="plate_cav_cuirass" name="plate_cav_cuirass" subtype="body_armor" mesh="plate_cav_cuirass" culture="Culture.dwdn" weight="23.0" difficulty="0" appearance="1.4" Type="BodyArmor">
+		<ItemComponent>
+			<Armor body_armor="42" leg_armor="16" arm_armor="14" has_gender_variations="false" modifier_group="plate" covers_body="true" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="bannreich_cav_body2" name="Bannreich Cavalry Body" subtype="body_armor" mesh="cav_bannreich_coat_of_plates2" culture="Culture.dwdn" weight="23.0" difficulty="0" appearance="1.4" Type="BodyArmor">
+		<ItemComponent>
+			<Armor body_armor="42" leg_armor="16" arm_armor="14" has_gender_variations="false" modifier_group="plate" covers_body="true" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="bannreich_cav_body3" name="Bannreich Cavalry Body" subtype="body_armor" mesh="cav_bannreich_coat_of_plates3" culture="Culture.dwdn" weight="23.0" difficulty="0" appearance="1.4" Type="BodyArmor">
+		<ItemComponent>
+			<Armor body_armor="42" leg_armor="16" arm_armor="14" has_gender_variations="false" modifier_group="plate" covers_body="true" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="run_body1" name="run_body1" subtype="body_armor" mesh="run_body1" culture="Culture.dwdn" weight="23.0" difficulty="0" appearance="1.4" Type="BodyArmor">
+		<ItemComponent>
+			<Armor body_armor="42" leg_armor="16" arm_armor="14" has_gender_variations="false" modifier_group="plate" covers_body="true" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="bergen_cuirass" name="bergen_cuirass" subtype="body_armor" mesh="bergen_cuirass" culture="Culture.dwdn" weight="23.0" difficulty="0" appearance="1.4" Type="BodyArmor">
+		<ItemComponent>
+			<Armor body_armor="43" leg_armor="17" arm_armor="14" has_gender_variations="false" modifier_group="plate" covers_body="true" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="Baron_Finnard_body" name="Baron Finnard Body" subtype="body_armor" mesh="Baron_Finnard_plate_body" culture="Culture.dwdn" weight="25.0" difficulty="0" appearance="1.4" Type="BodyArmor">
+		<ItemComponent>
+			<Armor body_armor="46" leg_armor="18" arm_armor="15" has_gender_variations="false" modifier_group="plate" covers_body="true" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<!--DWDN ARMOR CAPE-->
+	<Item multiplayer_item="true" id="ratay_chain_shoulder" name="Ratay Chain Shoulder" mesh="ratay_chain_shoulder" culture="Culture.dwdn" weight="1.0" appearance="1.4" Type="Cape">
+		<ItemComponent>
+			<Armor body_armor="2" has_gender_variations="false" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="archer_scarf" name="Archer Scarf" mesh="archer_scarf" culture="Culture.dwdn" weight="0.4" appearance="1.4" Type="Cape">
+		<ItemComponent>
+			<Armor body_armor="1" has_gender_variations="false" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="Baron_rundal_cape" name="Baron_rundal_cape" mesh="Baron_rundal_cape" culture="Culture.dwdn" weight="1.2" appearance="1.4" Type="Cape">
+		<ItemComponent>
+			<Armor body_armor="2" has_gender_variations="false" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="bergen_hood" name="bergen_hood" mesh="bergen_hood" culture="Culture.dwdn" weight="0.8" appearance="1.4" Type="Cape">
+		<ItemComponent>
+			<Armor body_armor="2" has_gender_variations="false" modifier_group="plate" material_type="Cloth" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="finard_cape" name="Finnard Cape" mesh="finard_cape" culture="Culture.dwdn" weight="1.4" appearance="1.4" Type="Cape">
+		<ItemComponent>
+			<Armor body_armor="3" has_gender_variations="false" modifier_group="plate" material_type="Cloth" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<!--DWDN ARMOR LEGS-->
+	<Item multiplayer_item="true" id="archer_leatherboots" name="Bannreich Archer Pants" mesh="archer_leatherboots" culture="Culture.dwdn" weight="1.0" Type="LegArmor">
+		<ItemComponent>
+			<Armor leg_armor="6" covers_legs="true" modifier_group="cloth_unarmoured" material_type="Cloth" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="archer_leatherboots" name="Bannreich Archer Pants" mesh="archer_leatherboots" culture="Culture.dwdn" weight="1.0" Type="LegArmor">
+		<ItemComponent>
+			<Armor leg_armor="6" covers_legs="true" modifier_group="cloth_unarmoured" material_type="Cloth" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="pikemen_dwdn_plate_leg" name="Bannreich Pikeman Plate Legs" mesh="pikemen_dwdn_plate_leg" culture="Culture.dwdn" weight="2.8" Type="LegArmor">
+		<ItemComponent>
+			<Armor leg_armor="18" covers_legs="true" modifier_group="cloth_unarmoured" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="knight_legs" name="Bannreich Knight Plate Legs" mesh="knight_legs" culture="Culture.dwdn" weight="3.0" Type="LegArmor">
+		<ItemComponent>
+			<Armor leg_armor="20" covers_legs="true" modifier_group="cloth_unarmoured" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="bannerman_legs" name="Bannreich Bannerman Plate Legs" mesh="bannerman_legs" culture="Culture.dwdn" weight="2.8" Type="LegArmor">
+		<ItemComponent>
+			<Armor leg_armor="18" covers_legs="true" modifier_group="cloth_unarmoured" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="officer_legs" name="Bannreich Officer Plate Legs" mesh="officer_legs" culture="Culture.dwdn" weight="2.9" Type="LegArmor">
+		<ItemComponent>
+			<Armor leg_armor="19" covers_legs="true" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="crossbowman_leggings" name="Bannreich Crossbowman Leggings" mesh="crossbowman_leggings" culture="Culture.dwdn" weight="1.4" Type="LegArmor">
+		<ItemComponent>
+			<Armor leg_armor="10" covers_legs="true" modifier_group="cloth_unarmoured" material_type="Cloth" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="banobranyi_leg" name="Banobranny Mail Chausses" mesh="banobranyi_leg" culture="Culture.dwdn" weight="2.2" Type="LegArmor">
+		<ItemComponent>
+			<Armor leg_armor="14" covers_legs="true" modifier_group="cloth_unarmoured" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="ratay_hose" name="Ratay Hose" mesh="ratay_hose" culture="Culture.dwdn" weight="0.5" Type="LegArmor">
+		<ItemComponent>
+			<Armor leg_armor="2" covers_legs="true" modifier_group="cloth_unarmoured" material_type="Cloth" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="plate_legs_dwdn" name="plate_legs_dwdn" mesh="plate_legs_dwdn" culture="Culture.dwdn" weight="3.0" Type="LegArmor">
+		<ItemComponent>
+			<Armor leg_armor="20" covers_legs="true" modifier_group="cloth_unarmoured" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="king_plate_legs" name="king_plate_legs" mesh="king_plate_legs" culture="Culture.dwdn" weight="3.1" Type="LegArmor">
+		<ItemComponent>
+			<Armor leg_armor="21" covers_legs="true" modifier_group="cloth_unarmoured" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="cav_bannreich_plate_legs" name="Cav Bannreich Plate Legs" mesh="cav_bannreich_plate_legs" culture="Culture.dwdn" weight="2.9" Type="LegArmor">
+		<ItemComponent>
+			<Armor leg_armor="19" covers_legs="true" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="rundal_leg" name="rundal_leg" mesh="rundal_leg" culture="Culture.dwdn" weight="1.5" Type="LegArmor">
+		<ItemComponent>
+			<Armor leg_armor="10" covers_legs="true" modifier_group="cloth_unarmoured" material_type="Cloth" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="bergen_legs" name="bergen_legs" mesh="bergen_legs" culture="Culture.dwdn" weight="3.0" Type="LegArmor">
+		<ItemComponent>
+			<Armor leg_armor="20" covers_legs="true" modifier_group="cloth_unarmoured" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<Item multiplayer_item="true" id="Baron_Finard_gothiclegs" name="Baron Finard Gothic Legs" mesh="Baron_Finard_gothiclegs_1" culture="Culture.dwdn" weight="3.1" Type="LegArmor">
+		<ItemComponent>
+			<Armor leg_armor="21" covers_legs="true" modifier_group="cloth_unarmoured" material_type="Plate" />
+		</ItemComponent>
+		<Flags UseTeamColor="false" />
+	</Item>
+	<!--DWDN ARMOR GlOVES-->
+	<Item id="arch_banreich_leatherglove" name="{=0}Heavy Leather Gloves" mesh="arch_banreich_leatherglove" culture="Culture.dwdn" weight="0.5" difficulty="0" appearance="3" Type="HandArmor">
+		<ItemComponent>
+			<Armor arm_armor="6" covers_hands="true" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+	</Item>
+	<Item id="plate_gauntlet" name="{=0}Heavy Leather Gloves" mesh="plate_gauntlet" culture="Culture.dwdn" weight="1.6" difficulty="0" appearance="3" Type="HandArmor">
+		<ItemComponent>
+			<Armor arm_armor="18" covers_hands="true" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+	</Item>
+	<Item id="plate_round_gauntlet" name="{=0}Heavy Leather Gloves" mesh="plate_round_gauntlet" culture="Culture.dwdn" weight="1.6" difficulty="0" appearance="3" Type="HandArmor">
+		<ItemComponent>
+			<Armor arm_armor="18" covers_hands="true" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+	</Item>
+	<Item id="gothic_gloves" name="{=0}Heavy Leather Gloves" mesh="gothic_gloves" culture="Culture.dwdn" weight="1.6" difficulty="0" appearance="3" Type="HandArmor">
+		<ItemComponent>
+			<Armor arm_armor="18" covers_hands="true" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+	</Item>
+	<Item id="king_plate_gauntlet" name="{=0}Heavy Leather Gloves" mesh="gothic_gloves" culture="Culture.dwdn" weight="1.6" difficulty="0" appearance="3" Type="HandArmor">
+		<ItemComponent>
+			<Armor arm_armor="18" covers_hands="true" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+	</Item>
+	<Item id="crossbowman_mailgoves" name="{=0}Heavy Leather Gloves" mesh="crossbowman_mailgoves" culture="Culture.dwdn" weight="1.2" difficulty="0" appearance="3" Type="HandArmor">
+		<ItemComponent>
+			<Armor arm_armor="12" covers_hands="true" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+	</Item>
+	<Item id="rundal_gloves_second" name="{=0}Heavy Leather Gloves" mesh="rundal_gloves_second" culture="Culture.dwdn" weight="1.6" difficulty="0" appearance="3" Type="HandArmor">
+		<ItemComponent>
+			<Armor arm_armor="18" covers_hands="true" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+	</Item>
+	<Item id="bergen_gloves" name="{=0}Heavy Leather Gloves" mesh="bergen_gloves" culture="Culture.dwdn" weight="1.7" difficulty="0" appearance="3" Type="HandArmor">
+		<ItemComponent>
+			<Armor arm_armor="19" covers_hands="true" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+	</Item>
+	<Item id="Baron_Finard_gauntlet" name="{=0}Heavy Leather Gloves" mesh="Baron_Finard_gothicgauntlet_1" culture="Culture.dwdn" weight="1.8" difficulty="0" appearance="3" Type="HandArmor">
+		<ItemComponent>
+			<Armor arm_armor="20" covers_hands="true" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+	</Item>
+	<Item id="mail__armeds_mitten" name="{=0}Heavy Leather Gloves" mesh="mail__armeds_mitten" culture="Culture.dwdn" weight="1.6" difficulty="0" appearance="3" Type="HandArmor">
+		<ItemComponent>
+			<Armor arm_armor="18" covers_hands="true" modifier_group="plate" material_type="Plate" />
+		</ItemComponent>
+	</Item>
+</Items>

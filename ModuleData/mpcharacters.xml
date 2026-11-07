@@ -1,0 +1,947 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MPCharacters>
+	<!-- King (Белый боевой конь + кольчужная попона) -->
+	<NPCCharacter id="mp_ALberic_Devald_hero" default_group="Cavalry" level="25" name="{=hoinf1}ALberic Devald" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="150" />
+			<skill id="OneHanded" value="150" />
+			<skill id="TwoHanded" value="140" />
+			<skill id="Polearm" value="140" />
+			<skill id="Crossbow" value="30" />
+			<skill id="Bow" value="30" />
+			<skill id="Throwing" value="80" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Item1" id="Item.devalds_bastard_sword" />
+				<equipment slot="Body" id="Item.king_daewden_covered_cuirass" />
+				<equipment slot="Leg" id="Item.king_plate_legs" />
+				<equipment slot="Gloves" id="Item.king_plate_gauntlet" />
+				<equipment slot="Horse" id="Item.mp_battania_horse_war" />
+				<equipment slot="HorseHarness" id="Item.mp_chain_barding" />
+				<equipment slot="Head" id="Item.armeds_bacinet_with_facemask" />
+				<equipment slot="Item0" id="Item.mp_vlandian_heavy_lance" />
+				<equipment slot="Item2" id="Item.zbroyniy_shield_silver1" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<!-- Bergen Klaus -->
+	<NPCCharacter id="mp_Bergen_Klaus_hero" default_group="Cavalry" level="25" name="{=hoinf1}Bergen Klaus" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="150" />
+			<skill id="OneHanded" value="140" />
+			<skill id="TwoHanded" value="130" />
+			<skill id="Polearm" value="140" />
+			<skill id="Crossbow" value="30" />
+			<skill id="Bow" value="30" />
+			<skill id="Throwing" value="80" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Item0" id="Item.mp_vlandian_heavy_lance" />
+				<equipment slot="Item1" id="Item.bergens_bastard_sword" />
+				<equipment slot="Item2" id="Item.bergen_shield" />
+				<equipment slot="Head" id="Item.bergen_bascinet_hounskull" />
+				<equipment slot="Body" id="Item.bergen_cuirass" />
+				<equipment slot="Leg" id="Item.bergen_legs" />
+				<equipment slot="Cape" id="Item.bergen_hood" />
+				<equipment slot="Gloves" id="Item.gothic_gloves" />
+				<equipment slot="Horse" id="Item.mp_vlandia_horse" />
+				<equipment slot="HorseHarness" id="Item.mp_chain_barding" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<!-- Finnard Valerian -->
+	<NPCCharacter id="mp_Finnard_Valerian_hero" default_group="Cavalry" level="25" name="{=hoinf1}Finnard Valerian" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="150" />
+			<skill id="OneHanded" value="140" />
+			<skill id="TwoHanded" value="120" />
+			<skill id="Polearm" value="150" />
+			<skill id="Crossbow" value="30" />
+			<skill id="Bow" value="30" />
+			<skill id="Throwing" value="80" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Item1" id="Item.finnard_spear" />
+				<equipment slot="Item2" id="Item.finnard_shield" />
+				<equipment slot="Head" id="Item.finnard_helmet" />
+				<equipment slot="Body" id="Item.Baron_Finnard_body" />
+				<equipment slot="Leg" id="Item.Baron_Finard_gothiclegs" />
+				<equipment slot="Cape" id="Item.finard_cape" />
+				<equipment slot="Gloves" id="Item.Baron_Finard_gauntlet" />
+				<equipment slot="Horse" id="Item.mp_vlandia_horse" />
+				<equipment slot="HorseHarness" id="Item.mp_chain_barding" />
+				<equipment slot="Item0" id="Item.mp_vlandia_cavalry_sword" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<!-- DWDN_Cav -->
+	<!-- DWDN_Cav -->
+	<NPCCharacter id="mp_DWDN_Cav_hero" default_group="Cavalry" level="25" name="{=hoinf1}Daewden cavalry" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="140" />
+			<skill id="OneHanded" value="90" />
+			<skill id="TwoHanded" value="60" />
+			<skill id="Polearm" value="130" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="60" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Horse" id="Item.mp_vlandia_horse" />
+				<equipment slot="HorseHarness" id="Item.mp_chain_barding" />
+				<equipment slot="Gloves" id="Item.plate_gauntlet" />
+				<equipment slot="Body" id="Item.plate_cav_cuirass" />
+				<equipment slot="Head" id="Item.bannreich_cav_helmet_visor" />
+				<equipment slot="Leg" id="Item.cav_bannreich_plate_legs" />
+				<!-- Базовое оружие: копьё + меч + щит -->
+				<equipment slot="Item0" id="Item.mp_vlandian_heavy_lance" />
+				<equipment slot="Item1" id="Item.mp_vlandia_cavalry_sword" />
+				<equipment slot="Item2" id="Item.bann_reich_cav_shield1" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<!-- Ratay -->
+	<NPCCharacter id="mp_Ratay_hero" default_group="Infantry" level="25" name="{=hoinf1}Ratay" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="40" />
+			<skill id="OneHanded" value="50" />
+			<skill id="TwoHanded" value="40" />
+			<skill id="Polearm" value="50" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="50" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Body" id="Item.ratay_overcoat" />
+				<equipment slot="Head" id="Item.ratay_kettle_bare" />
+				<equipment slot="Leg" id="Item.ratay_hose" />
+				<equipment slot="Item0" id="Item.mp_western_short_spear" />
+				<equipment slot="Item2" id="Item.ratay_1_shield" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Body" id="Item.ratay_overcoat" />
+				<equipment slot="Head" id="Item.ratay_kettle_bare" />
+				<equipment slot="Leg" id="Item.ratay_hose" />
+				<equipment slot="Item0" id="Item.mp_western_short_spear" />
+				<equipment slot="Item2" id="Item.ratay_2_shield" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<!-- Zbroyniy -->
+	<NPCCharacter id="mp_Zbroyniy_hero" default_group="Infantry" level="25" name="{=hoinf1}Zbroyniy" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="40" />
+			<skill id="OneHanded" value="120" />
+			<skill id="TwoHanded" value="100" />
+			<skill id="Polearm" value="100" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="70" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_gauntlet" />
+				<equipment slot="Body" id="Item.armeds_striped_cuirass" />
+				<equipment slot="Head" id="Item.armeds_bacinet_with_facemask" />
+				<equipment slot="Leg" id="Item.plate_legs_dwdn" />
+				<equipment slot="Item2" id="Item.zbroyniy_shield1" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_gauntlet" />
+				<equipment slot="Body" id="Item.armeds_striped_cuirass" />
+				<equipment slot="Head" id="Item.armeds_bacinet_with_facemask" />
+				<equipment slot="Leg" id="Item.plate_legs_dwdn" />
+				<equipment slot="Item2" id="Item.zbroyniy_shield_empty1" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_gauntlet" />
+				<equipment slot="Body" id="Item.armeds_striped_cuirass" />
+				<equipment slot="Head" id="Item.armeds_bacinet_with_facemask" />
+				<equipment slot="Leg" id="Item.plate_legs_dwdn" />
+				<equipment slot="Item2" id="Item.zbroyniy_shield_silver1" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<!-- Officer -->
+	<NPCCharacter id="mp_Officer_hero" default_group="Infantry" level="25" name="{=hoinf1}Officer" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="50" />
+			<skill id="OneHanded" value="140" />
+			<skill id="TwoHanded" value="120" />
+			<skill id="Polearm" value="120" />
+			<skill id="Crossbow" value="30" />
+			<skill id="Bow" value="30" />
+			<skill id="Throwing" value="80" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_round_gauntlet" />
+				<equipment slot="Body" id="Item.officer_brigantine" />
+				<equipment slot="Head" id="Item.officer_dwdn_bacinet" />
+				<equipment slot="Leg" id="Item.officer_legs" />
+				<equipment slot="Item2" id="Item.zbroyniy_shield1" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_round_gauntlet" />
+				<equipment slot="Body" id="Item.officer_brigantine" />
+				<equipment slot="Head" id="Item.officer_dwdn_bacinet" />
+				<equipment slot="Leg" id="Item.officer_legs" />
+				<equipment slot="Item2" id="Item.zbroyniy_shield_empty1" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_round_gauntlet" />
+				<equipment slot="Body" id="Item.officer_brigantine" />
+				<equipment slot="Head" id="Item.officer_dwdn_bacinet" />
+				<equipment slot="Leg" id="Item.officer_legs" />
+				<equipment slot="Item2" id="Item.zbroyniy_shield_silver1" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<!-- Sotnik -->
+	<NPCCharacter id="mp_Sotnik_hero" default_group="Infantry" level="25" name="{=hoinf1}Sotnik" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="60" />
+			<skill id="OneHanded" value="150" />
+			<skill id="TwoHanded" value="130" />
+			<skill id="Polearm" value="130" />
+			<skill id="Crossbow" value="30" />
+			<skill id="Bow" value="30" />
+			<skill id="Throwing" value="80" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.gothic_gloves" />
+				<equipment slot="Body" id="Item.dwdn_pikeman_cuirass_v1" />
+				<equipment slot="Cape" id="Item.Baron_rundal_cape" />
+				<equipment slot="Head" id="Item.armeds_bacinet_with_facemask" />
+				<equipment slot="Leg" id="Item.plate_legs_dwdn" />
+				<equipment slot="Item0" id="Item.mp_battania_noble_sword" />
+				<equipment slot="Item1" id="Item.zbroyniy_shield_silver1" />
+				<equipment slot="Item2" id="Item.mp_western_long_spear" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<!-- Knight -->
+	<NPCCharacter id="mp_Knight_hero" default_group="Cavalry" level="25" name="{=hoinf1}Knight" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="150" />
+			<skill id="OneHanded" value="130" />
+			<skill id="TwoHanded" value="110" />
+			<skill id="Polearm" value="150" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="70" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_round_gauntlet" />
+				<equipment slot="Body" id="Item.knight_cuirass" />
+				<equipment slot="Head" id="Item.knight_klappvisor" />
+				<equipment slot="Leg" id="Item.knight_legs" />
+				<equipment slot="Item2" id="Item.zbroyniy_shield1" />
+				<equipment slot="Item0" id="Item.mp_vlandian_heavy_lance" />
+				<equipment slot="Item1" id="Item.mp_vlandia_cavalry_sword" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_round_gauntlet" />
+				<equipment slot="Body" id="Item.knight_cuirass" />
+				<equipment slot="Head" id="Item.knight_klappvisor" />
+				<equipment slot="Leg" id="Item.knight_legs" />
+				<equipment slot="Item2" id="Item.zbroyniy_shield_empty1" />
+				<equipment slot="Item0" id="Item.mp_vlandian_heavy_lance" />
+				<equipment slot="Item1" id="Item.mp_vlandia_cavalry_sword" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_round_gauntlet" />
+				<equipment slot="Body" id="Item.knight_cuirass" />
+				<equipment slot="Head" id="Item.knight_klappvisor" />
+				<equipment slot="Leg" id="Item.knight_legs" />
+				<equipment slot="Item2" id="Item.zbroyniy_shield_silver1" />
+				<equipment slot="Item0" id="Item.mp_vlandian_heavy_lance" />
+				<equipment slot="Item1" id="Item.mp_vlandia_cavalry_sword" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<!-- Pikeman -->
+	<NPCCharacter id="mp_Pikeman_hero" default_group="Infantry" level="25" name="{=hoinf1}Pikeman" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="40" />
+			<skill id="OneHanded" value="60" />
+			<skill id="TwoHanded" value="50" />
+			<skill id="Polearm" value="130" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="40" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_gauntlet" />
+				<equipment slot="Body" id="Item.dwdn_pikeman_cuirass_v1" />
+				<equipment slot="Head" id="Item.dwdn_pikeman_kettlehad" />
+				<equipment slot="Leg" id="Item.pikemen_dwdn_plate_leg" />
+				<equipment slot="Item0" id="Item.pike1" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<!-- Banobranny -->
+	<NPCCharacter id="mp_Banobranny_hero" default_group="Infantry" level="25" name="{=hoinf1}Banobranny" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="40" />
+			<skill id="OneHanded" value="80" />
+			<skill id="TwoHanded" value="60" />
+			<skill id="Polearm" value="80" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="60" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.crossbowman_mailgoves" />
+				<equipment slot="Body" id="Item.Banobranny_surcoat" />
+				<equipment slot="Head" id="Item.Banobranny_helmet" />
+				<equipment slot="Leg" id="Item.banobranyi_leg" />
+				<equipment slot="Item2" id="Item.bannpbran_shield1" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.crossbowman_mailgoves" />
+				<equipment slot="Body" id="Item.Banobranny_surcoat" />
+				<equipment slot="Head" id="Item.Banobranny_helmet" />
+				<equipment slot="Leg" id="Item.banobranyi_leg" />
+				<equipment slot="Item2" id="Item.bannpbran_shield2" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.crossbowman_mailgoves" />
+				<equipment slot="Body" id="Item.Banobranny_surcoat" />
+				<equipment slot="Head" id="Item.Banobranny_helmet" />
+				<equipment slot="Leg" id="Item.banobranyi_leg" />
+				<equipment slot="Item2" id="Item.bannpbran_shield3" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.crossbowman_mailgoves" />
+				<equipment slot="Body" id="Item.Banobranny_surcoat" />
+				<equipment slot="Head" id="Item.Banobranny_helmet" />
+				<equipment slot="Leg" id="Item.banobranyi_leg" />
+				<equipment slot="Item2" id="Item.bannpbran_shield4" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<!-- Bannerman -->
+	<NPCCharacter id="mp_Bannerman_hero" default_group="Infantry" level="25" name="{=hoinf1}Bannerman" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="40" />
+			<skill id="OneHanded" value="100" />
+			<skill id="TwoHanded" value="70" />
+			<skill id="Polearm" value="100" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="50" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_round_gauntlet" />
+				<equipment slot="Body" id="Item.bannerman_cuirass" />
+				<equipment slot="Head" id="Item.banerman_bascinet" />
+				<equipment slot="Leg" id="Item.bannerman_legs" />
+				<equipment slot="Item0" id="Item.mp_battania_noble_sword" />
+				<equipment slot="Item1" id="Item.dwdn_banner1" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_round_gauntlet" />
+				<equipment slot="Body" id="Item.bannerman_cuirass" />
+				<equipment slot="Head" id="Item.banerman_bascinet" />
+				<equipment slot="Leg" id="Item.bannerman_legs" />
+				<equipment slot="Item0" id="Item.mp_battania_noble_sword" />
+				<equipment slot="Item1" id="Item.dwdn_banner1" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_round_gauntlet" />
+				<equipment slot="Body" id="Item.bannerman_cuirass" />
+				<equipment slot="Head" id="Item.banerman_bascinet" />
+				<equipment slot="Leg" id="Item.bannerman_legs" />
+				<equipment slot="Item0" id="Item.mp_battania_noble_sword" />
+				<equipment slot="Item1" id="Item.dwdn_banner1" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<!-- Archer -->
+	<NPCCharacter id="mp_DWDN_Archer_hero" default_group="Infantry" level="25" name="{=hoinf1}Daewden Archer" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="30" />
+			<skill id="OneHanded" value="60" />
+			<skill id="TwoHanded" value="40" />
+			<skill id="Polearm" value="40" />
+			<skill id="Crossbow" value="80" />
+			<skill id="Bow" value="110" />
+			<skill id="Throwing" value="100" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.arch_banreich_leatherglove" />
+				<equipment slot="Body" id="Item.arch_bannreich_gambeson" />
+				<equipment slot="Head" id="Item.archer_kettle_1_bare" />
+				<equipment slot="Cape" id="Item.archer_scarf" />
+				<equipment slot="Leg" id="Item.archer_leatherboots" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<!-- Crossbowman -->
+	<NPCCharacter id="mp_DWDN_Crossbowman_hero" default_group="Infantry" level="25" name="{=hoinf1}Daewden Crossbowman" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="30" />
+			<skill id="OneHanded" value="70" />
+			<skill id="TwoHanded" value="50" />
+			<skill id="Polearm" value="50" />
+			<skill id="Crossbow" value="120" />
+			<skill id="Bow" value="40" />
+			<skill id="Throwing" value="50" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.crossbowman_mailgoves" />
+				<equipment slot="Body" id="Item.crossbowman_surcoat_gambeson" />
+				<equipment slot="Head" id="Item.crossbowman_kettle_1" />
+				<equipment slot="Leg" id="Item.crossbowman_leggings" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<NPCCharacter id="mp_ALberic_Devald_troop" default_group="Cavalry" level="25" name="{=hoinf1}ALberic Devald" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="150" />
+			<skill id="OneHanded" value="150" />
+			<skill id="TwoHanded" value="140" />
+			<skill id="Polearm" value="140" />
+			<skill id="Crossbow" value="30" />
+			<skill id="Bow" value="30" />
+			<skill id="Throwing" value="80" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Item1" id="Item.devalds_bastard_sword" />
+				<equipment slot="Body" id="Item.king_daewden_covered_cuirass" />
+				<equipment slot="Leg" id="Item.king_plate_legs" />
+				<equipment slot="Gloves" id="Item.king_plate_gauntlet" />
+				<equipment slot="Horse" id="Item.mp_battania_horse_war" />
+				<equipment slot="HorseHarness" id="Item.mp_chain_barding" />
+				<equipment slot="Head" id="Item.armeds_bacinet_with_facemask" />
+				<equipment slot="Item0" id="Item.mp_vlandian_heavy_lance" />
+				<equipment slot="Item2" id="Item.zbroyniy_shield_silver1" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<NPCCharacter id="mp_Bergen_Klaus_troop" default_group="Cavalry" level="25" name="{=hoinf1}Bergen Klaus" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="150" />
+			<skill id="OneHanded" value="140" />
+			<skill id="TwoHanded" value="130" />
+			<skill id="Polearm" value="140" />
+			<skill id="Crossbow" value="30" />
+			<skill id="Bow" value="30" />
+			<skill id="Throwing" value="80" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Item0" id="Item.mp_vlandian_heavy_lance" />
+				<equipment slot="Item1" id="Item.bergens_bastard_sword" />
+				<equipment slot="Item2" id="Item.bergen_shield" />
+				<equipment slot="Head" id="Item.bergen_bascinet_hounskull" />
+				<equipment slot="Body" id="Item.bergen_cuirass" />
+				<equipment slot="Leg" id="Item.bergen_legs" />
+				<equipment slot="Cape" id="Item.bergen_hood" />
+				<equipment slot="Gloves" id="Item.gothic_gloves" />
+				<equipment slot="Horse" id="Item.mp_vlandia_horse" />
+				<equipment slot="HorseHarness" id="Item.mp_chain_barding" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<NPCCharacter id="mp_Finnard_Valerian_troop" default_group="Cavalry" level="25" name="{=hoinf1}Finnard Valerian" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="150" />
+			<skill id="OneHanded" value="140" />
+			<skill id="TwoHanded" value="120" />
+			<skill id="Polearm" value="150" />
+			<skill id="Crossbow" value="30" />
+			<skill id="Bow" value="30" />
+			<skill id="Throwing" value="80" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Item1" id="Item.finnard_spear" />
+				<equipment slot="Item2" id="Item.finnard_shield" />
+				<equipment slot="Head" id="Item.finnard_helmet" />
+				<equipment slot="Body" id="Item.Baron_Finnard_body" />
+				<equipment slot="Leg" id="Item.Baron_Finard_gothiclegs" />
+				<equipment slot="Cape" id="Item.finard_cape" />
+				<equipment slot="Gloves" id="Item.Baron_Finard_gauntlet" />
+				<equipment slot="Horse" id="Item.mp_vlandia_horse" />
+				<equipment slot="HorseHarness" id="Item.mp_chain_barding" />
+				<equipment slot="Item0" id="Item.mp_vlandia_cavalry_sword" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<NPCCharacter id="mp_DWDN_Cav_troop" default_group="Cavalry" level="25" name="{=hoinf1}Daewden cavalry" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="140" />
+			<skill id="OneHanded" value="90" />
+			<skill id="TwoHanded" value="60" />
+			<skill id="Polearm" value="130" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="60" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Horse" id="Item.mp_vlandia_horse" />
+				<equipment slot="HorseHarness" id="Item.mp_chain_barding" />
+				<equipment slot="Gloves" id="Item.plate_gauntlet" />
+				<equipment slot="Body" id="Item.plate_cav_cuirass" />
+				<equipment slot="Head" id="Item.bannreich_cav_helmet_visor" />
+				<equipment slot="Leg" id="Item.cav_bannreich_plate_legs" />
+				<!-- Базовое оружие: копьё + меч + щит -->
+				<equipment slot="Item0" id="Item.mp_vlandian_heavy_lance" />
+				<equipment slot="Item1" id="Item.mp_vlandia_cavalry_sword" />
+				<equipment slot="Item2" id="Item.bann_reich_cav_shield1" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<NPCCharacter id="mp_Ratay_troop" default_group="Infantry" level="25" name="{=hoinf1}Ratay" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="40" />
+			<skill id="OneHanded" value="50" />
+			<skill id="TwoHanded" value="40" />
+			<skill id="Polearm" value="50" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="50" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Body" id="Item.ratay_overcoat" />
+				<equipment slot="Head" id="Item.ratay_kettle_bare" />
+				<equipment slot="Leg" id="Item.ratay_hose" />
+				<equipment slot="Item0" id="Item.mp_western_short_spear" />
+				<equipment slot="Item2" id="Item.ratay_1_shield" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Body" id="Item.ratay_overcoat" />
+				<equipment slot="Head" id="Item.ratay_kettle_bare" />
+				<equipment slot="Leg" id="Item.ratay_hose" />
+				<equipment slot="Item0" id="Item.mp_western_short_spear" />
+				<equipment slot="Item2" id="Item.ratay_2_shield" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<NPCCharacter id="mp_Zbroyniy_troop" default_group="Infantry" level="25" name="{=hoinf1}Zbroyniy" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="40" />
+			<skill id="OneHanded" value="120" />
+			<skill id="TwoHanded" value="100" />
+			<skill id="Polearm" value="100" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="70" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_gauntlet" />
+				<equipment slot="Body" id="Item.armeds_striped_cuirass" />
+				<equipment slot="Head" id="Item.armeds_bacinet_with_facemask" />
+				<equipment slot="Leg" id="Item.plate_legs_dwdn" />
+				<equipment slot="Item2" id="Item.zbroyniy_shield1" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_gauntlet" />
+				<equipment slot="Body" id="Item.armeds_striped_cuirass" />
+				<equipment slot="Head" id="Item.armeds_bacinet_with_facemask" />
+				<equipment slot="Leg" id="Item.plate_legs_dwdn" />
+				<equipment slot="Item2" id="Item.zbroyniy_shield_empty1" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_gauntlet" />
+				<equipment slot="Body" id="Item.armeds_striped_cuirass" />
+				<equipment slot="Head" id="Item.armeds_bacinet_with_facemask" />
+				<equipment slot="Leg" id="Item.plate_legs_dwdn" />
+				<equipment slot="Item2" id="Item.zbroyniy_shield_silver1" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<NPCCharacter id="mp_Officer_troop" default_group="Infantry" level="25" name="{=hoinf1}Officer" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="50" />
+			<skill id="OneHanded" value="140" />
+			<skill id="TwoHanded" value="120" />
+			<skill id="Polearm" value="120" />
+			<skill id="Crossbow" value="30" />
+			<skill id="Bow" value="30" />
+			<skill id="Throwing" value="80" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_round_gauntlet" />
+				<equipment slot="Body" id="Item.officer_brigantine" />
+				<equipment slot="Head" id="Item.officer_dwdn_bacinet" />
+				<equipment slot="Leg" id="Item.officer_legs" />
+				<equipment slot="Item2" id="Item.zbroyniy_shield1" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_round_gauntlet" />
+				<equipment slot="Body" id="Item.officer_brigantine" />
+				<equipment slot="Head" id="Item.officer_dwdn_bacinet" />
+				<equipment slot="Leg" id="Item.officer_legs" />
+				<equipment slot="Item2" id="Item.zbroyniy_shield_empty1" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_round_gauntlet" />
+				<equipment slot="Body" id="Item.officer_brigantine" />
+				<equipment slot="Head" id="Item.officer_dwdn_bacinet" />
+				<equipment slot="Leg" id="Item.officer_legs" />
+				<equipment slot="Item2" id="Item.zbroyniy_shield_silver1" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<!-- Sotnik -->
+	<NPCCharacter id="mp_Sotnik_troop" default_group="Infantry" level="25" name="{=hoinf1}Sotnik" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="60" />
+			<skill id="OneHanded" value="150" />
+			<skill id="TwoHanded" value="130" />
+			<skill id="Polearm" value="130" />
+			<skill id="Crossbow" value="30" />
+			<skill id="Bow" value="30" />
+			<skill id="Throwing" value="80" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.gothic_gloves" />
+				<equipment slot="Body" id="Item.dwdn_pikeman_cuirass_v1" />
+				<equipment slot="Cape" id="Item.Baron_rundal_cape" />
+				<equipment slot="Head" id="Item.armeds_bacinet_with_facemask" />
+				<equipment slot="Leg" id="Item.plate_legs_dwdn" />
+				<equipment slot="Item0" id="Item.mp_battania_noble_sword" />
+				<equipment slot="Item1" id="Item.zbroyniy_shield_silver1" />
+				<equipment slot="Item2" id="Item.mp_western_long_spear" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<NPCCharacter id="mp_Knight_troop" default_group="Cavalry" level="25" name="{=hoinf1}Knight" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="150" />
+			<skill id="OneHanded" value="130" />
+			<skill id="TwoHanded" value="110" />
+			<skill id="Polearm" value="150" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="70" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_round_gauntlet" />
+				<equipment slot="Body" id="Item.knight_cuirass" />
+				<equipment slot="Head" id="Item.knight_klappvisor" />
+				<equipment slot="Leg" id="Item.knight_legs" />
+				<equipment slot="Item2" id="Item.zbroyniy_shield1" />
+				<equipment slot="Item0" id="Item.mp_vlandian_heavy_lance" />
+				<equipment slot="Item1" id="Item.mp_vlandia_cavalry_sword" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_round_gauntlet" />
+				<equipment slot="Body" id="Item.knight_cuirass" />
+				<equipment slot="Head" id="Item.knight_klappvisor" />
+				<equipment slot="Leg" id="Item.knight_legs" />
+				<equipment slot="Item2" id="Item.zbroyniy_shield_empty1" />
+				<equipment slot="Item0" id="Item.mp_vlandian_heavy_lance" />
+				<equipment slot="Item1" id="Item.mp_vlandia_cavalry_sword" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_round_gauntlet" />
+				<equipment slot="Body" id="Item.knight_cuirass" />
+				<equipment slot="Head" id="Item.knight_klappvisor" />
+				<equipment slot="Leg" id="Item.knight_legs" />
+				<equipment slot="Item2" id="Item.zbroyniy_shield_silver1" />
+				<equipment slot="Item0" id="Item.mp_vlandian_heavy_lance" />
+				<equipment slot="Item1" id="Item.mp_vlandia_cavalry_sword" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<NPCCharacter id="mp_Pikeman_troop" default_group="Infantry" level="25" name="{=hoinf1}Pikeman" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="40" />
+			<skill id="OneHanded" value="60" />
+			<skill id="TwoHanded" value="50" />
+			<skill id="Polearm" value="130" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="40" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_gauntlet" />
+				<equipment slot="Body" id="Item.dwdn_pikeman_cuirass_v1" />
+				<equipment slot="Head" id="Item.dwdn_pikeman_kettlehad" />
+				<equipment slot="Leg" id="Item.pikemen_dwdn_plate_leg" />
+				<equipment slot="Item0" id="Item.pike1" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<NPCCharacter id="mp_Banobranny_troop" default_group="Infantry" level="25" name="{=hoinf1}Banobranny" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="40" />
+			<skill id="OneHanded" value="80" />
+			<skill id="TwoHanded" value="60" />
+			<skill id="Polearm" value="80" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="60" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.crossbowman_mailgoves" />
+				<equipment slot="Body" id="Item.Banobranny_surcoat" />
+				<equipment slot="Head" id="Item.Banobranny_helmet" />
+				<equipment slot="Leg" id="Item.banobranyi_leg" />
+				<equipment slot="Item2" id="Item.bannpbran_shield1" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.crossbowman_mailgoves" />
+				<equipment slot="Body" id="Item.Banobranny_surcoat" />
+				<equipment slot="Head" id="Item.Banobranny_helmet" />
+				<equipment slot="Leg" id="Item.banobranyi_leg" />
+				<equipment slot="Item2" id="Item.bannpbran_shield2" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.crossbowman_mailgoves" />
+				<equipment slot="Body" id="Item.Banobranny_surcoat" />
+				<equipment slot="Head" id="Item.Banobranny_helmet" />
+				<equipment slot="Leg" id="Item.banobranyi_leg" />
+				<equipment slot="Item2" id="Item.bannpbran_shield3" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.crossbowman_mailgoves" />
+				<equipment slot="Body" id="Item.Banobranny_surcoat" />
+				<equipment slot="Head" id="Item.Banobranny_helmet" />
+				<equipment slot="Leg" id="Item.banobranyi_leg" />
+				<equipment slot="Item2" id="Item.bannpbran_shield4" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<NPCCharacter id="mp_Bannerman_troop" default_group="Infantry" level="25" name="{=hoinf1}Bannerman" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="40" />
+			<skill id="OneHanded" value="100" />
+			<skill id="TwoHanded" value="70" />
+			<skill id="Polearm" value="100" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="50" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_round_gauntlet" />
+				<equipment slot="Body" id="Item.bannerman_cuirass" />
+				<equipment slot="Head" id="Item.banerman_bascinet" />
+				<equipment slot="Leg" id="Item.bannerman_legs" />
+				<equipment slot="Item0" id="Item.mp_battania_noble_sword" />
+				<equipment slot="Item1" id="Item.dwdn_banner1" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_round_gauntlet" />
+				<equipment slot="Body" id="Item.bannerman_cuirass" />
+				<equipment slot="Head" id="Item.banerman_bascinet" />
+				<equipment slot="Leg" id="Item.bannerman_legs" />
+				<equipment slot="Item0" id="Item.mp_battania_noble_sword" />
+				<equipment slot="Item1" id="Item.dwdn_banner1" />
+			</EquipmentRoster>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.plate_round_gauntlet" />
+				<equipment slot="Body" id="Item.bannerman_cuirass" />
+				<equipment slot="Head" id="Item.banerman_bascinet" />
+				<equipment slot="Leg" id="Item.bannerman_legs" />
+				<equipment slot="Item0" id="Item.mp_battania_noble_sword" />
+				<equipment slot="Item1" id="Item.dwdn_banner1" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<NPCCharacter id="mp_DWDN_Archer_troop" default_group="Infantry" level="25" name="{=hoinf1}Daewden Archer" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="30" />
+			<skill id="OneHanded" value="60" />
+			<skill id="TwoHanded" value="40" />
+			<skill id="Polearm" value="40" />
+			<skill id="Crossbow" value="80" />
+			<skill id="Bow" value="110" />
+			<skill id="Throwing" value="100" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.arch_banreich_leatherglove" />
+				<equipment slot="Body" id="Item.arch_bannreich_gambeson" />
+				<equipment slot="Head" id="Item.archer_kettle_1_bare" />
+				<equipment slot="Cape" id="Item.archer_scarf" />
+				<equipment slot="Leg" id="Item.archer_leatherboots" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<NPCCharacter id="mp_DWDN_Crossbowman_troop" default_group="Infantry" level="25" name="{=hoinf1}Daewden Crossbowman" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="30" />
+			<skill id="OneHanded" value="70" />
+			<skill id="TwoHanded" value="50" />
+			<skill id="Polearm" value="50" />
+			<skill id="Crossbow" value="120" />
+			<skill id="Bow" value="40" />
+			<skill id="Throwing" value="50" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Gloves" id="Item.crossbowman_mailgoves" />
+				<equipment slot="Body" id="Item.crossbowman_surcoat_gambeson" />
+				<equipment slot="Head" id="Item.crossbowman_kettle_1" />
+				<equipment slot="Leg" id="Item.crossbowman_leggings" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+</MPCharacters>

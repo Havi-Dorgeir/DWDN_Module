@@ -1,0 +1,27 @@
+# ====================================================================
+# Daewden Module (DWDN) Git Ignore
+# ====================================================================
+
+# TaleWorlds Baked & Cached Packages (1.1GB+ binary exceeding GitHub 100MB limit)
+AssetPackages/
+RuntimeDataCache/
+
+# Visual Studio / Rider / IDE Caches
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build Intermediate Outputs
+ModuleData/scripts/DWDN_Script/bin/
+ModuleData/scripts/DWDN_Script/obj/
+**/obj/
+
+# Windows & OS Artifacts
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.tmp
+*.log

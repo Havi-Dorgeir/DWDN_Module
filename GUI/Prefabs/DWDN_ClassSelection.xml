@@ -1,0 +1,387 @@
+<Prefab>
+  <Window>
+    <!-- Главный полноэкранный контейнер (по центру свободен под 3D-персонажа на пьедестале) -->
+    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" IsVisible="@IsActive" DoNotAcceptEvents="true">
+      <Children>
+
+        <!-- ==================== ЛЕВАЯ ПАНЕЛЬ: ГЕРЦОГСТВА И КЛАССЫ ==================== -->
+        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="460"
+                HorizontalAlignment="Left" VerticalAlignment="Stretch"
+                MarginLeft="20" MarginTop="22" MarginBottom="22"
+                Sprite="BlankWhiteSquare_9" Color="#0B0F16FA" DoNotAcceptEvents="false">
+          <Children>
+            <!-- Золотая рамка панели -->
+            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="3" VerticalAlignment="Top" Sprite="BlankWhiteSquare_9" Color="#D4A044FF" DoNotAcceptEvents="true" />
+            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="3" VerticalAlignment="Bottom" Sprite="BlankWhiteSquare_9" Color="#D4A044FF" DoNotAcceptEvents="true" />
+            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="1" HorizontalAlignment="Left" Sprite="BlankWhiteSquare_9" Color="#C8963E66" DoNotAcceptEvents="true" />
+            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="1" HorizontalAlignment="Right" Sprite="BlankWhiteSquare_9" Color="#C8963E66" DoNotAcceptEvents="true" />
+
+            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                       MarginLeft="16" MarginRight="16" MarginTop="14" MarginBottom="14"
+                       StackLayout.LayoutMethod="VerticalTopToBottom">
+              <Children>
+
+                <!-- Заголовок герцогств -->
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                            Brush="MPClassLoadout.TroopBanner.SubClassText" Brush.FontSize="20" Brush.FontColor="#F5C768FF"
+                            Brush.TextOutlineColor="#000000FF" Brush.TextOutlineAmount="1"
+                            Brush.TextHorizontalAlignment="Center"
+                            Text="ГЕРЦОГСТВО" MarginBottom="8" DoNotAcceptEvents="true" />
+
+                <!-- Выбор герцогств -->
+                <ListPanel DataSource="{Duchies}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                           StackLayout.LayoutMethod="VerticalTopToBottom" MarginBottom="10">
+                  <ItemTemplate>
+                    <ButtonWidget Brush="EmptyBrush" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="38"
+                                  MarginBottom="5" IsEnabled="@IsEnabled" IsSelected="@IsSelected"
+                                  Command.Click="ExecuteSelect" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                      <Children>
+                        <!-- Фоновый цвет кнопки -->
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                Sprite="BlankWhiteSquare_9" Color="#131B26EE" DoNotAcceptEvents="true" />
+                        <!-- Рамка -->
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1" VerticalAlignment="Top" Sprite="BlankWhiteSquare_9" Color="#382E20FF" DoNotAcceptEvents="true" />
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1" VerticalAlignment="Bottom" Sprite="BlankWhiteSquare_9" Color="#382E20FF" DoNotAcceptEvents="true" />
+                        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="1" HorizontalAlignment="Left" Sprite="BlankWhiteSquare_9" Color="#382E20FF" DoNotAcceptEvents="true" />
+                        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="1" HorizontalAlignment="Right" Sprite="BlankWhiteSquare_9" Color="#382E20FF" DoNotAcceptEvents="true" />
+
+                        <!-- Подсветка и золотой маркер при выборе -->
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                Sprite="BlankWhiteSquare_9" Color="#C8963E44" IsVisible="@IsSelected" DoNotAcceptEvents="true" />
+                        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="4"
+                                HorizontalAlignment="Left" Sprite="BlankWhiteSquare_9" Color="#F2BC4BFF"
+                                IsVisible="@IsSelected" DoNotAcceptEvents="true" />
+
+                        <!-- Текст названия герцогства с четким контуром -->
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                    Brush="MPClassLoadout.TroopBanner.SubClassText" Brush.FontSize="17" Brush.FontColor="#FFFFFFFF"
+                                    Brush.TextOutlineColor="#000000FF" Brush.TextOutlineAmount="1"
+                                    Brush.TextHorizontalAlignment="Center" Brush.TextVerticalAlignment="Center"
+                                    Text="@DisplayName" DoNotAcceptEvents="true" />
+                      </Children>
+                    </ButtonWidget>
+                  </ItemTemplate>
+                </ListPanel>
+
+                <!-- Разделитель -->
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="2"
+                        Sprite="BlankWhiteSquare_9" Color="#C8963E77" MarginBottom="10" DoNotAcceptEvents="true" />
+
+                <!-- Заголовок списка классов -->
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                            Brush="MPClassLoadout.TroopBanner.SubClassText" Brush.FontSize="20" Brush.FontColor="#F5C768FF"
+                            Brush.TextOutlineColor="#000000FF" Brush.TextOutlineAmount="1"
+                            Brush.TextHorizontalAlignment="Center"
+                            Text="ВЫБОР КЛАССА" MarginBottom="8" DoNotAcceptEvents="true" />
+
+                <!-- Прокручиваемый список классов -->
+                <ScrollablePanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                 AutoHideScrollBars="true" ClipRect="ClassesClipRect"
+                                 InnerPanel="ClassesClipRect\ClassesListPanel" VerticalScrollbar="ClassesScrollbar">
+                  <Children>
+                    <Widget Id="ClassesClipRect" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" ClipContents="true">
+                      <Children>
+                        <ListPanel Id="ClassesListPanel" DataSource="{Classes}"
+                                   WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                   StackLayout.LayoutMethod="VerticalTopToBottom">
+                          <ItemTemplate>
+                            <!-- Карточка конкретного класса -->
+                            <ButtonWidget Brush="EmptyBrush" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="78"
+                                          MarginBottom="6" IsSelected="@IsSelected" Command.Click="ExecuteSelect"
+                                          DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                              <Children>
+                                <!-- Фоновый цвет карточки -->
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                        Sprite="BlankWhiteSquare_9" Color="#111722EE" DoNotAcceptEvents="true" />
+
+                                <!-- Рамка карточки -->
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1" VerticalAlignment="Top" Sprite="BlankWhiteSquare_9" Color="#382E20FF" DoNotAcceptEvents="true" />
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1" VerticalAlignment="Bottom" Sprite="BlankWhiteSquare_9" Color="#382E20FF" DoNotAcceptEvents="true" />
+                                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="1" HorizontalAlignment="Left" Sprite="BlankWhiteSquare_9" Color="#382E20FF" DoNotAcceptEvents="true" />
+                                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="1" HorizontalAlignment="Right" Sprite="BlankWhiteSquare_9" Color="#382E20FF" DoNotAcceptEvents="true" />
+
+                                <!-- Золотая подсветка для выбранного класса -->
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                        Sprite="BlankWhiteSquare_9" Color="#C8963E38" IsVisible="@IsSelected" DoNotAcceptEvents="true" />
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="2"
+                                        VerticalAlignment="Top" Sprite="BlankWhiteSquare_9" Color="#F2BC4BFF" IsVisible="@IsSelected" DoNotAcceptEvents="true" />
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="2"
+                                        VerticalAlignment="Bottom" Sprite="BlankWhiteSquare_9" Color="#F2BC4BFF" IsVisible="@IsSelected" DoNotAcceptEvents="true" />
+                                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="4"
+                                        HorizontalAlignment="Left" Sprite="BlankWhiteSquare_9" Color="#F2BC4BFF" IsVisible="@IsSelected" DoNotAcceptEvents="true" />
+                                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="2"
+                                        HorizontalAlignment="Right" Sprite="BlankWhiteSquare_9" Color="#F2BC4BFF" IsVisible="@IsSelected" DoNotAcceptEvents="true" />
+
+                                <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                           MarginLeft="10" MarginRight="10" MarginTop="6" MarginBottom="6"
+                                           StackLayout.LayoutMethod="HorizontalLeftToRight" DoNotAcceptEvents="true">
+                                  <Children>
+                                    <!-- Иконка класса (62x62) -->
+                                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="62" SuggestedHeight="62"
+                                            VerticalAlignment="Center" Sprite="BlankWhiteSquare_9" Color="#0A0E14FF" DoNotAcceptEvents="true">
+                                      <Children>
+                                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1" VerticalAlignment="Top" Sprite="BlankWhiteSquare_9" Color="#4A3C28FF" DoNotAcceptEvents="true" />
+                                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1" VerticalAlignment="Bottom" Sprite="BlankWhiteSquare_9" Color="#4A3C28FF" DoNotAcceptEvents="true" />
+                                        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="1" HorizontalAlignment="Left" Sprite="BlankWhiteSquare_9" Color="#4A3C28FF" DoNotAcceptEvents="true" />
+                                        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="1" HorizontalAlignment="Right" Sprite="BlankWhiteSquare_9" Color="#4A3C28FF" DoNotAcceptEvents="true" />
+                                        <ImageIdentifierWidget DataSource="{IconImage}" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                                               MarginLeft="2" MarginRight="2" MarginTop="2" MarginBottom="2"
+                                                               ImageId="@Id" AdditionalArgs="@AdditionalArgs" TextureProviderName="@TextureProviderName"
+                                                               IsBig="true" HideWhenNull="true" DoNotAcceptEvents="true" />
+                                      </Children>
+                                    </Widget>
+
+                                    <!-- Текстовое описание класса с четким контуром -->
+                                    <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                               VerticalAlignment="Center" MarginLeft="12"
+                                               StackLayout.LayoutMethod="VerticalTopToBottom" DoNotAcceptEvents="true">
+                                      <Children>
+                                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                                    Brush="MPClassLoadout.TroopBanner.SubClassText" Brush.FontSize="19" Brush.FontColor="#FFF6E0FF"
+                                                    Brush.TextOutlineColor="#000000FF" Brush.TextOutlineAmount="1"
+                                                    Brush.TextHorizontalAlignment="Left" Text="@DisplayName" DoNotAcceptEvents="true" />
+                                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                                    Brush="MPClassLoadout.TroopBanner.SubClassText" Brush.FontSize="12" Brush.FontColor="#D6C8B4FF"
+                                                    Brush.TextOutlineColor="#000000FF" Brush.TextOutlineAmount="1"
+                                                    Brush.TextHorizontalAlignment="Left" MarginTop="3" Text="@DisplayDescription" DoNotAcceptEvents="true" />
+                                      </Children>
+                                    </ListPanel>
+                                  </Children>
+                                </ListPanel>
+                              </Children>
+                            </ButtonWidget>
+                          </ItemTemplate>
+                        </ListPanel>
+                      </Children>
+                    </Widget>
+
+                    <!-- Скроллбар списка классов -->
+                    <ScrollbarWidget Id="ClassesScrollbar" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent"
+                                     SuggestedWidth="5" HorizontalAlignment="Right"
+                                     Brush="MPClassLoadout.Scrollbar.Bed" AlignmentAxis="Vertical"
+                                     Handle="ClassesScrollbarHandle" MaxValue="100" MinValue="0">
+                      <Children>
+                        <ImageWidget Id="ClassesScrollbarHandle" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                                     SuggestedWidth="5" SuggestedHeight="50" Brush="MPClassLoadout.Scrollbar.Handle" />
+                      </Children>
+                    </ScrollbarWidget>
+                  </Children>
+                </ScrollablePanel>
+
+              </Children>
+            </ListPanel>
+          </Children>
+        </Widget>
+
+        <!-- ==================== ПРАВАЯ ПАНЕЛЬ: ВЫБОР СНАРЯЖЕНИЯ И ОРУЖИЯ ==================== -->
+        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="520"
+                HorizontalAlignment="Right" VerticalAlignment="Top"
+                MarginRight="20" MarginTop="22"
+                Sprite="BlankWhiteSquare_9" Color="#0B0F16FA" DoNotAcceptEvents="false">
+          <Children>
+            <!-- Золотая рамка панели -->
+            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="3" VerticalAlignment="Top" Sprite="BlankWhiteSquare_9" Color="#D4A044FF" DoNotAcceptEvents="true" />
+            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="3" VerticalAlignment="Bottom" Sprite="BlankWhiteSquare_9" Color="#D4A044FF" DoNotAcceptEvents="true" />
+            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="1" HorizontalAlignment="Left" Sprite="BlankWhiteSquare_9" Color="#C8963E66" DoNotAcceptEvents="true" />
+            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="1" HorizontalAlignment="Right" Sprite="BlankWhiteSquare_9" Color="#C8963E66" DoNotAcceptEvents="true" />
+
+            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                       MarginLeft="16" MarginRight="16" MarginTop="14" MarginBottom="14"
+                       StackLayout.LayoutMethod="VerticalTopToBottom">
+              <Children>
+                <!-- Заголовок снаряжения -->
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                            Brush="MPClassLoadout.TroopBanner.SubClassText" Brush.FontSize="19" Brush.FontColor="#F5C768FF"
+                            Brush.TextOutlineColor="#000000FF" Brush.TextOutlineAmount="1"
+                            Brush.TextHorizontalAlignment="Center"
+                            Text="СНАРЯЖЕНИЕ И ОРУЖИЕ" MarginBottom="8" DoNotAcceptEvents="true" />
+
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1"
+                        Sprite="BlankWhiteSquare_9" Color="#C8963E77" MarginBottom="10" DoNotAcceptEvents="true" />
+
+                <!-- Список строк слотов экипировки (Шлем, Доспех, Оружие, Щит, Копьё и т.д.) -->
+                <ScrollablePanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MaxHeight="820"
+                                 AutoHideScrollBars="true" ClipRect="SlotsClipRect"
+                                 InnerPanel="SlotsClipRect\SlotsListPanel" VerticalScrollbar="SlotsScrollbar">
+                  <Children>
+                    <Widget Id="SlotsClipRect" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" ClipContents="true">
+                      <Children>
+                        <ListPanel Id="SlotsListPanel" DataSource="{EquipmentSlots}"
+                                   WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                   StackLayout.LayoutMethod="VerticalTopToBottom">
+                          <ItemTemplate>
+                            <!-- Строка слота: видна только если для класса есть опции выбора -->
+                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                    MarginBottom="6" IsVisible="@HasOptions">
+                              <Children>
+                                <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                           StackLayout.LayoutMethod="HorizontalLeftToRight">
+                                  <Children>
+
+                                    <!-- Левая колонка: Название слота и текущий предмет -->
+                                    <ListPanel WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="130"
+                                               VerticalAlignment="Center" MarginRight="10"
+                                               StackLayout.LayoutMethod="VerticalTopToBottom">
+                                      <Children>
+                                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                                    Brush="MPClassLoadout.TroopBanner.SubClassText" Brush.FontSize="16" Brush.FontColor="#F2BC4BFF"
+                                                    Brush.TextOutlineColor="#000000FF" Brush.TextOutlineAmount="1"
+                                                    Brush.TextHorizontalAlignment="Left" Text="@SlotName" DoNotAcceptEvents="true" />
+                                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                                    Brush="MPClassLoadout.TroopBanner.SubClassText" Brush.FontSize="12" Brush.FontColor="#D6C8B4FF"
+                                                    Brush.TextOutlineColor="#000000FF" Brush.TextOutlineAmount="1"
+                                                    Brush.TextHorizontalAlignment="Left" MarginTop="2"
+                                                    Text="@SelectedItemName" ClipContents="true" DoNotAcceptEvents="true" />
+                                      </Children>
+                                    </ListPanel>
+
+                                    <!-- Правая колонка: Горизонтальный ряд визуальных ячеек 3D-предметов -->
+                                    <ListPanel DataSource="{Options}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                               VerticalAlignment="Center" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                                      <ItemTemplate>
+                                        <ButtonWidget Brush="EmptyBrush" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                                                      SuggestedWidth="58" SuggestedHeight="58" MarginRight="6"
+                                                      IsSelected="@IsSelected" Command.Click="ExecuteSelect"
+                                                      DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                          <Children>
+                                            <!-- Темный фон ячейки -->
+                                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                                    Sprite="BlankWhiteSquare_9" Color="#0A0E14FF" DoNotAcceptEvents="true" />
+
+                                            <!-- Обводка ячейки -->
+                                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1" VerticalAlignment="Top" Sprite="BlankWhiteSquare_9" Color="#4A3C28FF" DoNotAcceptEvents="true" />
+                                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1" VerticalAlignment="Bottom" Sprite="BlankWhiteSquare_9" Color="#4A3C28FF" DoNotAcceptEvents="true" />
+                                            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="1" HorizontalAlignment="Left" Sprite="BlankWhiteSquare_9" Color="#4A3C28FF" DoNotAcceptEvents="true" />
+                                            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="1" HorizontalAlignment="Right" Sprite="BlankWhiteSquare_9" Color="#4A3C28FF" DoNotAcceptEvents="true" />
+
+                                            <!-- Золотая рамка и подсветка при выборе -->
+                                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                                    Sprite="BlankWhiteSquare_9" Color="#C8963E3C"
+                                                    IsVisible="@IsSelected" DoNotAcceptEvents="true" />
+                                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="2" VerticalAlignment="Top" Sprite="BlankWhiteSquare_9" Color="#F2BC4BFF" IsVisible="@IsSelected" DoNotAcceptEvents="true" />
+                                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="2" VerticalAlignment="Bottom" Sprite="BlankWhiteSquare_9" Color="#F2BC4BFF" IsVisible="@IsSelected" DoNotAcceptEvents="true" />
+                                            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="2" HorizontalAlignment="Left" Sprite="BlankWhiteSquare_9" Color="#F2BC4BFF" IsVisible="@IsSelected" DoNotAcceptEvents="true" />
+                                            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="2" HorizontalAlignment="Right" Sprite="BlankWhiteSquare_9" Color="#F2BC4BFF" IsVisible="@IsSelected" DoNotAcceptEvents="true" />
+
+                                            <!-- 3D-иконка предмета -->
+                                            <ImageIdentifierWidget DataSource="{ItemImage}"
+                                                                   WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                                                   MarginLeft="2" MarginRight="2" MarginTop="2" MarginBottom="2"
+                                                                   ImageId="@Id" AdditionalArgs="@AdditionalArgs"
+                                                                   TextureProviderName="@TextureProviderName"
+                                                                   IsBig="true" HideWhenNull="true" DoNotAcceptEvents="true" />
+
+                                            <!-- Текст "Нет" для пустого слота -->
+                                            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                                        Brush="MPClassLoadout.TroopBanner.SubClassText" Brush.FontSize="14" Brush.FontColor="#A09686FF"
+                                                        Brush.TextOutlineColor="#000000FF" Brush.TextOutlineAmount="1"
+                                                        Brush.TextHorizontalAlignment="Center" Brush.TextVerticalAlignment="Center"
+                                                        Text="@ShortLabel" IsVisible="@IsEmptyOption" DoNotAcceptEvents="true" />
+                                          </Children>
+                                        </ButtonWidget>
+                                      </ItemTemplate>
+                                    </ListPanel>
+
+                                  </Children>
+                                </ListPanel>
+                              </Children>
+                            </Widget>
+                          </ItemTemplate>
+                        </ListPanel>
+                      </Children>
+                    </Widget>
+
+                    <ScrollbarWidget Id="SlotsScrollbar" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent"
+                                     SuggestedWidth="5" HorizontalAlignment="Right"
+                                     Brush="MPClassLoadout.Scrollbar.Bed" AlignmentAxis="Vertical"
+                                     Handle="SlotsScrollbarHandle" MaxValue="100" MinValue="0">
+                      <Children>
+                        <ImageWidget Id="SlotsScrollbarHandle" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                                     SuggestedWidth="5" SuggestedHeight="50" Brush="MPClassLoadout.Scrollbar.Handle" />
+                      </Children>
+                    </ScrollbarWidget>
+                  </Children>
+                </ScrollablePanel>
+
+              </Children>
+            </ListPanel>
+          </Children>
+        </Widget>
+
+        <!-- ==================== НИЖНЯЯ ПАНЕЛЬ С ХАРАКТЕРИСТИКАМИ КЛАССА ==================== -->
+        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="460" SuggestedHeight="82"
+                HorizontalAlignment="Center" VerticalAlignment="Bottom" MarginBottom="16"
+                Sprite="BlankWhiteSquare_9" Color="#0B0F16FA" DoNotAcceptEvents="false">
+          <Children>
+            <!-- Золотая рамка -->
+            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="2" VerticalAlignment="Top" Sprite="BlankWhiteSquare_9" Color="#D4A044FF" DoNotAcceptEvents="true" />
+            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="2" VerticalAlignment="Bottom" Sprite="BlankWhiteSquare_9" Color="#D4A044FF" DoNotAcceptEvents="true" />
+            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="1" HorizontalAlignment="Left" Sprite="BlankWhiteSquare_9" Color="#C8963E66" DoNotAcceptEvents="true" />
+            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="1" HorizontalAlignment="Right" Sprite="BlankWhiteSquare_9" Color="#C8963E66" DoNotAcceptEvents="true" />
+
+            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                       MarginLeft="16" MarginRight="16" MarginTop="6" MarginBottom="6"
+                       StackLayout.LayoutMethod="VerticalTopToBottom">
+              <Children>
+                <!-- Название выбранного класса -->
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                            Brush="MPClassLoadout.TroopBanner.SubClassText" Brush.FontSize="18" Brush.FontColor="#F5C768FF"
+                            Brush.TextOutlineColor="#000000FF" Brush.TextOutlineAmount="1"
+                            Brush.TextHorizontalAlignment="Center" Text="@SelectedClassName" DoNotAcceptEvents="true" />
+
+                <!-- Характеристики: Здоровье, Броня, Скорость -->
+                <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                           MarginTop="4" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                  <Children>
+                    <!-- Здоровье -->
+                    <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" StackLayout.LayoutMethod="VerticalTopToBottom">
+                      <Children>
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                    Brush="MPClassLoadout.TroopBanner.SubClassText" Brush.FontSize="11" Brush.FontColor="#A09686FF"
+                                    Brush.TextOutlineColor="#000000FF" Brush.TextOutlineAmount="1"
+                                    Brush.TextHorizontalAlignment="Center" Text="ЗДОРОВЬЕ" DoNotAcceptEvents="true" />
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                    Brush="MPClassLoadout.TroopBanner.SubClassText" Brush.FontSize="18" Brush.FontColor="#FFFFFFFF"
+                                    Brush.TextOutlineColor="#000000FF" Brush.TextOutlineAmount="1"
+                                    Brush.TextHorizontalAlignment="Center" IntText="@SelectedClassHealth" DoNotAcceptEvents="true" />
+                      </Children>
+                    </ListPanel>
+
+                    <!-- Броня -->
+                    <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" StackLayout.LayoutMethod="VerticalTopToBottom">
+                      <Children>
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                    Brush="MPClassLoadout.TroopBanner.SubClassText" Brush.FontSize="11" Brush.FontColor="#A09686FF"
+                                    Brush.TextOutlineColor="#000000FF" Brush.TextOutlineAmount="1"
+                                    Brush.TextHorizontalAlignment="Center" Text="ЗАЩИТА КЛАССА" DoNotAcceptEvents="true" />
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                    Brush="MPClassLoadout.TroopBanner.SubClassText" Brush.FontSize="18" Brush.FontColor="#FFFFFFFF"
+                                    Brush.TextOutlineColor="#000000FF" Brush.TextOutlineAmount="1"
+                                    Brush.TextHorizontalAlignment="Center" IntText="@SelectedClassArmor" DoNotAcceptEvents="true" />
+                      </Children>
+                    </ListPanel>
+
+                    <!-- Скорость -->
+                    <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" StackLayout.LayoutMethod="VerticalTopToBottom">
+                      <Children>
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                    Brush="MPClassLoadout.TroopBanner.SubClassText" Brush.FontSize="11" Brush.FontColor="#A09686FF"
+                                    Brush.TextOutlineColor="#000000FF" Brush.TextOutlineAmount="1"
+                                    Brush.TextHorizontalAlignment="Center" Text="СКОРОСТЬ" DoNotAcceptEvents="true" />
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                    Brush="MPClassLoadout.TroopBanner.SubClassText" Brush.FontSize="18" Brush.FontColor="#FFFFFFFF"
+                                    Brush.TextOutlineColor="#000000FF" Brush.TextOutlineAmount="1"
+                                    Brush.TextHorizontalAlignment="Center" IntText="@SelectedClassSpeed" DoNotAcceptEvents="true" />
+                      </Children>
+                    </ListPanel>
+                  </Children>
+                </ListPanel>
+              </Children>
+            </ListPanel>
+          </Children>
+        </Widget>
+
+      </Children>
+    </Widget>
+  </Window>
+</Prefab>

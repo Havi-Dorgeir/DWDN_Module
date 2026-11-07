@@ -1,0 +1,481 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<MPCharacters>
+	<!-- King -->
+	<NPCCharacter
+		id="mp_ALberic_Devald_hero"
+		default_group="Cavalry"
+		level="25"
+		name="{=hoinf1}ALberic Devald"
+		occupation="Soldier"
+		culture="Culture.dwdn">
+		<face>
+			<BodyProperties
+				version="4"
+				age="61.23"
+				weight="0.3963"
+				build="0.3951"
+				key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax
+				version="4"
+				age="91.79"
+				weight="0.6728"
+				build="1"
+				key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="50" />
+			<skill id="OneHanded" value="50" />
+			<skill id="TwoHanded" value="50" />
+			<skill id="Polearm" value="50" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="70" />
+		</skills>
+		
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Item1" id="Item.devalds_bastard_sword" />
+			
+				<equipment slot="Body" id="Item.king_daewden_covered_cuirass" />
+				<equipment slot="Leg" id="Item.king_plate_legs" />
+				<equipment slot="Gloves" id="Item.king_plate_gauntlet" />
+				<equipment slot= "Horse" id ="Item.mp_vlandia_horse" />
+				<equipment slot="HorseHarness" id="Item.mp_light_harness" />
+			</EquipmentRoster>
+		</Equipments>
+		
+		<Resistances dismount="90" />
+	</NPCCharacter>
+
+	<NPCCharacter
+	id="mp_Bergen_Klaus_hero"
+	default_group="Cavalry"
+	level="25"
+	name="{=hoinf1}Bergen Klaus"
+	occupation="Soldier"
+	culture="Culture.dwdn">
+		<face>
+			<BodyProperties
+				version="4"
+				age="61.23"
+				weight="0.3963"
+				build="0.3951"
+				key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax
+				version="4"
+				age="91.79"
+				weight="0.6728"
+				build="1"
+				key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="50" />
+			<skill id="OneHanded" value="50" />
+			<skill id="TwoHanded" value="50" />
+			<skill id="Polearm" value="50" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="70" />
+		</skills>
+		
+		<Equipments>
+			<EquipmentRoster>
+				
+				<equipment slot="Item1" id="Item.bergens_bastard_sword" />
+				
+				<equipment slot="Item2" id="Item.bergen_shield" />
+				
+				
+				<equipment slot="Head" id="Item.bergen_helmet" />
+				<equipment slot="Body" id="Item.bergen_body" />
+				<equipment slot="Leg" id="Item.bergen_legs" />
+				<!--<equipment slot="Cape" id="Item.bergen_cape" /> -->
+				<equipment slot="Gloves" id="Item.bergen_gloves" />
+				
+				<equipment slot= "Horse" id ="Item.mp_vlandia_horse" />
+				<equipment slot="HorseHarness" id="Item.mp_light_harness" />
+			</EquipmentRoster>
+		</Equipments>
+		
+		<Resistances dismount="90" />
+	</NPCCharacter>
+
+	<!-- Finnard Valerian -->
+	<NPCCharacter
+		id="mp_Finnard_Valerian_hero"
+		default_group="Cavalry"
+		level="25"
+		name="{=hoinf1}Finnard Valerian"
+		occupation="Soldier"
+		culture="Culture.dwdn">
+		<face>
+			<BodyProperties
+				version="4"
+				age="61.23"
+				weight="0.3963"
+				build="0.3951"
+				key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax
+				version="4"
+				age="91.79"
+				weight="0.6728"
+				build="1"
+				key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="50" />
+			<skill id="OneHanded" value="50" />
+			<skill id="TwoHanded" value="50" />
+			<skill id="Polearm" value="50" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="70" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Item1" id="Item.finnard_spear" />
+				<!-- 
+				<equipment slot="Item1" id="mp_sturgia_northern_sword" />
+				-->
+				<equipment slot="Item2" id="Item.finnard_shield" />
+				<equipment slot="Head" id="Item.finnard_helmet" />
+				<equipment slot="Body" id="Item.Baron_Finnard_body" />
+				<equipment slot="Leg" id="Item.Baron_Finard_gothiclegs" />
+				<equipment slot="Cape" id="Item.finard_cape" />
+				<equipment slot="Gloves" id="Item.Baron_Finard_gauntlet" />
+				<equipment slot= "Horse" id ="Item.mp_vlandia_horse" />
+				<equipment slot="HorseHarness" id="Item.mp_light_harness" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+
+	<!-- Baldur Rundal -->
+	<!--
+	<NPCCharacter
+		id="mp_Baldur_Rundal_hero"
+		default_group="Cavalry"
+		level="25"
+		name="{=hoinf1}Baldur Rundal"
+		occupation="Soldier"
+		culture="Culture.dwdn">
+		<face>
+			<BodyProperties
+				version="4"
+				age="61.23"
+				weight="0.3963"
+				build="0.3951"
+				key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax
+				version="4"
+				age="91.79"
+				weight="0.6728"
+				build="1"
+				key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="50" />
+			<skill id="OneHanded" value="50" />
+			<skill id="TwoHanded" value="50" />
+			<skill id="Polearm" value="50" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="70" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Item1" id="Item.baldur_warpick" />
+				<equipment slot="Item2" id="Item.rundal_shield" />
+				<equipment slot="Head" id="Item.baron_roondalt_vendelhelmet_1" />
+				<equipment slot="Body" id="Item.run_body1" />
+				<equipment slot="Leg" id="Item.rundal_leg" />
+				<equipment slot="Cape" id="Item.Baron_rundal_cape" />
+				<equipment slot="Gloves" id="Item.rundal_gloves_second" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	-->
+	<!-- DWDN_Cav -->
+
+	<NPCCharacter
+	id="mp_DWDN_Cav_hero"
+	default_group="Cavalry"
+	level="25"
+	name="{=hoinf1}Daewden cavalry"
+	occupation="Soldier"
+	culture="Culture.dwdn">
+		<face>
+			<BodyProperties
+				version="4"
+				age="61.23"
+				weight="0.3963"
+				build="0.3951"
+				key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax
+				version="4"
+				age="91.79"
+				weight="0.6728"
+				build="1"
+				key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="50" />
+			<skill id="OneHanded" value="50" />
+			<skill id="TwoHanded" value="50" />
+			<skill id="Polearm" value="50" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="70" />
+		</skills>
+
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot= "Horse" id ="Item.mp_vlandia_horse" />
+				<equipment slot="HorseHarness" id="Item.mp_light_harness" />
+			</EquipmentRoster>
+		</Equipments>
+
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<!-- Ratay -->
+
+	<NPCCharacter
+	id="mp_Ratay_hero"
+	default_group="Infantry"
+	level="25"
+	name="{=hoinf1}Ratay"
+	occupation="Soldier"
+	culture="Culture.dwdn">
+		<face>
+			<BodyProperties
+				version="4"
+				age="61.23"
+				weight="0.3963"
+				build="0.3951"
+				key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax
+				version="4"
+				age="91.79"
+				weight="0.6728"
+				build="1"
+				key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="50" />
+			<skill id="OneHanded" value="50" />
+			<skill id="TwoHanded" value="50" />
+			<skill id="Polearm" value="50" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="70" />
+		</skills>
+
+		<Equipments>
+			<EquipmentRoster>
+			</EquipmentRoster>
+		</Equipments>
+
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	
+	<!-- Zbroyniy -->
+	<NPCCharacter
+	id="mp_Zbroyniy_hero"
+	default_group="Infantry"
+	level="25"
+	name="{=hoinf1}Zbroyniy"
+	occupation="Soldier"
+	culture="Culture.dwdn">
+		<face>
+			<BodyProperties
+				version="4"
+				age="61.23"
+				weight="0.3963"
+				build="0.3951"
+				key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax
+				version="4"
+				age="91.79"
+				weight="0.6728"
+				build="1"
+				key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="50" />
+			<skill id="OneHanded" value="50" />
+			<skill id="TwoHanded" value="50" />
+			<skill id="Polearm" value="50" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="70" />
+		</skills>
+
+		<Equipments>
+			<EquipmentRoster>
+			</EquipmentRoster>
+		</Equipments>
+
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<!-- Pikeman -->
+	<NPCCharacter
+	id="mp_Pikeman_hero"
+	default_group="Infantry"
+	level="25"
+	name="{=hoinf1}Pikeman"
+	occupation="Soldier"
+	culture="Culture.dwdn">
+		<face>
+			<BodyProperties
+				version="4"
+				age="61.23"
+				weight="0.3963"
+				build="0.3951"
+				key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax
+				version="4"
+				age="91.79"
+				weight="0.6728"
+				build="1"
+				key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="50" />
+			<skill id="OneHanded" value="50" />
+			<skill id="TwoHanded" value="50" />
+			<skill id="Polearm" value="50" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="70" />
+		</skills>
+
+		<Equipments>
+			<EquipmentRoster>
+			</EquipmentRoster>
+		</Equipments>
+
+		<Resistances dismount="90" />
+	</NPCCharacter>
+
+
+	<!-- Banobranny -->
+	
+	<NPCCharacter
+id="mp_Banobranny_hero"
+default_group="Infantry"
+level="25"
+name="{=hoinf1}Banobranny"
+occupation="Soldier"
+culture="Culture.dwdn">
+		<face>
+			<BodyProperties
+				version="4"
+				age="61.23"
+				weight="0.3963"
+				build="0.3951"
+				key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax
+				version="4"
+				age="91.79"
+				weight="0.6728"
+				build="1"
+				key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="50" />
+			<skill id="OneHanded" value="50" />
+			<skill id="TwoHanded" value="50" />
+			<skill id="Polearm" value="50" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="70" />
+		</skills>
+
+		<Equipments>
+			<EquipmentRoster>
+			</EquipmentRoster>
+		</Equipments>
+
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<!-- Archer -->
+	<NPCCharacter
+id="mp_DWDN_Archer_hero"
+default_group="Infantry"
+level="25"
+name="{=hoinf1}Daewden Archer"
+occupation="Soldier"
+culture="Culture.dwdn">
+		<face>
+			<BodyProperties
+				version="4"
+				age="61.23"
+				weight="0.3963"
+				build="0.3951"
+				key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax
+				version="4"
+				age="91.79"
+				weight="0.6728"
+				build="1"
+				key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="50" />
+			<skill id="OneHanded" value="50" />
+			<skill id="TwoHanded" value="50" />
+			<skill id="Polearm" value="50" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="70" />
+		</skills>
+
+		<Equipments>
+			<EquipmentRoster>
+			</EquipmentRoster>
+		</Equipments>
+
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<!-- Crossbowman -->
+	<NPCCharacter
+id="mp_DWDN_Crossbowman_hero"
+default_group="Infantry"
+level="25"
+name="{=hoinf1}Daewden Crossbowman"
+occupation="Soldier"
+culture="Culture.dwdn">
+		<face>
+			<BodyProperties
+				version="4"
+				age="61.23"
+				weight="0.3963"
+				build="0.3951"
+				key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax
+				version="4"
+				age="91.79"
+				weight="0.6728"
+				build="1"
+				key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="50" />
+			<skill id="OneHanded" value="50" />
+			<skill id="TwoHanded" value="50" />
+			<skill id="Polearm" value="50" />
+			<skill id="Crossbow" value="20" />
+			<skill id="Bow" value="20" />
+			<skill id="Throwing" value="70" />
+		</skills>
+
+		<Equipments>
+			<EquipmentRoster>
+			</EquipmentRoster>
+		</Equipments>
+
+		<Resistances dismount="90" />
+	</NPCCharacter>
+
+</MPCharacters>

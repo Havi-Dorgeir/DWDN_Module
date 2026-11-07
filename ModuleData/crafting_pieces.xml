@@ -1,0 +1,408 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CraftingPieces>
+	<!-- bergen_sword -->
+	<CraftingPiece
+		id="bergen_blade"
+		name="{=kuROzU1J}Bergen Blade"
+		tier="1"
+		piece_type="Blade"
+		mesh="bergen_blade"
+		length="92.4"
+		weight="1"
+		>
+
+		<!-- bergen_blade -->
+		<BuildData
+			piece_offset="0"
+			previous_piece_offset="7"
+			next_piece_offset="-2" />
+		<BladeData
+			
+			physics_material="metal_weapon"
+			body_name="bo_sword_one_handed"
+			>
+			<Thrust
+				damage_type="Pierce"
+				damage_factor="3.1" />
+			<Swing
+				damage_type="Cut"
+				damage_factor="3.5" />
+		</BladeData>
+		<Materials>
+			<Material
+				id="Iron2"
+				count="3" />
+		</Materials>
+	</CraftingPiece>
+	<CraftingPiece
+		id="bergen_handle"
+		name="{=RWljioj5}Iron And Leather Bound Horn One Handed Grip"
+		tier="2"
+		piece_type="Handle"
+		mesh="bergen_handle"
+		
+		length="15"
+		weight="0.1">
+
+
+		<!-- bergen_handle -->
+		<BuildData
+			piece_offset="0"
+			previous_piece_offset="15"
+			next_piece_offset="-29.5" />
+		<Materials>
+			<Material
+				id="Iron2"
+				count="1" />
+		</Materials>
+	</CraftingPiece>
+	<CraftingPiece
+		id="bergen_guard"
+		name="{=4FnOKgB6}Daewden Crescent Dagger Guard"
+		tier="1"
+		piece_type="Guard"
+		mesh="bergen_guard"
+		culture="Culture.battania"
+		length="4"
+		weight="0.97">
+
+		<!-- bergen_guard -->
+		<BuildData
+			piece_offset="0"
+			previous_piece_offset="11"
+			next_piece_offset="4" />
+		<StatContributions
+			armor_bonus="2" />
+		<Materials>
+			<Material
+				id="Iron4"
+				count="1" />
+		</Materials>
+	</CraftingPiece>
+	<CraftingPiece
+		id="bergen_pommel"
+		name="{=ldvppRXj}Patterned Pommel"
+		tier="4"
+		piece_type="Pommel"
+		mesh="bergen_pommel"
+		length="5"
+		weight="0.22">
+		<!-- bergen_pommel -->
+		<BuildData
+			piece_offset="0"
+			previous_piece_offset="1.5"
+			next_piece_offset="-19" />
+		<Materials>
+			<Material
+				id="Iron4"
+				count="1" />
+		</Materials>
+	</CraftingPiece>
+	<!-- bergen_sword -->
+	
+	<!-- devald_sword -->
+	<CraftingPiece
+		id="DevaldBlade_LP"
+		name="{=kuROzU1J}Bergen Blade"
+		tier="1"
+		piece_type="Blade"
+		mesh="DevaldBlade_LP"
+		length="92.4"
+		weight="1"
+		>
+
+		<!-- DevaldBlade_LP -->
+		<BuildData
+			piece_offset="0"
+			previous_piece_offset="-18"
+			next_piece_offset="0" />
+		<BladeData
+			
+			physics_material="metal_weapon"
+			body_name="bo_sword_one_handed"
+			>
+			<Thrust
+				damage_type="Pierce"
+				damage_factor="3.1" />
+			<Swing
+				damage_type="Cut"
+				damage_factor="3.5" />
+		</BladeData>
+		<Materials>
+			<Material
+				id="Iron2"
+				count="3" />
+		</Materials>
+	</CraftingPiece>
+	
+	<CraftingPiece
+		id="DevaldGrip_LP"
+		name="{=RWljioj5}Iron And Leather Bound Horn One Handed Grip"
+		tier="2"
+		piece_type="Handle"
+		mesh="DevaldGrip_LP"
+		
+		length="15"
+		weight="0.1">
+
+
+		<!-- DevaldGrip_LP -->
+		<BuildData
+			piece_offset="-3"
+			previous_piece_offset="0"
+			next_piece_offset="-7.5" />
+		<Materials>
+			<Material
+				id="Iron2"
+				count="1" />
+		</Materials>
+	</CraftingPiece>
+	<CraftingPiece
+		id="DevaldHandguard_LP"
+		name="{=4FnOKgB6}Daewden Crescent Dagger Guard"
+		tier="1"
+		piece_type="Guard"
+		mesh="DevaldHandguard_LP"
+		culture="Culture.battania"
+		length="4"
+		weight="0.97">
+
+		<!-- DevaldHandguard_LP -->
+		<BuildData
+			piece_offset="0"
+			previous_piece_offset="0"
+			next_piece_offset="0" />
+		<StatContributions
+			armor_bonus="2" />
+		<Materials>
+			<Material
+				id="Iron4"
+				count="1" />
+		</Materials>
+	</CraftingPiece>
+	<CraftingPiece
+		id="DevaldPommel_LP"
+		name="{=ldvppRXj}Patterned Pommel"
+		tier="4"
+		piece_type="Pommel"
+		mesh="DevaldPommel_LP"
+		length="5"
+		weight="0.22">
+		<!-- DevaldPommel_LP -->
+		<BuildData
+			piece_offset="0"
+			previous_piece_offset="0"
+			next_piece_offset="-6" />
+		<Materials>
+			<Material
+				id="Iron4"
+				count="1" />
+		</Materials>
+	</CraftingPiece>
+	<!-- devald_sword -->
+	
+	<CraftingPiece
+		id="baron_rindal_warpick_blade"
+		name="{=!}MP Vlandia Cavalry Mace"
+		tier="2"
+		piece_type="Blade"
+		mesh="baron_rindal_warpick_blade"
+		length="8.4"
+		weight="0.65"
+		full_scale="true"
+		excluded_item_usage_features="thrust">
+		<BladeData
+			stack_amount="3"
+			physics_material="wood_weapon"
+			body_name="bo_mace_a">
+			<Swing
+				damage_type="Blunt"
+				damage_factor="2.65" />
+		</BladeData>
+	</CraftingPiece>
+	<CraftingPiece
+			id="baron_rindal_warpick_handle"
+			name="{=!}MP Vlandian Mace Handle"
+			tier="2"
+			piece_type="Handle"
+			mesh="baron_rindal_warpick_handle"
+			length="78"
+			weight="0.40">
+		<BuildData
+			piece_offset="0" />
+	</CraftingPiece>
+	<!-- SPEARS -->
+	<!-- 
+	<CraftingPiece
+		id="finnard_spearhead"
+		name="{=Y4tIQnS4} Simple finnard_spearhead"
+		piece_type="Blade"
+		mesh="finnard_spearhead"
+		length="22.862"
+		weight="1.4"
+		excluded_item_usage_features="swing">
+		<BladeData
+			stack_amount="4"
+			physics_material="wood_weapon"
+			body_name="bo_spear_b"
+			holster_mesh="finnard_spearhead"
+			holster_body_name="finnard_spearhead"
+			holster_mesh_length="68.9">
+			<Thrust
+				damage_type="Pierce"
+				damage_factor="1.8" />
+		</BladeData>
+		<Flags>
+			<Flag
+				name="DropOnWeaponChange"
+				type="ItemFlags" />
+		</Flags>
+	</CraftingPiece>
+	 -->
+	<!-- finnard_spearhead -->
+	<CraftingPiece
+		id="finnard_spearhead"
+		name="Finnard spearhead"
+		piece_type="Blade"
+		mesh="finnard_spearhead"
+		length="51.5"
+		weight="0.500"
+		excluded_item_usage_features="swing">
+
+		<BuildData
+			piece_offset="0"
+			previous_piece_offset="1"
+			next_piece_offset="0" />
+		<BladeData
+			physics_material="wood_weapon"
+			body_name="bo_spear_b"
+			holster_mesh="throwing_spear_quiver_4"
+			holster_body_name="bo_throwing_spear_quiver_4"
+			holster_mesh_length="26.2">
+			<Thrust damage_type="Pierce" damage_factor="2.8" />
+		</BladeData>
+	</CraftingPiece>
+
+	<CraftingPiece
+		id="finnard_spear_handle"
+		name="Spear Shaft"
+		piece_type="Handle"
+		mesh="finnard_spear_handle"
+		length="240"
+		weight="3.900" >
+		<!-- finnard_spear_handle -->
+		<BuildData
+			piece_offset="0"
+			previous_piece_offset="0"
+			next_piece_offset="0" />
+	</CraftingPiece>
+
+	<CraftingPiece
+    id="finnard_speard_guard"
+    name="{=DVe5SkQA}Double Vane Wings"
+    piece_type="Guard"
+    mesh="finnard_speard_guard"
+    length="5.7"
+    weight="0">
+		<!-- finnard_speard_guard -->
+		<BuildData
+			piece_offset="0"
+			previous_piece_offset="157.7"
+			next_piece_offset="-167.1" />
+		<Materials>
+			<Material
+				id="Iron3"
+				count="1" />
+		</Materials>
+	</CraftingPiece>
+
+
+
+
+
+
+	<!-- pike1_blade -->
+	<CraftingPiece
+			id="pike1_blade"
+			name="Pike Blade"
+			piece_type="Blade"
+			mesh="pike1_blade"
+			length="51.5"
+			weight="0.500"
+			excluded_item_usage_features="swing">
+		
+		<BuildData
+			piece_offset="0"
+			previous_piece_offset="-6"
+			next_piece_offset="0" />
+		<BladeData
+			physics_material="wood_weapon"
+			body_name="bo_spear_b"
+			holster_mesh="throwing_spear_quiver_4"
+			holster_body_name="bo_throwing_spear_quiver_4"
+			holster_mesh_length="26.2">
+			<Thrust damage_type="Pierce" damage_factor="2.8" />
+		</BladeData>
+		<Flags>
+			<Flag
+			name="DropOnWeaponChange"
+				type="ItemFlags" />
+			<Flag name="CanDismount" />
+		</Flags>
+	</CraftingPiece>
+	<!-- pike1_handle -->
+	<CraftingPiece
+		id="pike1_handle"
+		name="Pike Handle"
+		piece_type="Handle"
+		mesh="pike1_handle"
+		length="240"
+		weight="3.900" >
+		<BuildData
+			piece_offset="16"
+			previous_piece_offset="0"
+			next_piece_offset="0" />
+	</CraftingPiece>
+	
+	
+	<!-- 
+	<CraftingPiece
+		id="finnard_spear_handle"
+		name="{=e1DF7wbz}Hardened Ashen Staff"
+		piece_type="Handle"
+		mesh="finnard_spear_handle"
+		length="210"
+		weight="1.5">
+		<BuildData
+			piece_offset="22.9" />
+		<Materials>
+			<Material
+				id="Wood"
+				count="1" />
+		</Materials>
+	</CraftingPiece>
+	-->
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</CraftingPieces>
+
