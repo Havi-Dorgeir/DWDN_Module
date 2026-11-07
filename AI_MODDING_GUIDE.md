@@ -177,9 +177,10 @@ sequenceDiagram
   * `event:/mission/combat/impact/ballista_missile/stone` (сухой пороховой щелчок).
   * `event:/mission/combat/impact/missile/pot_breakable` (глухой резонирующий хлопок).
 * **Визуальные партиклы (VFX)**:
+  * Мгновенный всплеск пламени: `prt_fireball` на `muzzlePos + forward * 0.10f` (0.20 сек, без остаточного горения).
   * Густой пороховой дым: `psys_game_stone_dust_a` и `psys_siege_door_falling_dust`.
   * Дымный шлейф по траектории выстрела: эмиттеры на `muzzlePos + forward * 0.60f` и `muzzlePos + forward * 1.20f`.
-  * Вспышка и искры: `psys_game_sparkle_a`.
+  * Яркие пороховые искры: `psys_game_sparkle_a`.
   * Дымок запального отверстия: на `position - forward * 0.10f + Vec3(0, 0, 0.04f)`.
 
 > [!IMPORTANT]
