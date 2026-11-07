@@ -473,7 +473,8 @@ namespace DWDN_Script.Client.UI
                 data.RightWieldedItemIndex((int)mainHandWeaponIndex);
                 data.LeftWieldedItemIndex((int)offHandWeaponIndex);
 
-                agentVisual.Refresh(false, data, true);
+                // false = мгновенная смена без белой вспышки (isSlow: false)
+                agentVisual.Refresh(false, data, false);
 
                 // Возобновляем анимацию покоя (idle), чтобы персонаж дышал и не застывал в статической позе
                 ActionIndexCache actionCode = ActionIndexCache.act_walk_idle_unarmed;
