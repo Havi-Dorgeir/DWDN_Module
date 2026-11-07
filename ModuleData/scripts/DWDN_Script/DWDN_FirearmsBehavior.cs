@@ -91,14 +91,13 @@ namespace DWDN_Script
                 // ==========================================
                 // 2. ОГНЕННАЯ ВСПЫШКА И ДЫМ (Gunpowder flash, sparks & smoke)
                 // ==========================================
-                // Огненная вспышка выстрела (~1 метр, яркий огненный шар перед дулом, исчезает без задержки в воздухе)
-                MatrixFrame flashFrame = new MatrixFrame(orientation, muzzlePos + forward * 0.15f);
-                flashFrame.Scale(new Vec3(0.67f, 0.67f, 0.67f));
+                // Огненная вспышка выстрела: чистое ортонормальное MatrixFrame без Scale() для 100% C++ совместимости
+                MatrixFrame flashFrame = new MatrixFrame(orientation, muzzlePos + forward * 0.20f);
                 Mission.AddParticleSystemBurstByName("explosion", flashFrame, true);
+                Debug.Print($"[DWDN Firearms] Muzzle flash fired at {muzzlePos}!");
 
-                // Густое облако порохового дыма у дула
+                // Пороховой дым у дула (без удушающей серой осадной пыли, чтобы пламя было ярким и четким)
                 Mission.AddParticleSystemBurstByName("psys_game_stone_dust_a", muzzleFrame, true);
-                Mission.AddParticleSystemBurstByName("psys_siege_door_falling_dust", muzzleFrame, true);
 
                 // Выброс порохового дыма вперед по траектории выстрела (+0.6м и +1.2м)
                 MatrixFrame smokePlume1 = new MatrixFrame(orientation, muzzlePos + forward * 0.60f);
