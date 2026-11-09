@@ -40,8 +40,9 @@ namespace DWDN_Script.Common.Duchies
             ratay.AllowedBodyArmors.AddRange(new[] { "ratay_overcoat" });
             ratay.AllowedLegs.AddRange(new[] { "ratay_hose" });
             ratay.AllowedGloves.AddRange(new[] { "arch_banreich_leatherglove", "" });
-            ratay.AllowedWeaponsSlot0.AddRange(new[] { "mp_western_short_spear", "mp_sturgia_axe", "mp_vlandian_short_sword", "mp_vlandian_hammer" });
+            ratay.AllowedWeaponsSlot0.AddRange(new[] { "dwdn_cleaver", "mp_sturgia_axe", "mp_vlandian_hammer" });
             ratay.AllowedWeaponsSlot1.AddRange(new[] { "ratay_1_shield", "ratay_2_shield", "" });
+            ratay.AllowedWeaponsSlot2.AddRange(new[] { "", "mp_western_short_spear" });
             ratay.DefaultLoadout = ratay.CreateDefaultLoadout(banreich.Id);
             banreich.Classes.Add(ratay);
 
@@ -56,7 +57,7 @@ namespace DWDN_Script.Common.Duchies
             banobranny.AllowedBodyArmors.AddRange(new[] { "Banobranny_surcoat" });
             banobranny.AllowedLegs.AddRange(new[] { "banobranyi_leg" });
             banobranny.AllowedGloves.AddRange(new[] { "crossbowman_mailgoves", "" });
-            banobranny.AllowedWeaponsSlot0.AddRange(new[] { "mp_vlandian_arming_sword", "mp_sturgia_axe", "mp_vlandian_mace" });
+            banobranny.AllowedWeaponsSlot0.AddRange(new[] { "dwdn_falchion", "mp_sturgia_axe", "mp_vlandian_mace" });
             banobranny.AllowedWeaponsSlot1.AddRange(new[] { "bannpbran_shield1", "bannpbran_shield2", "bannpbran_shield3", "bannpbran_shield4", "" });
             banobranny.AllowedWeaponsSlot2.AddRange(new[] { "", "mp_western_spear" });
             banobranny.DefaultLoadout = banobranny.CreateDefaultLoadout(banreich.Id);

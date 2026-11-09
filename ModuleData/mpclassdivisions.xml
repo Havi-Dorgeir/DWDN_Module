@@ -3,7 +3,7 @@
 	<!-- DWDN -->
 	<!-- Inf -->
 	<!-- Ratay -->
-	<MPClassDivision id="mp_Ratay" hero="mp_Ratay_hero" troop="mp_Ratay_troop" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.92" cost="80" icon="Infantry_Light" melee_ai="35" ranged_ai="30" armor="10" movement_speed="0.82" combat_movement_speed="0.9" acceleration="2.2" hitpoints="100">
+	<MPClassDivision id="mp_Ratay" hero="mp_Ratay_hero" troop="mp_Ratay_troop" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.92" cost="80" icon="Infantry_Light" melee_ai="35" ranged_ai="30" armor="10" movement_speed="0.86" combat_movement_speed="0.93" acceleration="1.8" hitpoints="100">
 		<Perks>
 			<!-- Слот 1: Баффы -->
 			<Perk game_mode="All" name="Agility" description="+7% Movement Speed" icon="PerkFleetFooted" perk_list="1">
@@ -12,20 +12,27 @@
 			<Perk game_mode="All" name="Combat Mobility" description="+10% Combat Movement Speed" icon="PerkBrawny" perk_list="1">
 				<Effect type="DrivenProperty" driven_property="CombatMaxSpeedMultiplier" value="0.10" />
 			</Perk>
-			<!-- Слот 2: Оружие -->
-			<Perk game_mode="All" name="Axe" description=" " icon="PerkHeavyAxe" perk_list="2">
+			<!-- Слот 2: Оружие ближнего боя -->
+			<Perk game_mode="All" name="Cleaver" description="Peasant cleaver" icon="PerkSword" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="dwdn_cleaver" />
+			</Perk>
+			<Perk game_mode="All" name="Axe" description="Woodsman axe" icon="PerkHeavyAxe" perk_list="2">
 				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_sturgia_axe" />
 			</Perk>
-			<Perk game_mode="All" name="Sword" description=" " icon="PerkSword" perk_list="2">
-				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_vlandian_short_sword" />
-			</Perk>
-			<Perk game_mode="All" name="Mace" description=" " icon="PerkMaces" perk_list="2">
+			<Perk game_mode="All" name="Mace" description="Militia mallet" icon="PerkMaces" perk_list="2">
 				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_vlandian_hammer" />
+			</Perk>
+			<!-- Слот 3: Отдельный слот под копье, как у остальных пехотинцев -->
+			<Perk game_mode="All" name="Short Spear" description="Short militia spear" icon="PerkSpears" perk_list="3">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item2" item="mp_western_short_spear" />
+			</Perk>
+			<Perk game_mode="All" name="Light Shield" description="Wooden light shield" icon="PerkShield" perk_list="3">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="ratay_1_shield" />
 			</Perk>
 		</Perks>
 	</MPClassDivision>
 	<!-- Banobranny -->
-	<MPClassDivision id="mp_Banobranny" hero="mp_Banobranny_hero" troop="mp_Banobranny_troop" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.70" cost="130" icon="Infantry_Heavy" melee_ai="50" ranged_ai="40" armor="25" movement_speed="0.80" combat_movement_speed="0.9" acceleration="2.2" hitpoints="100">
+	<MPClassDivision id="mp_Banobranny" hero="mp_Banobranny_hero" troop="mp_Banobranny_troop" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.70" cost="130" icon="Infantry_Heavy" melee_ai="50" ranged_ai="40" armor="25" movement_speed="0.80" combat_movement_speed="0.88" acceleration="2.2" hitpoints="100">
 		<Perks>
 			<!-- Слот 1: Баффы -->
 			<Perk game_mode="All" name="Iron Hide" description="+10 Armor" icon="PerkToughness" perk_list="1">
@@ -35,22 +42,22 @@
 				<Effect type="DrivenProperty" driven_property="MaxSpeedMultiplier" value="0.05" />
 			</Perk>
 			<!-- Слот 2: Оружие -->
-			<Perk game_mode="All" name="Axe" description=" " icon="PerkHeavyAxe" perk_list="2">
+			<Perk game_mode="All" name="Falchion" description="Infantry falchion" icon="PerkBetterSwords" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="dwdn_falchion" />
+			</Perk>
+			<Perk game_mode="All" name="Axe" description="War axe" icon="PerkHeavyAxe" perk_list="2">
 				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_sturgia_axe" />
 			</Perk>
-			<Perk game_mode="All" name="Sword" description=" " icon="PerkBetterSwords" perk_list="2">
-				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_vlandian_arming_sword" />
-			</Perk>
-			<Perk game_mode="All" name="Mace" description=" " icon="PerkMaces" perk_list="2">
+			<Perk game_mode="All" name="Mace" description="Flanged mace" icon="PerkMaces" perk_list="2">
 				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_vlandian_mace" />
 			</Perk>
 			<Perk game_mode="all" name="Spear" description="{=eMd39oQf}Grants Long Spear." icon="PerkSpears" perk_list="2">
-				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_western_spear" />
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item2" item="mp_western_spear" />
 			</Perk>
 		</Perks>
 	</MPClassDivision>
 	<!-- Pikeman-->
-	<MPClassDivision id="mp_Pikeman" hero="mp_Pikeman_hero" troop="mp_Pikeman_troop" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.64" cost="130" icon="Infantry_Heavy" melee_ai="50" ranged_ai="30" armor="18" movement_speed="0.81" combat_movement_speed="0.85" acceleration="2.3" hitpoints="100">
+	<MPClassDivision id="mp_Pikeman" hero="mp_Pikeman_hero" troop="mp_Pikeman_troop" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.64" cost="130" icon="Infantry_Heavy" melee_ai="50" ranged_ai="30" armor="18" movement_speed="0.83" combat_movement_speed="0.82" acceleration="2.0" hitpoints="100">
 		<Perks>
 			<!-- Слот 1: Баффы + железная выдача кастомной пики pike1 в Item0 -->
 			<Perk game_mode="All" name="Reinforced Torso" description="+10 Armor" icon="PerkArmorUpgrade" perk_list="1">
@@ -74,7 +81,7 @@
 		</Perks>
 	</MPClassDivision>
 	<!-- Zbroyniy -->
-	<MPClassDivision id="mp_Zbroyniy" hero="mp_Zbroyniy_hero" troop="mp_Zbroyniy_troop" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.61" cost="160" icon="Infantry_Heavy" melee_ai="60" ranged_ai="40" armor="40" movement_speed="0.79" combat_movement_speed="0.9" acceleration="2.4" hitpoints="100">
+	<MPClassDivision id="mp_Zbroyniy" hero="mp_Zbroyniy_hero" troop="mp_Zbroyniy_troop" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.61" cost="160" icon="Infantry_Heavy" melee_ai="60" ranged_ai="40" armor="40" movement_speed="0.75" combat_movement_speed="0.80" acceleration="2.6" hitpoints="100">
 		<Perks>
 			<!-- Слот 1: Баффы -->
 			<Perk game_mode="All" name="Heavy Plating" description="+12 Armor" icon="PerkToughness" perk_list="1">
@@ -99,7 +106,7 @@
 		</Perks>
 	</MPClassDivision>
 	<!-- Officer (Десятник) -->
-	<MPClassDivision id="mp_Officer" hero="mp_Officer_hero" troop="mp_Officer_troop" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.50" cost="170" icon="Infantry_Heavy" melee_ai="70" ranged_ai="50" armor="42" movement_speed="0.79" combat_movement_speed="0.9" acceleration="2.4" hitpoints="100">
+	<MPClassDivision id="mp_Officer" hero="mp_Officer_hero" troop="mp_Officer_troop" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.50" cost="170" icon="Infantry_Heavy" melee_ai="70" ranged_ai="50" armor="42" movement_speed="0.74" combat_movement_speed="0.79" acceleration="2.7" hitpoints="100">
 		<Perks>
 			<!-- Слот 1: Баффы -->
 			<Perk game_mode="All" name="Heavy Plating" description="+12 Armor" icon="PerkToughness" perk_list="1">
@@ -124,7 +131,7 @@
 		</Perks>
 	</MPClassDivision>
 	<!-- Sotnik (Сотник) -->
-	<MPClassDivision id="mp_Sotnik" hero="mp_Sotnik_hero" troop="mp_Sotnik_troop" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.45" cost="190" icon="Infantry_Heavy" melee_ai="75" ranged_ai="50" armor="48" movement_speed="0.77" combat_movement_speed="0.88" acceleration="2.4" hitpoints="100">
+	<MPClassDivision id="mp_Sotnik" hero="mp_Sotnik_hero" troop="mp_Sotnik_troop" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.45" cost="190" icon="Infantry_Heavy" melee_ai="75" ranged_ai="50" armor="48" movement_speed="0.73" combat_movement_speed="0.78" acceleration="2.8" hitpoints="100">
 		<Perks>
 			<!-- Слот 1: Баффы -->
 			<Perk game_mode="All" name="Heavy Plating" description="+12 Armor" icon="PerkToughness" perk_list="1">
@@ -150,7 +157,7 @@
 		</Perks>
 	</MPClassDivision>
 	<!-- Bannerman -->
-	<MPClassDivision id="mp_Bannerman" hero="mp_Bannerman_hero" troop="mp_Bannerman_troop" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.60" cost="140" icon="Infantry_Heavy" melee_ai="55" ranged_ai="40" armor="35" movement_speed="0.80" combat_movement_speed="0.9" acceleration="2.2" hitpoints="100">
+	<MPClassDivision id="mp_Bannerman" hero="mp_Bannerman_hero" troop="mp_Bannerman_troop" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.60" cost="140" icon="Infantry_Heavy" melee_ai="55" ranged_ai="40" armor="35" movement_speed="0.77" combat_movement_speed="0.84" acceleration="2.4" hitpoints="100">
 		<Perks>
 			<!-- Слот 1: Баффы -->
 			<Perk game_mode="All" name="Heavy Plating" description="+12 Armor" icon="PerkToughness" perk_list="1">
@@ -176,7 +183,7 @@
 	</MPClassDivision>
 	<!--item="mp_sturgia_heavy_axe" /> -->
 	<!-- Ranged -->
-	<MPClassDivision id="mp_DWDN_Archer" hero="mp_DWDN_Archer_hero" troop="mp_DWDN_Archer_troop" hero_idle_anim="act_empire_mp_archer_militia_idle" troop_idle_anim="act_idle_bow_1" multiplier="0.65" cost="120" icon="Archer_Light" melee_ai="40" ranged_ai="90" armor="8" movement_speed="0.76" combat_movement_speed="0.75" acceleration="3.0" hitpoints="100">
+	<MPClassDivision id="mp_DWDN_Archer" hero="mp_DWDN_Archer_hero" troop="mp_DWDN_Archer_troop" hero_idle_anim="act_empire_mp_archer_militia_idle" troop_idle_anim="act_idle_bow_1" multiplier="0.65" cost="120" icon="Archer_Light" melee_ai="40" ranged_ai="90" armor="8" movement_speed="0.79" combat_movement_speed="0.74" acceleration="2.4" hitpoints="100">
 		<Perks>
 			<!-- Слот 1: Баффы -->
 			<Perk game_mode="All" name="Steady Aim" description="Faster and steadier aiming with reduced movement penalty" icon="PerkMarksman" perk_list="1">
@@ -216,7 +223,7 @@
 		</Perks>
 	</MPClassDivision>
 	<!-- Crossbowman -->
-	<MPClassDivision id="mp_DWDN_Crossbowman" hero="mp_DWDN_Crossbowman_hero" troop="mp_DWDN_Crossbowman_troop" hero_idle_anim="act_empire_mp_archer_militia_idle" troop_idle_anim="act_idle_bow_1" multiplier="0.52" cost="150" icon="Archer_Light" melee_ai="50" ranged_ai="100" armor="20" movement_speed="0.74" combat_movement_speed="0.70" acceleration="3.0" hitpoints="100">
+	<MPClassDivision id="mp_DWDN_Crossbowman" hero="mp_DWDN_Crossbowman_hero" troop="mp_DWDN_Crossbowman_troop" hero_idle_anim="act_empire_mp_archer_militia_idle" troop_idle_anim="act_idle_bow_1" multiplier="0.52" cost="150" icon="Archer_Light" melee_ai="50" ranged_ai="100" armor="20" movement_speed="0.74" combat_movement_speed="0.68" acceleration="3.0" hitpoints="100">
 		<Perks>
 			<!-- Слот 1: Баффы -->
 			<Perk game_mode="All" name="Drill / Fast Reload" description="+20% Reload Speed" icon="PerkFasterRelease" perk_list="1">
@@ -245,7 +252,7 @@
 	</MPClassDivision>
 	<!-- Cav -->
 	<!-- Cav -->
-	<MPClassDivision id="mp_DWDN_Cav" hero="mp_DWDN_Cav_hero" troop="mp_DWDN_Cav_troop" hero_mount_idle_anim="act_vlandia_mp_vanguard_mount_idle" troop_mount_idle_anim="act_horse_idle_1" multiplier="0.42" cost="160" icon="Cavalry_Heavy" melee_ai="60" ranged_ai="40" armor="32" movement_speed="0.74" combat_movement_speed="0.65" acceleration="2.8" hitpoints="100">
+	<MPClassDivision id="mp_DWDN_Cav" hero="mp_DWDN_Cav_hero" troop="mp_DWDN_Cav_troop" hero_mount_idle_anim="act_vlandia_mp_vanguard_mount_idle" troop_mount_idle_anim="act_horse_idle_1" multiplier="0.42" cost="160" icon="Cavalry_Heavy" melee_ai="60" ranged_ai="40" armor="32" movement_speed="0.71" combat_movement_speed="0.63" acceleration="3.0" hitpoints="100">
 		<Perks>
 			<!-- Слот 1: Баффы -->
 			<Perk game_mode="All" name="Cuirassier" description="+10 Armor" icon="PerkArmorUpgrade" perk_list="1">
@@ -270,7 +277,7 @@
 		</Perks>
 	</MPClassDivision>
 	<!-- Knight -->
-	<MPClassDivision id="mp_Knight" hero="mp_Knight_hero" troop="mp_Knight_troop" hero_mount_idle_anim="act_vlandia_mp_vanguard_mount_idle" troop_mount_idle_anim="act_horse_idle_1" multiplier="0.30" cost="200" icon="Cavalry_Heavy" melee_ai="70" ranged_ai="40" armor="38" movement_speed="0.72" combat_movement_speed="0.60" acceleration="2.8" hitpoints="100">
+	<MPClassDivision id="mp_Knight" hero="mp_Knight_hero" troop="mp_Knight_troop" hero_mount_idle_anim="act_vlandia_mp_vanguard_mount_idle" troop_mount_idle_anim="act_horse_idle_1" multiplier="0.30" cost="200" icon="Cavalry_Heavy" melee_ai="70" ranged_ai="40" armor="38" movement_speed="0.70" combat_movement_speed="0.60" acceleration="3.2" hitpoints="100">
 		<Perks>
 			<!-- Слот 1: Конный / Пеший бой -->
 			<Perk game_mode="All" name="Warhorse" description="Spawns with an armored warhorse" icon="PerkCharger" perk_list="1">
@@ -296,7 +303,7 @@
 		</Perks>
 	</MPClassDivision>
 	<!-- Barons -->
-	<MPClassDivision id="mp_Bergen_Klaus" hero="mp_Bergen_Klaus_hero" troop="mp_Bergen_Klaus_troop" hero_mount_idle_anim="act_vlandia_mp_vanguard_mount_idle" troop_mount_idle_anim="act_horse_idle_1" multiplier="0.30" cost="200" icon="Cavalry_Heavy" melee_ai="70" ranged_ai="50" armor="38" movement_speed="0.73" combat_movement_speed="0.65" acceleration="2.8" hitpoints="100">
+	<MPClassDivision id="mp_Bergen_Klaus" hero="mp_Bergen_Klaus_hero" troop="mp_Bergen_Klaus_troop" hero_mount_idle_anim="act_vlandia_mp_vanguard_mount_idle" troop_mount_idle_anim="act_horse_idle_1" multiplier="0.30" cost="200" icon="Cavalry_Heavy" melee_ai="70" ranged_ai="50" armor="38" movement_speed="0.71" combat_movement_speed="0.63" acceleration="3.0" hitpoints="100">
 		<Perks>
 			<Perk game_mode="All" name="Light Armor" description="+5 Armor" icon="PerkArmorPadding" perk_list="1">
 				<OnSpawnEffect type="ArmorOnSpawn" value="5" />
@@ -306,7 +313,7 @@
 			</Perk>
 		</Perks>
 	</MPClassDivision>
-	<MPClassDivision id="mp_Finnard_Valerian" hero="mp_Finnard_Valerian_hero" troop="mp_Finnard_Valerian_troop" hero_mount_idle_anim="act_vlandia_mp_vanguard_mount_idle" troop_mount_idle_anim="act_horse_idle_1" multiplier="0.30" cost="200" icon="Cavalry_Heavy" melee_ai="70" ranged_ai="50" armor="38" movement_speed="0.73" combat_movement_speed="0.65" acceleration="2.8" hitpoints="100">
+	<MPClassDivision id="mp_Finnard_Valerian" hero="mp_Finnard_Valerian_hero" troop="mp_Finnard_Valerian_troop" hero_mount_idle_anim="act_vlandia_mp_vanguard_mount_idle" troop_mount_idle_anim="act_horse_idle_1" multiplier="0.30" cost="200" icon="Cavalry_Heavy" melee_ai="70" ranged_ai="50" armor="38" movement_speed="0.71" combat_movement_speed="0.63" acceleration="3.0" hitpoints="100">
 		<Perks>
 			<Perk game_mode="All" name="Light Armor" description="+5 Armor" icon="PerkArmorPadding" perk_list="1">
 				<OnSpawnEffect type="ArmorOnSpawn" value="5" />

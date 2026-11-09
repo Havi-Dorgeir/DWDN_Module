@@ -83,4 +83,14 @@ foreach ($xml in $xmlFiles) {
     }
 }
 
+# 8. Mirror mpitems (weapons, armors, shields, banners)
+if (Test-Path "$masterDir\ModuleData\mpitems") {
+    New-Item -ItemType Directory -Force -Path "$clientDir\ModuleData\mpitems" | Out-Null
+    New-Item -ItemType Directory -Force -Path "$serverDir\ModuleData\mpitems" | Out-Null
+    New-Item -ItemType Directory -Force -Path "$banAiDir\ModuleData\mpitems" | Out-Null
+    Copy-Item "$masterDir\ModuleData\mpitems\*" "$clientDir\ModuleData\mpitems\" -Recurse -Force
+    Copy-Item "$masterDir\ModuleData\mpitems\*" "$serverDir\ModuleData\mpitems\" -Recurse -Force
+    Copy-Item "$masterDir\ModuleData\mpitems\*" "$banAiDir\ModuleData\mpitems\" -Recurse -Force
+}
+
 Write-Host "Sync successful! Master DWDN_TRYM -> DWDN_TRY + DaewdenM fully deployed." -ForegroundColor Green

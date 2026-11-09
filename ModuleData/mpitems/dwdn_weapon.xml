@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Items>
+	<!-- DWDN Cleaver (Тесак Ратая) -->
+	<CraftedItem id="dwdn_cleaver" name="Тесак" crafting_template="OneHandedSword" culture="Culture.neutral_culture" modifier_group="sword" multiplayer_item="true">
+		<Pieces>
+			<Piece id="cleaver_blade_1" Type="Blade" scale_factor="100" />
+			<Piece id="cleaver_guard_1" Type="Guard" scale_factor="100" />
+			<Piece id="cleaver_grip_1" Type="Handle" scale_factor="100" />
+			<Piece id="cleaver_pommel_1" Type="Pommel" scale_factor="100" />
+		</Pieces>
+	</CraftedItem>
+	<!-- DWDN Falchion (Фальшион Банобранного) -->
+	<CraftedItem id="dwdn_falchion" name="Фальшион" crafting_template="OneHandedSword" culture="Culture.neutral_culture" modifier_group="sword" multiplayer_item="true">
+		<Pieces>
+			<Piece id="vlandian_blade_9" Type="Blade" scale_factor="100" />
+			<Piece id="vlandian_guard_1" Type="Guard" scale_factor="100" />
+			<Piece id="cleaver_grip_1" Type="Handle" scale_factor="100" />
+			<Piece id="vlandian_pommel_1" Type="Pommel" scale_factor="100" />
+		</Pieces>
+	</CraftedItem>
 	<!-- Bergen Sword -->
 	<CraftedItem id="bergens_bastard_sword" name="Bergens bastard sword" crafting_template="Daewden_BastardSword" multiplayer_item="true">
 		<Pieces>
@@ -60,7 +78,7 @@
 	-->
 	<Item id="mp_steppe_superior_bow" name="{=0h7l0uK3}Steppe Superior Bow" body_name="bo_longbow_a" mesh="bow_roman_a" holster_mesh_with_weapon="longbow_a_holster" weight="1.4" value="1" is_merchandise="false" difficulty="0" Type="Bow" item_holsters="bow_back_longbow:bow_back_longbow_2">
 		<ItemComponent>
-			<Weapon weapon_class="Bow" ammo_class="Arrow" missile_speed="65" accuracy="98" thrust_damage="48" thrust_speed="100" speed_rating="90" weapon_length="95" ammo_limit="1" thrust_damage_type="Pierce" item_usage="bow" physics_material="wood_weapon" center_of_mass="0.1,0,-0.15">
+			<Weapon weapon_class="Bow" ammo_class="Arrow" missile_speed="65" accuracy="98" thrust_damage="38" thrust_speed="100" speed_rating="90" weapon_length="95" ammo_limit="1" thrust_damage_type="Pierce" item_usage="bow" physics_material="wood_weapon" center_of_mass="0.1,0,-0.15">
 				<WeaponFlags RangedWeapon="true" HasString="true" StringHeldByHand="true" NotUsableWithOneHand="true" TwoHandIdleOnMount="true" AutoReload="true" UnloadWhenSheathed="true" />
 			</Weapon>
 		</ItemComponent>
@@ -92,7 +110,7 @@
 	<!-- Firearms (13-14th Century Handgonnes & Bombards) -->
 	<Item multiplayer_item="true" id="mp_gun_prototype" name="{=*}Prototype Handgonne" body_name="bo_composite_crossbows" mesh="crossbow_e" culture="Culture.neutral_culture" value="1" is_merchandise="false" weight="3.0" difficulty="0" Type="Crossbow" AmmoOffset="0.0, 0.02131, 0.22975" item_holsters="crossbow_back:bow_hip:mace_right_hip:bow_hip_2" holster_position_shift="0.02,0,-0.4">
 		<ItemComponent>
-			<Weapon weapon_class="Crossbow" ammo_class="Bolt" missile_speed="145" accuracy="22" thrust_damage="140" thrust_speed="25" speed_rating="18" weapon_length="95" ammo_limit="1" thrust_damage_type="Pierce" item_usage="crossbow" reload_phase_count="2" physics_material="wood_weapon" center_of_mass="0,0,0.4">
+			<Weapon weapon_class="Crossbow" ammo_class="Bolt" missile_speed="145" accuracy="22" thrust_damage="90" thrust_speed="25" speed_rating="18" weapon_length="95" ammo_limit="1" thrust_damage_type="Pierce" item_usage="crossbow" reload_phase_count="2" physics_material="wood_weapon" center_of_mass="0,0,0.4">
 				<WeaponFlags RangedWeapon="true" BonusAgainstShield="true" CanPenetrateShield="true" AmmoSticksWhenShot="false" AttachAmmoToVisual="false" CantReloadOnHorseback="true" NotUsableWithOneHand="true" TwoHandIdleOnMount="true" />
 			</Weapon>
 		</ItemComponent>
@@ -109,7 +127,7 @@
 
 	<Item multiplayer_item="true" id="hand_cannon" name="{=*}Hand Bombard" body_name="bo_composite_crossbows" mesh="crossbow_e" culture="Culture.vlandia" weight="3.8" appearance="1" difficulty="0" Type="Crossbow" AmmoOffset="0.0, 0.02131, 0.22975" item_holsters="crossbow_back:bow_hip:mace_right_hip:bow_hip_2" holster_position_shift="0.02,0,-0.4">
 		<ItemComponent>
-			<Weapon weapon_class="Crossbow" ammo_class="Bolt" missile_speed="135" accuracy="18" thrust_damage="165" thrust_speed="22" speed_rating="15" weapon_length="100" ammo_limit="1" thrust_damage_type="Pierce" item_usage="crossbow" reload_phase_count="2" physics_material="wood_weapon" center_of_mass="0,0,0.4">
+			<Weapon weapon_class="Crossbow" ammo_class="Bolt" missile_speed="135" accuracy="18" thrust_damage="110" thrust_speed="22" speed_rating="15" weapon_length="100" ammo_limit="1" thrust_damage_type="Pierce" item_usage="crossbow" reload_phase_count="2" physics_material="wood_weapon" center_of_mass="0,0,0.4">
 				<WeaponFlags RangedWeapon="true" BonusAgainstShield="true" CanPenetrateShield="true" AmmoSticksWhenShot="false" AttachAmmoToVisual="false" CantReloadOnHorseback="true" NotUsableWithOneHand="true" TwoHandIdleOnMount="true" />
 			</Weapon>
 		</ItemComponent>
