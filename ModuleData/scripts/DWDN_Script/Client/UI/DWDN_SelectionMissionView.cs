@@ -423,10 +423,11 @@ namespace DWDN_Script.Client.UI
             if (selection == null) return;
             _currentSelection = selection;
 
-            // Не вызываем SyncNativeTroopIndex здесь! Иначе нативный спавнер TaleWorlds пересоздает
-            // марионетку с белым шейдером материализации (белая вспышка). Синхронизируем только при спавне в ExecuteSpawn.
+            // Обновляем визуализацию марионетки на пьедестале локально без сетевых запросов.
+            // НЕ отправляем SendLoadoutToServer здесь! Иначе сервер шлет UpdateSelectedTroopIndex,
+            // что вызывает нативный белый спавн-шейдер марионетки (белую вспышку).
+            // Сервер получает финальный лодаут строго при нажатии "В бой" в ExecuteSpawn().
             UpdatePedestalVisual(_currentSelection);
-            SendLoadoutToServer(_currentSelection);
         }
 
         /// <summary>
