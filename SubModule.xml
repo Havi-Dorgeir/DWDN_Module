@@ -3,10 +3,11 @@
 	<Id value="DWDN_TRY"/>
 	<Version value="v1.0.0.0"/>
 	<DefaultModule value="false"/>
-	<ModuleCategory value="Singleplayer"/>
+	<ModuleCategory value="Multiplayer"/>
 	<Official value="false"/>
 	<DependedModules>
-		<DependedModule Id="Native" DependentVersion="v1.2.8" Optional="false" />
+		<DependedModule Id="Native" Optional="false" />
+		<DependedModule Id="Multiplayer" Optional="false" />
 	</DependedModules>
 	<SubModules>
 		<SubModule>
@@ -29,6 +30,30 @@
 	</SubModules>
 	<Xmls>
 		<XmlNode>
+			<XmlName id="CraftingTemplates" path="crafting_templates" />
+		</XmlNode>
+		<XmlNode>
+			<XmlName id="WeaponDescriptions" path="weapon_descriptions" />
+		</XmlNode>
+		<XmlNode>
+			<XmlName id="CraftingPieces" path="crafting_pieces" />
+			<IncludedGameTypes>
+				<GameType value="MultiplayerGame" />
+			</IncludedGameTypes>
+		</XmlNode>
+		<XmlNode>
+			<XmlName id="Items" path="mpitems" />
+			<IncludedGameTypes>
+				<GameType value="MultiplayerGame" />
+			</IncludedGameTypes>
+		</XmlNode>
+		<XmlNode>
+			<XmlName id="BasicCultures" path="mpcultures" />
+			<IncludedGameTypes>
+				<GameType value="MultiplayerGame" />
+			</IncludedGameTypes>
+		</XmlNode>
+		<XmlNode>
 			<XmlName id="MPCharacters" path="mpcharacters" />
 			<IncludedGameTypes>
 				<GameType value="MultiplayerGame" />
@@ -41,34 +66,10 @@
 			</IncludedGameTypes>
 		</XmlNode>
 		<XmlNode>
-			<XmlName id="BasicCultures" path="mpcultures" />
-			<IncludedGameTypes>
-				<GameType value="MultiplayerGame" />
-			</IncludedGameTypes>
-		</XmlNode>
-		<XmlNode>
-			<XmlName id="Items" path="mpitems" />
-			<GameType value="MultiplayerGame" />
-		</XmlNode>
-		<XmlNode>
 			<XmlName id="GameText" path="module_strings" />
 			<IncludedGameTypes>
 				<GameType value="MultiplayerGame" />
 			</IncludedGameTypes>
-		</XmlNode>
-		<XmlNode>
-			<XmlName id="WeaponDescriptions" path="weapon_descriptions" />
-			<GameType value="MultiplayerGame" />
-		</XmlNode>
-		<XmlNode>
-			<XmlName id="CraftingPieces" path="crafting_pieces" />
-			<IncludedGameTypes>
-				<GameType value="MultiplayerGame" />
-			</IncludedGameTypes>
-		</XmlNode>
-		<XmlNode>
-			<XmlName id="CraftingTemplates" path="crafting_templates" />
-			<GameType value="MultiplayerGame" />
 		</XmlNode>
 		<XmlNode>
 			<XmlName id="Monsters" path="monsters" />
