@@ -423,11 +423,9 @@ namespace DWDN_Script.Client.UI
             if (selection == null) return;
             _currentSelection = selection;
 
-            // Обновляем визуализацию марионетки на пьедестале локально без сетевых запросов.
-            // НЕ отправляем SendLoadoutToServer здесь! Иначе сервер шлет UpdateSelectedTroopIndex,
-            // что вызывает нативный белый спавн-шейдер марионетки (белую вспышку).
-            // Сервер получает финальный лодаут строго при нажатии "В бой" в ExecuteSpawn().
+            SyncNativeTroopIndex(_currentSelection);
             UpdatePedestalVisual(_currentSelection);
+            SendLoadoutToServer(_currentSelection);
         }
 
         /// <summary>
@@ -475,8 +473,7 @@ namespace DWDN_Script.Client.UI
                 data.RightWieldedItemIndex((int)mainHandWeaponIndex);
                 data.LeftWieldedItemIndex((int)offHandWeaponIndex);
 
-                // false = мгновенная смена без белой вспышки (isSlow: false)
-                agentVisual.Refresh(false, data, false);
+                agentVisual.Refresh(false, data, true);
 
                 // Возобновляем анимацию покоя (idle), чтобы персонаж дышал и не застывал в статической позе
                 ActionIndexCache actionCode = ActionIndexCache.act_walk_idle_unarmed;
@@ -562,7 +559,6 @@ namespace DWDN_Script.Client.UI
 
         public void ExecuteSpawn()
         {
-            SyncNativeTroopIndex(_currentSelection);
             SendLoadoutToServer(_currentSelection);
             _manualOpen = false;
 

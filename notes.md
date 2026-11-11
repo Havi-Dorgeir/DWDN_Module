@@ -1303,3 +1303,15 @@ ext_piece_offset="0"
        * РЎРЅСЏС‚Рѕ РѕРіСЂР°РЅРёС‡РµРЅРёРµ DependentVersion="v1.2.8".
 - **РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ СЃРµСЂРІРµСЂР°**:
   - Р‘Р°Р»Р°РЅСЃРЅС‹Рµ С„Р°Р№Р»С‹ СЂРµРїР»РёС†РёСЂРѕРІР°РЅС‹ РІ E:\SteamLibrary\steamapps\common\Mount & Blade II Dedicated Server\Modules\DaewdenM Рё СЃРµСЂРІРµСЂРЅС‹Р№ РєР°С‚Р°Р»РѕРі bin.
+---
+
+## 46. Перенос репозитория Git в DWDN_TRY (Единый корень разработки)
+
+- **Миграция священного ядра Git**:
+  - Папка .git (история, ветка main, хуки LFS, токен origin/main) перенесена в E:\SteamLibrary\steamapps\common\Mount & Blade II Bannerlord\Modules\DWDN_TRY.
+  - Модуль DWDN_TRY теперь является прямым Git-репозиторием проекта.
+  - В DWDN_TRY перенесены файлы конфигурации .gitignore и .gitattributes (Git LFS для rt_assets/).
+  - Все сопутствующие скрижали (
+otes.md, AI_MODDING_GUIDE.md, DOCUMENTATION.md, README.md, rt_assets/) развернуты в корне DWDN_TRY.
+- **Скрипт развертывания**:
+  - sync_all.ps1 в корне DWDN_TRY настроен на репликацию бинарников, скриптов, SubModule.xml и mpitems напрямую из DWDN_TRY в DaewdenM (Dedicated Server).

@@ -89,16 +89,11 @@ namespace DWDN_Script
                 }
 
                 // ==========================================
-                // 2. ОГНЕННАЯ ВСПЫШКА И ДЫМ (Gunpowder flash, sparks & smoke)
+                // 2. ДЫМ И ВСПЫШКА — Плотное облако порохового дыма (Gunpowder smoke cloud)
                 // ==========================================
-                // Огненная вспышка выстрела: мощный огненный шар (материал prt_shd_fire_1) перед стволом
-                MatrixFrame flashFrame = new MatrixFrame(orientation, muzzlePos + forward * 0.20f);
-                Mission.AddParticleSystemBurstByName("psys_game_burning_jar_trail", flashFrame, true);
-                Mission.AddParticleSystemBurstByName("psys_game_missile_flame", flashFrame, true);
-                Debug.Print($"[DWDN Firearms] Muzzle flash fired at {muzzlePos}!");
-
-                // Пороховой дым у дула (без удушающей серой осадной пыли, чтобы пламя было ярким и четким)
+                // Густое облако дыма у дула
                 Mission.AddParticleSystemBurstByName("psys_game_stone_dust_a", muzzleFrame, true);
+                Mission.AddParticleSystemBurstByName("psys_siege_door_falling_dust", muzzleFrame, true);
 
                 // Выброс порохового дыма вперед по траектории выстрела (+0.6м и +1.2м)
                 MatrixFrame smokePlume1 = new MatrixFrame(orientation, muzzlePos + forward * 0.60f);
@@ -107,7 +102,7 @@ namespace DWDN_Script
                 MatrixFrame smokePlume2 = new MatrixFrame(orientation, muzzlePos + forward * 1.20f);
                 Mission.AddParticleSystemBurstByName("psys_game_stone_dust_a", smokePlume2, true);
 
-                // Яркие пороховые искры
+                // Яркие пороховые искры и вспышка
                 Mission.AddParticleSystemBurstByName("psys_game_sparkle_a", muzzleFrame, true);
 
                 // Дымок у запального отверстия

@@ -1,11 +1,11 @@
 $ErrorActionPreference = "Stop"
 
 Write-Host "==================================================" -ForegroundColor Cyan
-Write-Host " [DWDN] Sacred Sync Ritual: DWDN_TRYM -> DaewdenM (Dedicated Server)" -ForegroundColor Cyan
+Write-Host " [DWDN] Sacred Sync Ritual: DWDN_TRY -> DaewdenM (Dedicated Server)" -ForegroundColor Cyan
 Write-Host "==================================================" -ForegroundColor Cyan
 
 # 0. Directories
-$masterDir     = "E:\SteamLibrary\steamapps\common\Mount & Blade II Bannerlord\Modules\DWDN_TRYM"
+$masterDir     = "E:\SteamLibrary\steamapps\common\Mount & Blade II Bannerlord\Modules\DWDN_TRY"
 $serverDir     = "E:\SteamLibrary\steamapps\common\Mount & Blade II Dedicated Server\Modules\DaewdenM"
 $serverBinDir  = "E:\SteamLibrary\steamapps\common\Mount & Blade II Dedicated Server\bin\Win64_Shipping_Server"
 $banAiDir      = "d:\banAImod\DWDN_TRY"
@@ -46,7 +46,7 @@ if (Test-Path $masterServerPdb) {
     Copy-Item $masterServerPdb "$serverBinDir\DWDN_Script.Server.pdb" -Force
 }
 
-# 4. Mirror scripts from Master DWDN_TRYM to Server and banAiDir
+# 4. Mirror scripts from Master DWDN_TRY to Server and banAiDir
 Write-Host "Mirroring scripts across modules..." -ForegroundColor Gray
 Copy-Item "$masterDir\ModuleData\scripts\*" "$serverDir\ModuleData\scripts\" -Recurse -Force
 Copy-Item "$masterDir\ModuleData\scripts\*" "$banAiDir\ModuleData\scripts\" -Recurse -Force
@@ -83,4 +83,4 @@ if (Test-Path "$masterDir\ModuleData\mpitems") {
     Copy-Item "$masterDir\ModuleData\mpitems\*" "$banAiDir\ModuleData\mpitems\" -Recurse -Force
 }
 
-Write-Host "Sync successful! Master DWDN_TRYM -> DaewdenM (Dedicated Server) fully deployed." -ForegroundColor Green
+Write-Host "Sync successful! Master DWDN_TRY -> DaewdenM (Dedicated Server) fully deployed." -ForegroundColor Green

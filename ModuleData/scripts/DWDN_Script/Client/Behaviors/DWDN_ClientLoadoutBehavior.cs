@@ -536,8 +536,7 @@ namespace DWDN_Script.Client.Behaviors
                 data.Equipment(customEquip);
                 data.RightWieldedItemIndex(0);
                 data.LeftWieldedItemIndex(1);
-                // false = мгновенная смена без белой вспышки (isSlow: false)
-                agentVisual.Refresh(false, data, false);
+                agentVisual.Refresh(false, data, true);
             }
             catch (Exception ex)
             {
