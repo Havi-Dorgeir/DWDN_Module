@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -30,16 +30,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Server|AnyCPU' ">
-    <AssemblyName>DWDN_Script.Server</AssemblyName>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\..\bin\Win64_Shipping_Server\</OutputPath>
-    <IntermediateOutputPath>obj\Server\</IntermediateOutputPath>
-    <DefineConstants>SERVER;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+
 
   <!-- Общие референсы (присутствуют и на Клиенте, и на Выделенном Сервере) -->
   <ItemGroup>
@@ -181,25 +172,14 @@
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 
-  <!-- Пост-билд для Клиентской сборки (автоматически собирает Серверную) -->
-  <Target Name="PostBuildClient" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)' != 'Server' ">
-    <MSBuild Projects="$(MSBuildProjectFile)" Properties="Configuration=Server;Platform=$(Platform)" Targets="Build" />
-  </Target>
-
-  <!-- Пост-билд для Серверной сборки (копирует чистую серверную DLL и SubModule.xml на Dedicated Server) -->
-  <Target Name="PostBuildServer" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)' == 'Server' ">
-    <Exec Command="
-      if exist &quot;..\..\..\bin\Win64_Shipping_Server\DWDN_Script.dll&quot; del /F /Q &quot;..\..\..\bin\Win64_Shipping_Server\DWDN_Script.dll&quot;
-      xcopy /Y /I &quot;$(TargetPath)&quot; &quot;..\..\..\bin\Win64_Shipping_Client\&quot;
-      xcopy /Y /I &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;..\..\..\bin\Win64_Shipping_Client\&quot;
-      if exist &quot;E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Dedicated Server\Modules\DaewdenM\bin\Win64_Shipping_Server\&quot; (
-        if exist &quot;E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Dedicated Server\Modules\DaewdenM\bin\Win64_Shipping_Server\DWDN_Script.dll&quot; del /F /Q &quot;E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Dedicated Server\Modules\DaewdenM\bin\Win64_Shipping_Server\DWDN_Script.dll&quot;
-        xcopy /Y /I &quot;$(TargetPath)&quot; &quot;E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Dedicated Server\Modules\DaewdenM\bin\Win64_Shipping_Server\&quot;
-        xcopy /Y /I &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Dedicated Server\Modules\DaewdenM\bin\Win64_Shipping_Server\&quot;
-        xcopy /Y /I &quot;$(TargetPath)&quot; &quot;E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Dedicated Server\Modules\DaewdenM\bin\Win64_Shipping_Client\&quot;
-        xcopy /Y /I &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Dedicated Server\Modules\DaewdenM\bin\Win64_Shipping_Client\&quot;
-        xcopy /Y &quot;..\..\..\SubModule.xml&quot; &quot;E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Dedicated Server\Modules\DaewdenM\&quot;
-      )
-    " />
+  <!--
+    Серверная DLL (DWDN_Script.Server.dll) с Bannerlord v1.5.7 собирается ОТДЕЛЬНЫМ
+    проектом ..\DWDN_Script.Server под net8.0 и против библиотек выделенного
+    сервера: под .NET Framework 4.7.2 новый сервер её не загрузит. Прежняя
+    конфигурация Server этого проекта снята. Клиентская сборка зовёт серверную
+    следом, как и раньше; путь к серверу — см. шапку DWDN_Script.Server.csproj.
+  -->
+  <Target Name="PostBuildServerNet8" AfterTargets="PostBuildEvent">
+    <Exec Command="dotnet build &quot;$(MSBuildProjectDirectory)\..\DWDN_Script.Server\DWDN_Script.Server.csproj&quot; -c Release" />
   </Target>
 </Project>
