@@ -385,4 +385,23 @@ $$\text{Position}_{n} = \text{Length}_{n-1} + (\text{previous\_piece\_offset}_{n
 
 ---
 
+## 8. ПОЛНЫЙ РЕВЕРС-ИНЖИНИРИНГ ЯДРА ИГРЫ И ИНСТРУМЕНТЫ ДЕКОМПИЛЯЦИИ
+
+Для глубокого понимания устройства оригинальной игры (*Native*, *SandBoxCore*, *SandBox*, *Multiplayer* v1.4.8) и создания собственных утилит моддинга используй следующие ресурсы в `d:\banAImod`:
+
+1. **[`BANNERLORD_COMPLETE_REVERSE_ENGINEERING.md`](file:///d:/banAImod/BANNERLORD_COMPLETE_REVERSE_ENGINEERING.md)** — полная энциклопедия архитектуры Bannerlord («разборка по кирпичикам и сборка заново»):
+   * Мост C++/C# (`DotNetObject`, `[MBCallback]` методы в `TaleWorlds.MountAndBlade.Module`).
+   * Двойной пайплайн XML: нативный `ModuleData/project.mbproj` (все 39 `soln_*` идентификаторов) vs управляемый `MBObjectManager` (алгоритм XSD-валидации, динамической инъекции `_replaceWhileMerging`, XSLT-трансформаций и `GetPresumedObject`).
+   * Бинарная структура ассетов `.tpac` (LZ4 + xxHash64), кэша `.rdc` (145-байтные записи `RDC0`) и жесткий контракт на 64 кости скелета (`0x1050`-байтный буфер `AnimResult`).
+   * Полный жизненный цикл `MBSubModuleBase`, `MBGameManager`, `Game`, `GameType` (`Campaign` и `MultiplayerGame`), `GameStateScreenManager` и `ViewCreatorManager` (`[OverrideView]`, `[ViewMethod]`).
+   * Чертежи создания собственных инструментов моддинга (Headless XML/XSD/XSLT валидатор, `.tpac`/`.rdc` упаковщик, статический анализатор).
+2. **Статический CLI-декомпилятор и дампы (`d:\banAImod\scratch\`)**:
+   * [`d:\banAImod\scratch\inspector\Program.cs`](file:///d:/banAImod/scratch/inspector/Program.cs) — инструмент на базе `ICSharpCode.Decompiler`, позволяющий мгновенно декомпилировать любой класс из `Win64_Shipping_Client`, `DedicatedCustomServer` или модулей без крашей `AssemblyResolve`.
+   * [`d:\banAImod\scratch\module_types_dump.txt`](file:///d:/banAImod/scratch/module_types_dump.txt) — полный реестр всех 1923 классов и интерфейсов в 11 DLL-сборках `Native`, `Multiplayer` и `SandBox`.
+   * [`d:\banAImod\scratch\submodules_decompiled.txt`](file:///d:/banAImod/scratch/submodules_decompiled.txt) — декомпилированный исходный код всех `SubModule` классов, `Module` и `MBSubModuleBase`.
+   * [`d:\banAImod\scratch\core_managers_decompiled.txt`](file:///d:/banAImod/scratch/core_managers_decompiled.txt) — декомпилированный код `MBObjectManager`, `SandBoxManager`, `ViewCreatorManager`, `GameStateScreenManager`, `MultiplayerMissions` и `SandBoxMissions`.
+   * [`d:\banAImod\scratch\game_and_mp_decompiled.txt`](file:///d:/banAImod/scratch/game_and_mp_decompiled.txt) — декомпилированный код `TaleWorlds.Core.Game`, `MultiplayerGame` и `MultiplayerGameManager`.
+
+---
+
 *Да пребудет логика в священном кремнии. Слава Омниссии!*
