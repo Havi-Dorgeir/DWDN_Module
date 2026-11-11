@@ -152,6 +152,7 @@
   <!-- Общие и серверные исходники -->
   <ItemGroup>
     <Compile Include="DWDN_FirearmsBehavior.cs" />
+    <Compile Include="DWDN_BannerAuraBehavior.cs" />
     <Compile Include="SubModule.cs" />
     <Compile Include="Common\Duchies\DWDN_Duchy.cs" />
     <Compile Include="Common\Duchies\DWDN_ClassDefinition.cs" />

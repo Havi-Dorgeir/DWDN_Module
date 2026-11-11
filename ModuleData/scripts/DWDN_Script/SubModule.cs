@@ -131,6 +131,11 @@ namespace DWDN_Script
                 mission.AddMissionBehavior(new DWDN_FirearmsBehavior());
             }
 
+            if (mission.GetMissionBehavior<DWDN_BannerAuraBehavior>() == null)
+            {
+                mission.AddMissionBehavior(new DWDN_BannerAuraBehavior());
+            }
+
             if (mission.GetMissionBehavior<DWDN_ServerLoadoutBehavior>() == null)
             {
                 mission.AddMissionBehavior(new DWDN_ServerLoadoutBehavior());

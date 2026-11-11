@@ -136,7 +136,7 @@ namespace DWDN_Script.Common.Duchies
             var bannerman = new DWDN_ClassDefinition(
                 "mp_Bannerman",
                 "Знаменосец",
-                "Несет священное знамя Даевдена, вдохновляя соратников на ратные подвиги.",
+                "Носитель боевого знамени (Аура 12м со знаменем в руках: +4 брони, +5% скорости, +4% атаки, реген до 75% HP вне боя).",
                 "mp_Bannerman_hero"
             );
             bannerman.AllowedHelmets.AddRange(new[] { "banerman_bascinet", "" });

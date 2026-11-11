@@ -17,7 +17,11 @@ RuntimeDataCache/
 # Build Intermediate Outputs
 ModuleData/scripts/DWDN_Script/bin/
 ModuleData/scripts/DWDN_Script/obj/
+Tools/**/bin/
+Tools/**/obj/
+Tools/**/output/
 **/obj/
+SubModules.xml
 
 # Windows & OS Artifacts
 Thumbs.db

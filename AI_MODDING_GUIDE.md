@@ -404,4 +404,24 @@ $$\text{Position}_{n} = \text{Length}_{n-1} + (\text{previous\_piece\_offset}_{n
 
 ---
 
+## 9. АВТОНОМНЫЕ ИНСТРУМЕНТЫ МОДДИНГА И ИГРОВЫЕ СИСТЕМЫ DWDN
+
+В корне `d:\banAImod` созданы три специализированные GUI-студии (WinForms .NET 8.0) для автоматизации моддинга и верификации:
+
+1. **Авто-Калибратор 3D Оружия (`d:\banAImod\WeaponCalibrator\`, ярлык [`ЗАПУСК_КАЛИБРАТОРА.bat`](file:///d:/banAImod/%D0%97%D0%90%D0%9F%D0%A3%D0%A1%D0%9A_%D0%9A%D0%90%D0%9B%D0%98%D0%91%D0%A0%D0%90%D0%A2%D0%9E%D0%A0%D0%90.bat))**:
+   * Напрямую парсит бинарные `.tpac` архивы модуля (`LZ4` + `METM`) и `AssetSources/*.fbx`, вычисляя точные 3D-габариты (`BoundingBox`, Z-стыки, радиус шейки) и автоматически генерируя калиброванный XML для `crafting_pieces.xml` и `mpitems.xml` с интерактивным 3D-вьюпортом.
+2. **Визуальный Конструктор Герцогств и Лодаутов (`d:\banAImod\DuchyLoadoutStudio\`, ярлык [`ЗАПУСК_КОНСТРУКТОРА_КЛАССОВ.bat`](file:///d:/banAImod/%D0%97%D0%90%D0%9F%D0%A3%D0%A1%D0%9A_%D0%9A%D0%9E%D0%9D%D1%81%D0%A2%D0%A0%D0%A3%D0%9A%D0%A2%D0%9E%D0%A0%D0%90_%D0%9A%D0%9B%D0%90%D0%A1%D0%A1%D0%9E%D0%92.bat))**:
+   * Парсит `DWDN_DuchyManager.cs`, `mpclassdivisions.xml`, `mpcharacters.xml` и `mpitems.xml`, отображая 3D-манекен выбранного класса в реальном времени.
+   * Кнопка **«⚡ АВТО-ПРИМЕНИТЬ В МОД DWDN_TRY»** автоматически патчит `DWDN_DuchyManager.cs`, синхронизирует `mpclassdivisions.xml` и `mpcharacters.xml`, компилирует `DWDN_Script.dll` + `DWDN_Script.Server.dll` и зеркалирует билд на выделенный сервер `DaewdenM`.
+3. **Мгновенный Предпусковой Валидатор Мода (`d:\banAImod\ModValidator\`, ярлык [`ЗАПУСК_ВАЛИДАТОРА_МОДА.bat`](file:///d:/banAImod/%D0%97%D0%90%D0%9F%D0%A3%D0%A1%D0%9A_%D0%92%D0%90%D0%9B%D0%98%D0%94%D0%90%D0%A2%D0%9E%D0%A0%D0%90_%D0%9C%D0%9E%D0%94%D0%90.bat))**:
+   * За ~0.25 сек проверяет 8 критических узлов мода: синтаксис XML, `SubModule.xml`, целостность цепочки `DWDN_DuchyManager.cs` $\leftrightarrow$ `mpclassdivisions.xml` $\leftrightarrow$ `mpcharacters.xml` $\leftrightarrow$ `mpitems.xml` $\leftrightarrow$ `crafting_pieces.xml`, наличие 3D-мешей в `.tpac`, баланс зазоров составного оружия и побайтовую синхронизацию хэшей `SHA-256` между клиентом и сервером (с кнопкой авто-исправления в 1 клик).
+
+### Система Тактической Ауры Знаменосца (`DWDN_BannerAuraBehavior.cs`)
+* Файл: [`DWDN_BannerAuraBehavior.cs`](file:///e:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/DWDN_BannerAuraBehavior.cs), регистрируется в `SubModule.AddMissionBehaviors`.
+* **Важный технический паттерн `AgentDrivenProperties` в мультиплеере**:
+  * В Bannerlord при смене оружия (`OnWieldedItemIndexChange`) движок вызывает `agent.UpdateAgentProperties()`, который перезаписывает динамические статы (`MaxSpeedMultiplier`, `SwingSpeedMultiplier`, `ReloadSpeed`), но **не** пересчитывает статические статы спавна (`ArmorHead/Torso/Arms/Legs`, `CombatMaxSpeedMultiplier`).
+  * Поэтому при наложении или снятии баффов в `DWDN_BannerAuraBehavior` сначала кэшируются базовые значения брони (`BaseArmorHead` и т.д.) при первом входе агента, затем вызывается `agent.UpdateAgentProperties()`, после чего поверх чистых статов выставляется `Armor* = BaseArmor* + bonus`, умножаются скоростные коэффициенты и вызывается `agent.UpdateCustomDrivenProperties()`. Это полностью исключает кумулятивное накопление статов и сброс баффа при смене оружия, а выполнение на клиенте и сервере одновременно предотвращает сетевой рассинхрон скорости (rubberbanding).
+
+---
+
 *Да пребудет логика в священном кремнии. Слава Омниссии!*
