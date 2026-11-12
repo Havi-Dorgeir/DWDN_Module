@@ -31,17 +31,30 @@
 
 ## 🛠 Быстрый старт: Сборка исходного кода
 
-Проект C# расположен по пути:
-`ModuleData/scripts/DWDN_Script/DWDN_Script.csproj` (Target Framework: `.NET Framework 4.7.2`).
+Модуль собирается из двух проектов:
 
-Сборка через .NET CLI:
+| Что | Проект | Платформа | Куда кладётся |
+|---|---|---|---|
+| Клиент — `DWDN_Script.dll` | `ModuleData/scripts/DWDN_Script/DWDN_Script.csproj` | .NET Framework 4.7.2 | `bin/Win64_Shipping_Client` |
+| Сервер — `DWDN_Script.Server.dll` | `ModuleData/scripts/DWDN_Script.Server/DWDN_Script.Server.csproj` | **.NET 8** | `bin/Win64_Shipping_Server` и `bin/Linux64_Shipping_Server` |
+
+С Bannerlord **v1.5.7** выделенный сервер работает на .NET 8. Серверная DLL,
+собранная под .NET Framework, на нём не загружается, поэтому сервер собирается
+отдельным проектом и против библиотек **выделенного сервера** (Steam,
+«Mount & Blade II: Dedicated Server»), а не клиента.
+
 ```powershell
-# Клиентская библиотека (DWDN_Script.dll)
+# Клиент (следом сам соберёт и сервер)
 dotnet build ModuleData/scripts/DWDN_Script/DWDN_Script.csproj -c Release
 
-# Серверная библиотека для Dedicated Server (DWDN_Script.Server.dll)
-dotnet build ModuleData/scripts/DWDN_Script/DWDN_Script.csproj -c Server
+# Только сервер
+dotnet build ModuleData/scripts/DWDN_Script.Server/DWDN_Script.Server.csproj -c Release
 ```
+
+Где лежит выделенный сервер, проект ищет сам — рядом с клиентом в той же
+библиотеке Steam (`steamapps/common/Mount & Blade II Dedicated Server`). Если он
+в другом месте, укажите путь: `-p:BannerlordServerDir="D:\...\Mount & Blade II Dedicated Server"`
+или переменной окружения `BANNERLORD_SERVER_DIR`.
 
 ---
 
