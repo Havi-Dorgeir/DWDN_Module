@@ -536,7 +536,7 @@ namespace DWDN_Script.Client.Behaviors
                 data.Equipment(customEquip);
                 data.RightWieldedItemIndex(0);
                 data.LeftWieldedItemIndex(1);
-                agentVisual.Refresh(false, data, true);
+                agentVisual.Refresh(false, data, false);
             }
             catch (Exception ex)
             {

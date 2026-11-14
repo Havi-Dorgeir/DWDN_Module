@@ -1,10 +1,151 @@
 using System;
+using System.Collections.Generic;
+using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.MountAndBlade.Network.Messages;
 using DWDN_Script.Common.Duchies;
 
 namespace DWDN_Script.Common.Network
 {
+    /// <summary>
+    /// Сетевой пакет: запрос игрока на отцепку коня и перевод артиллерии в боевое положение.
+    /// Отправляется клиентом на сервер при нажатии [F] возле упряжи/сцепки.
+    /// </summary>
+    [DefineGameNetworkMessageTypeForMod(GameNetworkMessageSendType.FromClient)]
+    public sealed class RequestDeployArtilleryMessage : GameNetworkMessage
+    {
+        public int EngineId { get; set; }
+
+        public RequestDeployArtilleryMessage() { }
+        public RequestDeployArtilleryMessage(int engineId)
+        {
+            EngineId = engineId;
+        }
+
+        protected override void OnWrite()
+        {
+            WriteIntToPacket(EngineId, CompressionBasic.DebugIntNonCompressionInfo);
+        }
+
+        protected override bool OnRead()
+        {
+            bool bufferReadValid = true;
+            EngineId = ReadIntFromPacket(CompressionBasic.DebugIntNonCompressionInfo, ref bufferReadValid);
+            return bufferReadValid;
+        }
+
+        protected override MultiplayerMessageFilter OnGetLogFilter() => MultiplayerMessageFilter.GameMode;
+        protected override string OnGetLogFormat() => $"RequestDeployArtilleryMessage: EngineId={EngineId}";
+    }
+
+    /// <summary>
+    /// Сетевой пакет: полная рекурсивная синхронизация MissionObjectId всех вложенных
+    /// узлов осадного орудия (StandingPoint, SiegeMachineStonePile, ammo_pos и др.) от сервера к клиентам.
+    /// Также передает индекс упряжной лошади и флаг использования ванильной тележки.
+    /// </summary>
+    [DefineGameNetworkMessageTypeForMod(GameNetworkMessageSendType.FromServer)]
+    public sealed class SyncArtilleryDescendantsMessage : GameNetworkMessage
+    {
+        public int EngineId { get; set; }
+        public MissionObjectId RootObjectId { get; set; }
+        public string PrefabName { get; set; } = "";
+        public int TeamSide { get; set; }
+        public MatrixFrame Frame { get; set; }
+        public int HorseAgentIndex { get; set; } = -1;
+        public bool UsesCart { get; set; }
+        public List<MissionObjectId> DescendantObjectIds { get; set; } = new List<MissionObjectId>();
+
+        public SyncArtilleryDescendantsMessage() { }
+        public SyncArtilleryDescendantsMessage(int engineId, MissionObjectId rootObjectId, string prefabName, int teamSide, MatrixFrame frame, int horseAgentIndex, bool usesCart, List<MissionObjectId> descendantObjectIds)
+        {
+            EngineId = engineId;
+            RootObjectId = rootObjectId;
+            PrefabName = prefabName ?? "";
+            TeamSide = teamSide;
+            Frame = frame;
+            HorseAgentIndex = horseAgentIndex;
+            UsesCart = usesCart;
+            DescendantObjectIds = descendantObjectIds ?? new List<MissionObjectId>();
+        }
+
+        protected override void OnWrite()
+        {
+            WriteIntToPacket(EngineId, CompressionBasic.DebugIntNonCompressionInfo);
+            WriteMissionObjectIdToPacket(RootObjectId);
+            WriteStringToPacket(PrefabName ?? "");
+            WriteIntToPacket(TeamSide, CompressionBasic.DebugIntNonCompressionInfo);
+            WriteMatrixFrameToPacket(Frame);
+            WriteAgentIndexToPacket(HorseAgentIndex);
+            WriteBoolToPacket(UsesCart);
+            int count = DescendantObjectIds?.Count ?? 0;
+            WriteIntToPacket(count, CompressionBasic.DebugIntNonCompressionInfo);
+            for (int i = 0; i < count; i++)
+            {
+                WriteMissionObjectIdToPacket(DescendantObjectIds[i]);
+            }
+        }
+
+        protected override bool OnRead()
+        {
+            bool bufferReadValid = true;
+            EngineId = ReadIntFromPacket(CompressionBasic.DebugIntNonCompressionInfo, ref bufferReadValid);
+            RootObjectId = ReadMissionObjectIdFromPacket(ref bufferReadValid);
+            PrefabName = ReadStringFromPacket(ref bufferReadValid);
+            TeamSide = ReadIntFromPacket(CompressionBasic.DebugIntNonCompressionInfo, ref bufferReadValid);
+            Frame = ReadMatrixFrameFromPacket(ref bufferReadValid);
+            HorseAgentIndex = ReadAgentIndexFromPacket(ref bufferReadValid);
+            UsesCart = ReadBoolFromPacket(ref bufferReadValid);
+            int count = ReadIntFromPacket(CompressionBasic.DebugIntNonCompressionInfo, ref bufferReadValid);
+            DescendantObjectIds = new List<MissionObjectId>(count);
+            for (int i = 0; i < count; i++)
+            {
+                DescendantObjectIds.Add(ReadMissionObjectIdFromPacket(ref bufferReadValid));
+            }
+            return bufferReadValid;
+        }
+
+        protected override MultiplayerMessageFilter OnGetLogFilter() => MultiplayerMessageFilter.GameMode;
+        protected override string OnGetLogFormat() => $"SyncArtilleryDescendantsMessage: EngineId={EngineId}, Prefab={PrefabName}, Horse={HorseAgentIndex}, Cart={UsesCart}, Children={DescendantObjectIds.Count}";
+    }
+
+    /// <summary>
+    /// Сетевой пакет: трансляция перехода орудия в боевой режим (отцепка коня, активация боеприпасов и станций огня).
+    /// </summary>
+    [DefineGameNetworkMessageTypeForMod(GameNetworkMessageSendType.FromServer)]
+    public sealed class SetArtilleryCombatStateMessage : GameNetworkMessage
+    {
+        public int EngineId { get; set; }
+        public bool IsCombatState { get; set; }
+        public MatrixFrame Frame { get; set; }
+
+        public SetArtilleryCombatStateMessage() { }
+        public SetArtilleryCombatStateMessage(int engineId, bool isCombatState, MatrixFrame frame)
+        {
+            EngineId = engineId;
+            IsCombatState = isCombatState;
+            Frame = frame;
+        }
+
+        protected override void OnWrite()
+        {
+            WriteIntToPacket(EngineId, CompressionBasic.DebugIntNonCompressionInfo);
+            WriteBoolToPacket(IsCombatState);
+            WriteMatrixFrameToPacket(Frame);
+        }
+
+        protected override bool OnRead()
+        {
+            bool bufferReadValid = true;
+            EngineId = ReadIntFromPacket(CompressionBasic.DebugIntNonCompressionInfo, ref bufferReadValid);
+            IsCombatState = ReadBoolFromPacket(ref bufferReadValid);
+            Frame = ReadMatrixFrameFromPacket(ref bufferReadValid);
+            return bufferReadValid;
+        }
+
+        protected override MultiplayerMessageFilter OnGetLogFilter() => MultiplayerMessageFilter.GameMode;
+        protected override string OnGetLogFormat() => $"SetArtilleryCombatStateMessage: EngineId={EngineId}, Combat={IsCombatState}";
+    }
+
     /// <summary>
     /// Сетевой пакет: отправка выбранного комплекта экипировки с клиента на сервер.
     /// Использует официальный Mod-атрибут Bannerlord: DefineGameNetworkMessageTypeForMod.
@@ -110,5 +251,77 @@ namespace DWDN_Script.Common.Network
                 HorseId = this.HorseId
             };
         }
+    }
+
+    /// <summary>
+    /// Сетевой пакет: запрос административного действия с клиента на сервер.
+    /// Отправляется при взаимодействии с кастомной админ-панелью DWDN Admin Tools.
+    /// </summary>
+    [DefineGameNetworkMessageTypeForMod(GameNetworkMessageSendType.FromClient)]
+    public sealed class RequestAdminActionMessage : GameNetworkMessage
+    {
+        public string Action { get; set; } = "";
+        public string TargetPlayerId { get; set; } = "";
+        public string Argument { get; set; } = "";
+
+        public RequestAdminActionMessage() { }
+
+        public RequestAdminActionMessage(string action, string targetPlayerId = "", string argument = "")
+        {
+            Action = action ?? "";
+            TargetPlayerId = targetPlayerId ?? "";
+            Argument = argument ?? "";
+        }
+
+        protected override void OnWrite()
+        {
+            WriteStringToPacket(Action ?? "");
+            WriteStringToPacket(TargetPlayerId ?? "");
+            WriteStringToPacket(Argument ?? "");
+        }
+
+        protected override bool OnRead()
+        {
+            bool bufferReadValid = true;
+            Action = ReadStringFromPacket(ref bufferReadValid);
+            TargetPlayerId = ReadStringFromPacket(ref bufferReadValid);
+            Argument = ReadStringFromPacket(ref bufferReadValid);
+            return bufferReadValid;
+        }
+
+        protected override MultiplayerMessageFilter OnGetLogFilter() => MultiplayerMessageFilter.GameMode;
+        protected override string OnGetLogFormat() => $"RequestAdminActionMessage: Action={Action}, Target={TargetPlayerId}, Arg={Argument}";
+    }
+
+    /// <summary>
+    /// Сетевой пакет: синхронизация статуса администратора от сервера клиенту.
+    /// Позволяет клиентскому UI знать, доступны ли права модератора/администратора.
+    /// </summary>
+    [DefineGameNetworkMessageTypeForMod(GameNetworkMessageSendType.FromServer)]
+    public sealed class SyncAdminStateMessage : GameNetworkMessage
+    {
+        public bool IsAdmin { get; set; }
+
+        public SyncAdminStateMessage() { }
+
+        public SyncAdminStateMessage(bool isAdmin)
+        {
+            IsAdmin = isAdmin;
+        }
+
+        protected override void OnWrite()
+        {
+            WriteBoolToPacket(IsAdmin);
+        }
+
+        protected override bool OnRead()
+        {
+            bool bufferReadValid = true;
+            IsAdmin = ReadBoolFromPacket(ref bufferReadValid);
+            return bufferReadValid;
+        }
+
+        protected override MultiplayerMessageFilter OnGetLogFilter() => MultiplayerMessageFilter.GameMode;
+        protected override string OnGetLogFormat() => $"SyncAdminStateMessage: IsAdmin={IsAdmin}";
     }
 }

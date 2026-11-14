@@ -3,16 +3,19 @@ using System.IO;
 using System.Reflection;
 using Path = System.IO.Path;
 using TaleWorlds.Engine;
+using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 using DWDN_Script.Common.Duchies;
 using DWDN_Script.Server.Behaviors;
+using DWDN_Script.Server.Admin;
 #if !SERVER
 using TaleWorlds.Engine.GauntletUI;
 using TaleWorlds.GauntletUI.BaseTypes;
 using TaleWorlds.ScreenSystem;
 using TaleWorlds.TwoDimension;
 using DWDN_Script.Client.Behaviors;
+using DWDN_Script.Client.UI.Admin;
 #endif
 
 namespace DWDN_Script
@@ -110,6 +113,15 @@ namespace DWDN_Script
             ));
         }
 
+        public override void OnMultiplayerGameStart(Game game, object starterObject)
+        {
+            base.OnMultiplayerGameStart(game, starterObject);
+            if (GameNetwork.IsServer)
+            {
+                game.AddGameHandler<DWDN_AdminGameHandler>();
+            }
+        }
+
         public override void OnBeforeMissionBehaviorInitialize(Mission mission)
         {
             base.OnBeforeMissionBehaviorInitialize(mission);
@@ -131,14 +143,29 @@ namespace DWDN_Script
                 mission.AddMissionBehavior(new DWDN_FirearmsBehavior());
             }
 
+            if (mission.GetMissionBehavior<DWDN_GrenadeBehavior>() == null)
+            {
+                mission.AddMissionBehavior(new DWDN_GrenadeBehavior());
+            }
+
             if (mission.GetMissionBehavior<DWDN_BannerAuraBehavior>() == null)
             {
                 mission.AddMissionBehavior(new DWDN_BannerAuraBehavior());
             }
 
+            if (mission.GetMissionBehavior<DWDN_FieldArtilleryBehavior>() == null)
+            {
+                mission.AddMissionBehavior(new DWDN_FieldArtilleryBehavior());
+            }
+
             if (mission.GetMissionBehavior<DWDN_ServerLoadoutBehavior>() == null)
             {
                 mission.AddMissionBehavior(new DWDN_ServerLoadoutBehavior());
+            }
+
+            if (mission.GetMissionBehavior<DWDN_AdminBehavior>() == null)
+            {
+                mission.AddMissionBehavior(new DWDN_AdminBehavior());
             }
 
 #if !SERVER
@@ -148,6 +175,13 @@ namespace DWDN_Script
                 {
                     mission.AddMissionBehavior(new DWDN_ClientMissionComponent());
                 }
+
+                if (mission.GetMissionBehavior<DWDN_InputBehavior>() == null)
+                {
+                    mission.AddMissionBehavior(new DWDN_InputBehavior());
+                }
+
+
             }
 #endif
         }

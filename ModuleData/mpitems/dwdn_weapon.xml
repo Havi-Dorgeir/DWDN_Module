@@ -1,21 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Items>
-	<!-- DWDN Cleaver (Тесак Ратая) -->
+	<!-- DWDN Peasant Knife (Сельскохозяйственный нож Ратая) -->
+	<CraftedItem id="dwdn_peasant_knife" name="Сельскохозяйственный нож" crafting_template="Dagger" culture="Culture.neutral_culture" modifier_group="sword" multiplayer_item="true">
+		<Pieces>
+			<Piece id="mp_dagger_blade_1" Type="Blade" scale_factor="100" />
+			<Piece id="mp_battania_dagger_guard" Type="Guard" scale_factor="100" />
+			<Piece id="mp_battania_dagger_grip" Type="Handle" scale_factor="100" />
+			<Piece id="mp_battania_dagger_pommel" Type="Pommel" scale_factor="100" />
+		</Pieces>
+	</CraftedItem>
+	<!-- DWDN Cleaver (Тесак) -->
 	<CraftedItem id="dwdn_cleaver" name="Тесак" crafting_template="OneHandedSword" culture="Culture.neutral_culture" modifier_group="sword" multiplayer_item="true">
 		<Pieces>
-			<Piece id="cleaver_blade_1" Type="Blade" scale_factor="100" />
-			<Piece id="cleaver_guard_1" Type="Guard" scale_factor="100" />
-			<Piece id="cleaver_grip_1" Type="Handle" scale_factor="100" />
-			<Piece id="cleaver_pommel_1" Type="Pommel" scale_factor="100" />
+			<Piece id="mp_battania_cleaver_blade" Type="Blade" scale_factor="100" />
+			<Piece id="mp_battania_short_sword_guard" Type="Guard" scale_factor="100" />
+			<Piece id="mp_battania_bastard_sword_grip" Type="Handle" scale_factor="100" />
+			<Piece id="mp_battania_bastard_sword_pommel" Type="Pommel" scale_factor="100" />
 		</Pieces>
 	</CraftedItem>
 	<!-- DWDN Falchion (Фальшион Банобранного) -->
 	<CraftedItem id="dwdn_falchion" name="Фальшион" crafting_template="OneHandedSword" culture="Culture.neutral_culture" modifier_group="sword" multiplayer_item="true">
 		<Pieces>
-			<Piece id="vlandian_blade_9" Type="Blade" scale_factor="100" />
-			<Piece id="vlandian_guard_1" Type="Guard" scale_factor="100" />
-			<Piece id="cleaver_grip_1" Type="Handle" scale_factor="100" />
-			<Piece id="vlandian_pommel_1" Type="Pommel" scale_factor="100" />
+			<Piece id="mp_vlandia_fast_sword_blade" Type="Blade" scale_factor="100" />
+			<Piece id="mp_vlandia_fast_sword_guard" Type="Guard" scale_factor="100" />
+			<Piece id="mp_vlandia_fast_sword_grip" Type="Handle" scale_factor="100" />
+			<Piece id="mp_vlandia_fast_sword_pommel" Type="Pommel" scale_factor="100" />
 		</Pieces>
 	</CraftedItem>
 	<!-- Bergen Sword -->
@@ -116,19 +125,119 @@
 		</ItemComponent>
 	</Item>
 
-	<Item multiplayer_item="true" id="mp_bullets" name="{=*}Lead Shot" body_name="bo_capsule_arrow" holster_body_name="bo_axe_short" mesh="bolt_bl_c" value="1" is_merchandise="false" holster_mesh="bolt_bl_c_quiver" holster_mesh_with_weapon="bolt_bl_c_quiver" flying_mesh="bolt_bl_flying" weight="0.10" appearance="1" Type="Bolts" item_holsters="quiver_bolts:quiver_bolts_2:quiver_back_middle:quiver_back_top">
+	<Item multiplayer_item="true" id="mp_bullets" name="{=*}Lead Shot" body_name="bo_capsule_arrow" holster_body_name="bo_axe_short" mesh="bolt_bl_c" culture="Culture.neutral_culture" value="1" is_merchandise="false" holster_mesh="bolt_bl_c_quiver" holster_mesh_with_weapon="bolt_bl_c_quiver" flying_mesh="bolt_bl_flying" weight="0.10" appearance="1" Type="Bolts" item_holsters="quiver_bolts:quiver_bolts_2:quiver_back_middle:quiver_back_top">
 		<ItemComponent>
 			<Weapon weapon_class="Bolt" stack_amount="16" thrust_speed="0" thrust_damage_type="Pierce" thrust_damage="15" speed_rating="0" missile_speed="10" weapon_length="37" item_usage="" passby_sound_code="event:/mission/combat/missile/passby" rotation="180, 0, 0" physics_material="missile" sticking_position="0,-0.37,0" sticking_rotation="90,0,0" center_of_mass="0,0,-0.1" modifier_group="bolt">
-				<WeaponFlags AttachAmmoToVisual="false" Consumable="true" AmmoSticksWhenShot="false" AmmoBreaksOnBounceBack="true" />
+				<WeaponFlags AttachAmmoToVisual="true" Consumable="true" AmmoSticksWhenShot="true" AmmoBreaksOnBounceBack="true" />
 			</Weapon>
 		</ItemComponent>
 		<Flags ForceAttachOffHandPrimaryItemBone="true" />
 	</Item>
 
-	<Item multiplayer_item="true" id="hand_cannon" name="{=*}Hand Bombard" body_name="bo_composite_crossbows" mesh="crossbow_e" culture="Culture.vlandia" weight="3.8" appearance="1" difficulty="0" Type="Crossbow" AmmoOffset="0.0, 0.02131, 0.22975" item_holsters="crossbow_back:bow_hip:mace_right_hip:bow_hip_2" holster_position_shift="0.02,0,-0.4">
+	<Item multiplayer_item="true" id="hand_cannon" name="{=*}Hand Bombard" body_name="bo_composite_crossbows" mesh="crossbow_e" culture="Culture.neutral_culture" value="1" is_merchandise="false" weight="3.8" appearance="1" difficulty="0" Type="Crossbow" AmmoOffset="0.0, 0.02131, 0.22975" item_holsters="crossbow_back:bow_hip:mace_right_hip:bow_hip_2" holster_position_shift="0.02,0,-0.4">
 		<ItemComponent>
 			<Weapon weapon_class="Crossbow" ammo_class="Bolt" missile_speed="135" accuracy="18" thrust_damage="110" thrust_speed="22" speed_rating="15" weapon_length="100" ammo_limit="1" thrust_damage_type="Pierce" item_usage="crossbow" reload_phase_count="2" physics_material="wood_weapon" center_of_mass="0,0,0.4">
-				<WeaponFlags RangedWeapon="true" BonusAgainstShield="true" CanPenetrateShield="true" AmmoSticksWhenShot="false" AttachAmmoToVisual="false" CantReloadOnHorseback="true" NotUsableWithOneHand="true" TwoHandIdleOnMount="true" />
+				<WeaponFlags RangedWeapon="true" HasString="true" BonusAgainstShield="true" CanPenetrateShield="true" CantReloadOnHorseback="true" NotUsableWithOneHand="true" TwoHandIdleOnMount="true" />
+			</Weapon>
+		</ItemComponent>
+		<Flags />
+	</Item>
+
+	<!-- ========================================================================= -->
+	<!-- FIELD ARTILLERY & CREW EQUIPMENT (Полевая Артиллерия и Инструменты Расчёта) -->
+	<!-- ========================================================================= -->
+
+	<!-- 1. Полевая Бомбарда (Основное орудие 1-го номера расчёта — Наводчика) -->
+	<Item multiplayer_item="true" id="dwdn_field_bombard" name="{=*}Полевая Бомбарда" body_name="bo_composite_crossbows" mesh="crossbow_e" culture="Culture.vlandia" value="1" is_merchandise="false" weight="11.5" appearance="1" difficulty="0" Type="Crossbow" AmmoOffset="0.0, 0.02131, 0.22975" item_holsters="crossbow_back:bow_hip:mace_right_hip:bow_hip_2" holster_position_shift="0.02,0,-0.4">
+		<ItemComponent>
+			<Weapon weapon_class="Crossbow" ammo_class="Bolt" missile_speed="118" accuracy="55" thrust_damage="140" thrust_speed="12" speed_rating="10" weapon_length="125" ammo_limit="1" thrust_damage_type="Blunt" item_usage="crossbow" reload_phase_count="2" physics_material="wood_weapon" center_of_mass="0,0,0.4">
+				<WeaponFlags RangedWeapon="true" BonusAgainstShield="true" CanPenetrateShield="true" CanKnockDown="true" MultiplePenetration="true" AffectsAreaBig="true" CanKillEvenIfBlunt="true" AmmoSticksWhenShot="false" AttachAmmoToVisual="false" CantReloadOnHorseback="true" NotUsableWithOneHand="true" TwoHandIdleOnMount="true" />
+			</Weapon>
+		</ItemComponent>
+		<Flags />
+	</Item>
+
+	<!-- 2. Чугунные Пушечные Ядра (Фугасный снаряд AoE + опрокидывание строя) -->
+	<Item multiplayer_item="true" id="dwdn_cannonball_ammo" name="{=*}Чугунные Ядра (Фугас)" body_name="bo_capsule_arrow" holster_body_name="bo_axe_short" mesh="throwing_stone" value="1" is_merchandise="false" holster_mesh="stone_holster" holster_mesh_with_weapon="stone_holster" flying_mesh="projectile_rock" weight="0.80" appearance="1" Type="Bolts" item_holsters="throwing_stone:throwing_stone_2:quiver_bolts:quiver_bolts_2">
+		<ItemComponent>
+			<Weapon weapon_class="Bolt" stack_amount="5" thrust_speed="0" thrust_damage_type="Blunt" thrust_damage="35" speed_rating="0" missile_speed="12" weapon_length="37" item_usage="" passby_sound_code="event:/mission/combat/boulder/passby" flying_sound_code="event:/mission/combat/boulder/passby" trail_particle_name="psys_game_burning_jar_trail" rotation="180, 0, 0" physics_material="boulder_stone" sticking_position="0,-0.37,0" sticking_rotation="90,0,0" center_of_mass="0,0,-0.1" modifier_group="bolt">
+				<WeaponFlags AttachAmmoToVisual="false" Consumable="true" AmmoSticksWhenShot="false" AmmoBreaksOnBounceBack="true" CanPenetrateShield="true" CanKnockDown="true" AffectsAreaBig="true" CanKillEvenIfBlunt="true" LeavesTrail="true" />
+			</Weapon>
+		</ItemComponent>
+		<Flags ForceAttachOffHandPrimaryItemBone="true" />
+	</Item>
+
+	<!-- 3. Картечные Заряды (Конусный дробовой залп по пехоте и коннице вблизи) -->
+	<Item multiplayer_item="true" id="dwdn_canister_ammo" name="{=*}Картечные Заряды (Дробь)" body_name="bo_capsule_arrow" holster_body_name="bo_axe_short" mesh="bolt_bl_c" value="1" is_merchandise="false" holster_mesh="stone_holster" holster_mesh_with_weapon="stone_holster" flying_mesh="throwing_stone" weight="0.60" appearance="1" Type="Bolts" item_holsters="throwing_stone:throwing_stone_2:quiver_bolts:quiver_bolts_2">
+		<ItemComponent>
+			<Weapon weapon_class="Bolt" stack_amount="6" thrust_speed="0" thrust_damage_type="Pierce" thrust_damage="20" speed_rating="0" missile_speed="15" weapon_length="37" item_usage="" passby_sound_code="event:/mission/combat/missile/passby" rotation="180, 0, 0" physics_material="missile" sticking_position="0,-0.37,0" sticking_rotation="90,0,0" center_of_mass="0,0,-0.1" modifier_group="bolt">
+				<WeaponFlags AttachAmmoToVisual="false" Consumable="true" AmmoSticksWhenShot="false" AmmoBreaksOnBounceBack="true" CanPenetrateShield="true" />
+			</Weapon>
+		</ItemComponent>
+		<Flags ForceAttachOffHandPrimaryItemBone="true" />
+	</Item>
+
+	<!-- 4. Артиллерийский Банник-Шомпол (Инструмент 2-го номера расчёта — Заряжающего: +160% к зарядке орудия и дробящее оружие) -->
+	<CraftedItem multiplayer_item="true" id="dwdn_artillery_ramrod" name="{=*}Артиллерийский Банник-Шомпол" crafting_template="TwoHandedMace" value="1" is_merchandise="false" culture="Culture.neutral_culture">
+		<Pieces>
+			<Piece id="mp_sturgia_2hhammer_head" Type="Blade" scale_factor="100" />
+			<Piece id="mp_sturgia_2hammer_handle" Type="Handle" scale_factor="100" />
+		</Pieces>
+	</CraftedItem>
+
+	<!-- 5. Зарядная Сума Бомбардира (Запас снарядов 3-го номера расчёта для подачи в казённик орудия) -->
+	<Item multiplayer_item="true" id="dwdn_powder_chest" name="{=*}Зарядная Сума Бомбардира" body_name="bo_capsule_arrow" holster_body_name="bo_axe_short" mesh="throwing_stone" value="1" is_merchandise="false" holster_mesh="stone_holster" holster_mesh_with_weapon="stone_holster" flying_mesh="projectile_rock" weight="1.20" appearance="1" Type="Bolts" item_holsters="throwing_stone:throwing_stone_2:quiver_bolts:quiver_bolts_2">
+		<ItemComponent>
+			<Weapon weapon_class="Bolt" stack_amount="10" thrust_speed="0" thrust_damage_type="Blunt" thrust_damage="30" speed_rating="0" missile_speed="12" weapon_length="37" item_usage="" passby_sound_code="event:/mission/combat/boulder/passby" flying_sound_code="event:/mission/combat/boulder/passby" trail_particle_name="psys_game_burning_jar_trail" rotation="180, 0, 0" physics_material="boulder_stone" sticking_position="0,-0.37,0" sticking_rotation="90,0,0" center_of_mass="0,0,-0.1" modifier_group="bolt">
+				<WeaponFlags AttachAmmoToVisual="false" Consumable="true" AmmoSticksWhenShot="false" AmmoBreaksOnBounceBack="true" CanPenetrateShield="true" CanKnockDown="true" AffectsAreaBig="true" CanKillEvenIfBlunt="true" LeavesTrail="true" />
+			</Weapon>
+		</ItemComponent>
+		<Flags ForceAttachOffHandPrimaryItemBone="true" />
+	</Item>
+
+	<!-- 6. Осадная Мортира (Тяжёлое навесное орудие для поражения укреплений и навесного огня) -->
+	<Item multiplayer_item="true" id="dwdn_siege_mortar" name="{=*}Осадная Мортира" body_name="bo_composite_crossbows" mesh="crossbow_e" culture="Culture.vlandia" value="1" is_merchandise="false" weight="14.0" appearance="1" difficulty="0" Type="Crossbow" AmmoOffset="0.0, 0.02131, 0.22975" item_holsters="crossbow_back:bow_hip:mace_right_hip:bow_hip_2" holster_position_shift="0.02,0,-0.4">
+		<ItemComponent>
+			<Weapon weapon_class="Crossbow" ammo_class="Bolt" missile_speed="85" accuracy="40" thrust_damage="180" thrust_speed="10" speed_rating="8" weapon_length="110" ammo_limit="1" thrust_damage_type="Blunt" item_usage="crossbow" reload_phase_count="2" physics_material="wood_weapon" center_of_mass="0,0,0.4">
+				<WeaponFlags RangedWeapon="true" BonusAgainstShield="true" CanPenetrateShield="true" CanKnockDown="true" MultiplePenetration="true" AffectsAreaBig="true" CanKillEvenIfBlunt="true" AmmoSticksWhenShot="false" AttachAmmoToVisual="false" CantReloadOnHorseback="true" NotUsableWithOneHand="true" TwoHandIdleOnMount="true" />
+			</Weapon>
+		</ItemComponent>
+		<Flags />
+	</Item>
+
+	<!-- 7. Полевая Кулеврина (Дальнобойное настильное орудие повышенной точности) -->
+	<Item multiplayer_item="true" id="dwdn_culverin" name="{=*}Полевая Кулеврина" body_name="bo_composite_crossbows" mesh="crossbow_e" culture="Culture.vlandia" value="1" is_merchandise="false" weight="10.5" appearance="1" difficulty="0" Type="Crossbow" AmmoOffset="0.0, 0.02131, 0.22975" item_holsters="crossbow_back:bow_hip:mace_right_hip:bow_hip_2" holster_position_shift="0.02,0,-0.4">
+		<ItemComponent>
+			<Weapon weapon_class="Crossbow" ammo_class="Bolt" missile_speed="135" accuracy="70" thrust_damage="150" thrust_speed="14" speed_rating="12" weapon_length="135" ammo_limit="1" thrust_damage_type="Pierce" item_usage="crossbow" reload_phase_count="2" physics_material="wood_weapon" center_of_mass="0,0,0.4">
+				<WeaponFlags RangedWeapon="true" BonusAgainstShield="true" CanPenetrateShield="true" CanKnockDown="true" MultiplePenetration="true" AffectsAreaBig="true" CanKillEvenIfBlunt="true" AmmoSticksWhenShot="false" AttachAmmoToVisual="false" CantReloadOnHorseback="true" NotUsableWithOneHand="true" TwoHandIdleOnMount="true" />
+			</Weapon>
+		</ItemComponent>
+		<Flags />
+	</Item>
+
+	<!-- 8. Заявка: Передвижной Онагр (Мобильный камнемёт на колёсах) -->
+	<Item multiplayer_item="true" id="dwdn_order_mangonel" name="{=*}Заявка: Передвижной Онагр" body_name="bo_throwing_stone_01" holster_body_name="bo_axe_short" holster_mesh="stone_holster" holster_mesh_with_weapon="stone_holster" mesh="throwing_stone" culture="Culture.vlandia" value="1" is_merchandise="false" weight="0.1" appearance="0.1" Type="Thrown" item_holsters="throwing_stone:throwing_stone_2">
+		<ItemComponent>
+			<Weapon weapon_class="Stone" ammo_class="Stone" stack_amount="1" physics_material="missile" accuracy="100" thrust_speed="10" speed_rating="10" missile_speed="1" weapon_length="10" thrust_damage="0" item_usage="stone" passby_sound_code="">
+				<WeaponFlags Consumable="false" />
+			</Weapon>
+		</ItemComponent>
+	</Item>
+
+	<!-- 9. Заявка: Передвижная Баллиста (Мобильный стреломёт на колёсах) -->
+	<Item multiplayer_item="true" id="dwdn_order_ballista" name="{=*}Заявка: Передвижная Баллиста" body_name="bo_throwing_stone_01" holster_body_name="bo_axe_short" holster_mesh="stone_holster" holster_mesh_with_weapon="stone_holster" mesh="throwing_stone" culture="Culture.vlandia" value="1" is_merchandise="false" weight="0.1" appearance="0.1" Type="Thrown" item_holsters="throwing_stone:throwing_stone_2">
+		<ItemComponent>
+			<Weapon weapon_class="Stone" ammo_class="Stone" stack_amount="1" physics_material="missile" accuracy="100" thrust_speed="10" speed_rating="10" missile_speed="1" weapon_length="10" thrust_damage="0" item_usage="stone" passby_sound_code="">
+				<WeaponFlags Consumable="false" />
+			</Weapon>
+		</ItemComponent>
+	</Item>
+
+	<!-- 10. Ручная Граната (Осколочно-фугасная бомба с фитилём) -->
+	<Item multiplayer_item="true" id="dwdn_grenade" name="{=*}Ручная Граната" body_name="bo_throwing_stone_01" holster_body_name="bo_axe_short" holster_mesh="stone_holster" holster_mesh_with_weapon="stone_holster" mesh="throwing_stone" culture="Culture.vlandia" value="1" is_merchandise="false" weight="1.2" appearance="0.1" Type="Thrown" item_holsters="throwing_stone:throwing_stone_2">
+		<ItemComponent>
+			<Weapon weapon_class="Stone" ammo_class="Stone" stack_amount="2" physics_material="burning_jar" accuracy="90" thrust_speed="82" speed_rating="102" missile_speed="26" weapon_length="10" thrust_damage="15" item_usage="stone" rotation="100,30,20" passby_sound_code="" trail_particle_name="psys_game_sparkle_a" rotation_speed="0, -3.0, 0">
+				<WeaponFlags RangedWeapon="true" Consumable="true" AutoReload="true" UnloadWhenSheathed="true" UseHandAsThrowBase="true" LeavesTrail="true" AmmoBreaksOnBounceBack="true" AmmoSticksWhenShot="false" AttachAmmoToVisual="false" CanKnockDown="true" />
 			</Weapon>
 		</ItemComponent>
 		<Flags />

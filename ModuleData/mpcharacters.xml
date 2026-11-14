@@ -944,4 +944,57 @@
 		</Equipments>
 		<Resistances dismount="90" />
 	</NPCCharacter>
+	<!-- Artillerist (Hero & Troop) -->
+	<NPCCharacter id="mp_Artillerist_hero" default_group="Ranged" level="25" name="{=*}Артиллерист (Пушкарь)" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="30" />
+			<skill id="OneHanded" value="85" />
+			<skill id="TwoHanded" value="95" />
+			<skill id="Polearm" value="80" />
+			<skill id="Crossbow" value="140" />
+			<skill id="Bow" value="40" />
+			<skill id="Throwing" value="70" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Head" id="Item.dwdn_pikeman_kettlehad" />
+				<equipment slot="Cape" id="Item.archer_scarf" />
+				<equipment slot="Body" id="Item.Banobranny_surcoat" />
+				<equipment slot="Gloves" id="Item.crossbowman_mailgoves" />
+				<equipment slot="Leg" id="Item.banobranyi_leg" />
+				<equipment slot="Item0" id="Item.dwdn_falchion" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<NPCCharacter id="mp_Artillerist_troop" default_group="Ranged" level="25" name="{=*}Артиллерист (Расчёт)" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="30" />
+			<skill id="OneHanded" value="85" />
+			<skill id="TwoHanded" value="95" />
+			<skill id="Polearm" value="80" />
+			<skill id="Crossbow" value="140" />
+			<skill id="Bow" value="40" />
+			<skill id="Throwing" value="70" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Head" id="Item.dwdn_pikeman_kettlehad" />
+				<equipment slot="Cape" id="Item.archer_scarf" />
+				<equipment slot="Body" id="Item.Banobranny_surcoat" />
+				<equipment slot="Gloves" id="Item.crossbowman_mailgoves" />
+				<equipment slot="Leg" id="Item.banobranyi_leg" />
+				<equipment slot="Item0" id="Item.dwdn_falchion" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
 </MPCharacters>

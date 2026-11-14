@@ -40,7 +40,7 @@ namespace DWDN_Script.Common.Duchies
             ratay.AllowedBodyArmors.AddRange(new[] { "ratay_overcoat" });
             ratay.AllowedLegs.AddRange(new[] { "ratay_hose" });
             ratay.AllowedGloves.AddRange(new[] { "arch_banreich_leatherglove", "" });
-            ratay.AllowedWeaponsSlot0.AddRange(new[] { "dwdn_cleaver", "mp_sturgia_axe", "mp_vlandian_hammer" });
+            ratay.AllowedWeaponsSlot0.AddRange(new[] { "dwdn_peasant_knife", "mp_sturgia_axe", "mp_vlandian_hammer" });
             ratay.AllowedWeaponsSlot1.AddRange(new[] { "ratay_1_shield", "ratay_2_shield", "" });
             ratay.AllowedWeaponsSlot2.AddRange(new[] { "", "mp_western_short_spear" });
             ratay.DefaultLoadout = ratay.CreateDefaultLoadout(banreich.Id);
@@ -57,9 +57,9 @@ namespace DWDN_Script.Common.Duchies
             banobranny.AllowedBodyArmors.AddRange(new[] { "Banobranny_surcoat" });
             banobranny.AllowedLegs.AddRange(new[] { "banobranyi_leg" });
             banobranny.AllowedGloves.AddRange(new[] { "crossbowman_mailgoves", "" });
-            banobranny.AllowedWeaponsSlot0.AddRange(new[] { "dwdn_falchion", "mp_sturgia_axe", "mp_vlandian_mace" });
+            banobranny.AllowedWeaponsSlot0.AddRange(new[] { "dwdn_cleaver", "dwdn_falchion", "mp_sturgia_axe", "mp_vlandian_mace" });
             banobranny.AllowedWeaponsSlot1.AddRange(new[] { "bannpbran_shield1", "bannpbran_shield2", "bannpbran_shield3", "bannpbran_shield4", "" });
-            banobranny.AllowedWeaponsSlot2.AddRange(new[] { "", "mp_western_spear" });
+            banobranny.AllowedWeaponsSlot2.AddRange(new[] { "", "mp_western_spear", "dwdn_grenade" });
             banobranny.DefaultLoadout = banobranny.CreateDefaultLoadout(banreich.Id);
             banreich.Classes.Add(banobranny);
 
@@ -76,7 +76,7 @@ namespace DWDN_Script.Common.Duchies
             pikeman.AllowedGloves.AddRange(new[] { "plate_gauntlet", "" });
             // Кастомная пика ТОЛЬКО у пикинёра!
             pikeman.AllowedWeaponsSlot0.AddRange(new[] { "pike1" });
-            pikeman.AllowedWeaponsSlot1.AddRange(new[] { "mp_vlandian_arming_sword", "mp_sturgia_axe", "mp_vlandian_mace" });
+            pikeman.AllowedWeaponsSlot1.AddRange(new[] { "dwdn_cleaver", "mp_vlandian_arming_sword", "mp_sturgia_axe", "mp_vlandian_mace" });
             pikeman.DefaultLoadout = pikeman.CreateDefaultLoadout(banreich.Id);
             banreich.Classes.Add(pikeman);
 
@@ -91,7 +91,7 @@ namespace DWDN_Script.Common.Duchies
             zbroyniy.AllowedBodyArmors.AddRange(new[] { "armeds_striped_cuirass" });
             zbroyniy.AllowedLegs.AddRange(new[] { "plate_legs_dwdn" });
             zbroyniy.AllowedGloves.AddRange(new[] { "plate_gauntlet", "plate_round_gauntlet", "" });
-            zbroyniy.AllowedWeaponsSlot0.AddRange(new[] { "mp_battania_noble_sword", "mp_sturgia_heavy_axe", "mp_battnia_heavy_mace" });
+            zbroyniy.AllowedWeaponsSlot0.AddRange(new[] { "mp_battania_noble_sword", "dwdn_falchion", "mp_sturgia_heavy_axe", "mp_battnia_heavy_mace" });
             zbroyniy.AllowedWeaponsSlot1.AddRange(new[] { "zbroyniy_shield1", "zbroyniy_shield_empty1", "zbroyniy_shield_silver1", "" });
             zbroyniy.AllowedWeaponsSlot2.AddRange(new[] { "", "mp_western_long_spear" });
             zbroyniy.DefaultLoadout = zbroyniy.CreateDefaultLoadout(banreich.Id);
@@ -108,9 +108,9 @@ namespace DWDN_Script.Common.Duchies
             officer.AllowedBodyArmors.AddRange(new[] { "officer_brigantine" });
             officer.AllowedLegs.AddRange(new[] { "officer_legs" });
             officer.AllowedGloves.AddRange(new[] { "plate_gauntlet", "plate_round_gauntlet", "" });
-            officer.AllowedWeaponsSlot0.AddRange(new[] { "mp_battania_noble_sword", "mp_sturgia_heavy_axe", "mp_battnia_heavy_mace" });
+            officer.AllowedWeaponsSlot0.AddRange(new[] { "mp_vlandian_arming_sword", "dwdn_falchion", "dwdn_cleaver", "mp_sturgia_heavy_axe", "mp_vlandian_mace" });
             officer.AllowedWeaponsSlot1.AddRange(new[] { "zbroyniy_shield1", "zbroyniy_shield_silver1", "zbroyniy_shield_empty1", "" });
-            officer.AllowedWeaponsSlot2.AddRange(new[] { "", "mp_western_long_spear" });
+            officer.AllowedWeaponsSlot2.AddRange(new[] { "", "mp_western_long_spear", "dwdn_grenade" });
             officer.DefaultLoadout = officer.CreateDefaultLoadout(banreich.Id);
             banreich.Classes.Add(officer);
 
@@ -126,7 +126,7 @@ namespace DWDN_Script.Common.Duchies
             sotnik.AllowedCapes.AddRange(new[] { "Baron_rundal_cape", "" });
             sotnik.AllowedLegs.AddRange(new[] { "plate_legs_dwdn", "officer_legs" });
             sotnik.AllowedGloves.AddRange(new[] { "gothic_gloves", "plate_gauntlet", "" });
-            sotnik.AllowedWeaponsSlot0.AddRange(new[] { "mp_battania_noble_sword", "mp_sturgia_heavy_axe" });
+            sotnik.AllowedWeaponsSlot0.AddRange(new[] { "mp_battania_noble_sword", "mp_vlandia_cavalry_sword", "mp_sturgia_heavy_axe", "mp_battnia_heavy_mace" });
             sotnik.AllowedWeaponsSlot1.AddRange(new[] { "zbroyniy_shield_silver1", "zbroyniy_shield1", "" });
             sotnik.AllowedWeaponsSlot2.AddRange(new[] { "mp_western_long_spear", "" });
             sotnik.DefaultLoadout = sotnik.CreateDefaultLoadout(banreich.Id);
@@ -143,7 +143,7 @@ namespace DWDN_Script.Common.Duchies
             bannerman.AllowedBodyArmors.AddRange(new[] { "bannerman_cuirass" });
             bannerman.AllowedLegs.AddRange(new[] { "bannerman_legs" });
             bannerman.AllowedGloves.AddRange(new[] { "plate_round_gauntlet", "" });
-            bannerman.AllowedWeaponsSlot0.AddRange(new[] { "mp_battania_noble_sword", "mp_sturgia_heavy_axe", "mp_battnia_heavy_mace" });
+            bannerman.AllowedWeaponsSlot0.AddRange(new[] { "mp_vlandian_arming_sword", "dwdn_cleaver", "dwdn_falchion", "mp_sturgia_heavy_axe" });
             bannerman.AllowedWeaponsSlot1.AddRange(new[] { "dwdn_banner1" });
             bannerman.DefaultLoadout = bannerman.CreateDefaultLoadout(banreich.Id);
             banreich.Classes.Add(bannerman);
@@ -165,7 +165,7 @@ namespace DWDN_Script.Common.Duchies
             // Боеприпасы (болты и стрелы)
             marksman.AllowedWeaponsSlot1.AddRange(new[] { "mp_bolts_strong", "mp_bolts_western_extra", "mp_arrows_steppe_extra" });
             // Оружие ближнего боя
-            marksman.AllowedWeaponsSlot2.AddRange(new[] { "mp_vlandian_short_sword", "mp_sturgia_axe" });
+            marksman.AllowedWeaponsSlot2.AddRange(new[] { "dwdn_peasant_knife", "dwdn_cleaver", "mp_vlandian_short_sword", "mp_sturgia_axe" });
             // Дополнительный щит
             marksman.AllowedWeaponsSlot3.AddRange(new[] { "", "ratay_1_shield" });
             marksman.DefaultLoadout = marksman.CreateDefaultLoadout(banreich.Id);
@@ -188,9 +188,31 @@ namespace DWDN_Script.Common.Duchies
             // Пули (mp_bullets)
             handgonner.AllowedWeaponsSlot1.AddRange(new[] { "mp_bullets" });
             // Вторичное оружие ближнего боя
-            handgonner.AllowedWeaponsSlot2.AddRange(new[] { "mp_vlandian_short_sword", "mp_sturgia_axe", "baldur_warpick" });
+            handgonner.AllowedWeaponsSlot2.AddRange(new[] { "dwdn_cleaver", "mp_vlandian_short_sword", "mp_sturgia_axe", "baldur_warpick" });
+            // Ручные гранаты (отдельный слот 3)
+            handgonner.AllowedWeaponsSlot3.AddRange(new[] { "dwdn_grenade", "" });
             handgonner.DefaultLoadout = handgonner.CreateDefaultLoadout(banreich.Id);
             banreich.Classes.Add(handgonner);
+
+            // 9. Артиллерист (Передвижная Артиллерия: Онагры и Баллисты)
+            var artillerist = new DWDN_ClassDefinition(
+                "mp_Artillerist",
+                "Артиллерист (Осадный мастер)",
+                "Мастер осадных орудий (Лимит: 2 орудия на команду). Развертывает на базе передвижной онагр или баллисту на колёсах. Снаряды спавнятся рядом с орудием на грунте и сворачиваются при движении тележки.",
+                "mp_Artillerist_hero"
+            );
+            artillerist.AllowedHelmets.AddRange(new[] { "dwdn_pikeman_kettlehad", "crossbowman_kettle_1", "Banobranny_helmet", "officer_dwdn_bacinet", "" });
+            artillerist.AllowedCapes.AddRange(new[] { "archer_scarf", "ratay_chain_shoulder", "" });
+            artillerist.AllowedBodyArmors.AddRange(new[] { "Banobranny_surcoat", "crossbowman_surcoat_gambeson", "officer_brigantine" });
+            artillerist.AllowedGloves.AddRange(new[] { "crossbowman_mailgoves", "arch_banreich_leatherglove", "plate_round_gauntlet", "" });
+            artillerist.AllowedLegs.AddRange(new[] { "banobranyi_leg", "crossbowman_leggings", "officer_legs" });
+            // Слот 0: Оружие ближнего боя на выбор (строго одно оружие)
+            artillerist.AllowedWeaponsSlot0.AddRange(new[] { "dwdn_cleaver", "dwdn_falchion", "mp_vlandian_hammer", "mp_vlandian_short_sword" });
+            // Слот 1: Заявка на осадное орудие на выбор
+            artillerist.AllowedWeaponsSlot1.AddRange(new[] { "dwdn_order_mangonel", "dwdn_order_ballista" });
+            // Слоты 2 и 3 намеренно не заполняются, чтобы не плодить пустые строки в интерфейсе
+            artillerist.DefaultLoadout = artillerist.CreateDefaultLoadout(banreich.Id);
+            banreich.Classes.Add(artillerist);
 
             // 9. Кавалерия (Всадник Даевдена)
             var cav = new DWDN_ClassDefinition(
@@ -223,7 +245,7 @@ namespace DWDN_Script.Common.Duchies
             knight.AllowedGloves.AddRange(new[] { "plate_round_gauntlet", "" });
             knight.AllowedWeaponsSlot0.AddRange(new[] { "mp_vlandian_heavy_lance", "mp_battania_cavalry_spear" });
             knight.AllowedWeaponsSlot1.AddRange(new[] { "zbroyniy_shield1", "zbroyniy_shield_empty1", "zbroyniy_shield_silver1", "" });
-            knight.AllowedWeaponsSlot2.AddRange(new[] { "mp_vlandia_cavalry_sword", "mp_sturgia_cavalry_axe", "mp_vlandian_cavalry_mace" });
+            knight.AllowedWeaponsSlot2.AddRange(new[] { "mp_battania_noble_sword", "mp_vlandia_cavalry_sword", "mp_sturgia_cavalry_axe", "mp_vlandian_cavalry_mace" });
             knight.AllowedMounts.AddRange(new[] { "mp_vlandia_horse", "" });
             knight.DefaultLoadout = knight.CreateDefaultLoadout(banreich.Id);
             banreich.Classes.Add(knight);

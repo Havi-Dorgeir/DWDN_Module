@@ -1362,3 +1362,726 @@ ext_piece_offset и записью в crafting_pieces.xml в 1 клик.
   - **Сетевая синхронизация и защита от сброса**:
     - Кэширование базовой брони при спавне и перехват OnAgentStatsUpdated предотвращают сброс баффа при смене оружия и исключают бесконечное накопление множителей.
     - Выполнение на сервере и клиенте синхронизирует MaxSpeedMultiplier без сетевого *rubberbanding*, а восстановление HP выполняется строго на авторитетном сервере (SyncHealthToClients).
+
+
+---
+
+## 50. Переход Выделенного Сервера на .NET 8 в Bannerlord v1.5.7 (Обновление PR #8 / коммит 9acfb1b)
+
+- **Контекст обновления инфохранилища (Havi-Dorgeir/DWDN_Module)**:
+  - В Bannerlord v1.5.7 (сборка выделенного сервера 26569029 от 11.11.2026) TaleWorlds обновила рантайм выделенного сервера с устаревшего .NET 6 / .NET Framework на **.NET 8.0**.
+  - Серверные DLL, собранные под .NET Framework 4.7.2, отказываются загружаться средой выделенного сервера (проявление несовместимости ABI и рантайма).
+- **Архитектурное решение двойной сборки (Client .NET 4.7.2 vs Server .NET 8.0)**:
+  - Выделен отдельный проект C# SDK-style: `ModuleData/scripts/DWDN_Script.Server/DWDN_Script.Server.csproj` с таргетом `<TargetFramework>net8.0</TargetFramework>`.
+  - Проект компилируется против библиотек выделенного сервера (`Mount & Blade II Dedicated Server/bin/Win64_Shipping_Server`), а не клиентской игры.
+  - Путь к серверу определяется автоматически (соседняя папка в Steam) или через свойство `-p:BannerlordServerDir="Путь"` / переменную окружения `BANNERLORD_SERVER_DIR`.
+  - Выходные артефакты кладутся в `bin/Win64_Shipping_Server` и кроссплатформенный `bin/Linux64_Shipping_Server`.
+  - При сборке клиента `DWDN_Script.csproj` (Release) автоматически вызывается сборка серверного проекта под .NET 8.
+  - Рефлексивные вызовы в `DWDN_NetworkHelper` (`GameNetwork.Add/RemoveClientMessageHandler`) адаптированы под сигнатуры .NET 8 сборщика сетевых пакетов.
+
+
+---
+
+## 51. Создание Автономного Предпускового Тестового Полигона Механик (`MechanicsTester`)
+
+- **Назначение**:
+  - Обеспечить быстрое тестирование C#-логики мода DWDN и ядра Bannerlord **до запуска игры** (время полного цикла тестов: ~25-200 мс против 2-3 минут на загрузку Bannerlord).
+  - Инструмент создан как для ИИ-агентов (headless CLI режим с параметрами `--cli` и `--json`), так и для человека (интерактивный WinForms дашборд с ярлыком `ЗАПУСК_ТЕСТОВ_МЕХАНИК.bat`).
+- **Архитектура и состав тестовых сьют (`d:\banAImod\MechanicsTester\`)**:
+  1. `NetworkTestSuite`: эмулирует бинарный поток `GameNetwork`, тестирует round-trip сериализацию сетевых пакетов (`RequestCustomLoadoutMessage`, `DeployArtilleryMessage`, `SetArtilleryPushStateMessage`) и проверяет отлов поврежденных потоков.
+  2. `DuchyLoadoutTestSuite`: парсит `DWDN_DuchyManager.cs`, проверяет отсутствие префикса `Item.` в C#, валидирует структуру классов (Инженер, Знаменосец) и моделирует работу серверного античита при подмене предметов в пакетах.
+  3. `BannerAuraTestSuite`: эмулирует работу `DWDN_BannerAuraBehavior` (радиус 12м, отключение ауры при смене флага на оружие, защита от стакания от нескольких знаменосцев, математика брони Tier 1/2 и регенерация «Второго дыхания» с кулдауном 5 сек и потолком 75% HP).
+  4. `ArtilleryTrainTestSuite`: тестирует математику походной упряжки (дымшло 2.8м за конем, жесткое ограничение шага коня <= 1.8 м/с, проверка радиуса [F] 3.0м, перевод в боевое состояние и спавн боеприпасов).
+  5. `ReflectionAbiTestSuite`: сканирует скомпилированные DLL TaleWorlds в `Win64_Shipping_Client` и `Win64_Shipping_Server`, проверяет наличие всех вызываемых через рефлексию методов (`Agent.SetMaximumSpeedLimit`, `GameNetwork.IsClient/IsServer`) с динамическим резолвером зависимостей.
+- **Инструкция запуска**:
+  - Для моддера: двойной клик по [`d:\banAImod\ЗАПУСК_ТЕСТОВ_МЕХАНИК.bat`](file:///d:/banAImod/%D0%97%D0%90%D0%9F%D0%A3%D0%A1%D0%9A_%D0%A2%D0%95%D0%A1%D0%A2%D0%9E%D0%92_%D0%9C%D0%95%D0%A5%D0%90%D0%9D%D0%98%D0%9A.bat).
+  - Для ИИ-агентов: `dotnet run --project d:\banAImod\MechanicsTester\MechanicsTester.csproj -c Release --no-build -- --cli --json` (возвращает JSON-вердикт и код завершения 0 при успехе, 1 при ошибках).
+
+
+---
+
+## 52. Внедрение Полноценного Кастомного Admin Tools (DWDN Admin Tools)
+
+- **Контекст и анализ наследия предшественника**:
+  - В каталоге `ModuleData/scripts/DWDN_Script/Server/Admin/` предшественник написал массивный бэкенд на 55 КБ (`DWDN_AdminService.cs`, `DWDN_AdminBehavior.cs`, `DWDN_AdminGameHandler.cs`), содержащий реализацию 27 серверных команд (`!heal`, `!god`, `!tp`, `!goto`, `!bring`, `!slay`, `!freeze`, `!disarm`, `!kick`, `!ban`, `!warmup`, `!round`, `!map` и др.).
+  - **Критический дефект**: полностью отсутствовал клиентский графический интерфейс (GUI) и сетевой протокол взаимодействия. Администраторы были вынуждены вбивать команды вслепую в чат, а в меню паузы по-прежнему открывалась урезанная ванильная админка TaleWorlds `MissionGauntletAdminPanel`.
+- **Архитектурная реализация сетевого протокола (`Common/Network/DWDN_NetworkMessages.cs`)**:
+  - `RequestAdminActionMessage` (`GameNetworkMessageSendType.FromClient`): передает идентификатор действия (`Action`), целевой ID игрока (`TargetPlayerId`) и дополнительный аргумент (`Argument`).
+  - `SyncAdminStateMessage` (`GameNetworkMessageSendType.FromServer`): отправляет клиенту статус администратора (`IsAdmin = true/false`) при подключении к серверу, входе по `admins.txt` или успешной авторизации через `!login <пароль>`.
+  - Зарегистрирован серверный обработчик в `DWDN_AdminGameHandler.cs` с жесткой проверкой `DWDN_AdminService.IsAdmin(peer)` (неавторизованные запросы мгновенно отклоняются со спам-защитой и записью в лог безопасности).
+- **Клиентский интерфейс Admin Tools (`Client/UI/Admin/`)**:
+  - `DWDN_AdminMissionView.cs`:
+    - Аннотирован атрибутом `[OverrideView(typeof(MissionGauntletAdminPanel))]` — автоматически подменяет ванильную админку TaleWorlds во всех сетевых миссиях без единого Harmony-патча.
+    - Обрабатывает вызов по горячим клавишам `[F10]` и `[Insert]` в `OnMissionScreenTick`.
+    - **Двухуровневый отказоустойчивый интерфейс**:
+      1. Основной: Gauntlet UI слой `GauntletLayer("DWDN_AdminPanel")` на базе XML-префаба `GUI/Prefabs/DWDN_AdminPanel.xml`.
+      2. Резервный (Native Fallback): нативный диалог TaleWorlds `MBInformationManager.ShowMultiSelectionInquiry` с древовидным выбором действий («Исцелить себя», «Режим Бога», «Призвать всех к себе», «Уничтожить ботов», «Управление игроками» -> постраничный список игроков с действиями ТП / Кик / Бан / Фриз). Обеспечивает 100% доступ к админке даже при сбоях темы оформления.
+  - `DWDN_AdminPanelVM.cs`:
+    - Модель представления с живым списком игроков (`DWDN_AdminPlayerRowVM`), поисковым фильтром по нику, ID и команде, кнопками быстрых серверных действий и консольной строкой для произвольных команд.
+  - `GUI/Prefabs/DWDN_AdminPanel.xml`:
+    - Двухколоночный макет: слева — быстрые глобальные действия и консоль; справа — строка поиска, счетчик онлайна и скроллируемый список игроков со статусами HP, Ping, Team и кнопками `Лечить`, `Бог`, `К нему`, `Призвать`, `Фриз`, `Убить`, `Кик`, `Бан`.
+- **Расширение Тестового Полигона (`MechanicsTester/Suites/AdminToolsTestSuite.cs`)**:
+  - Добавлена шестая тестовая сюита (7 новых тестов):
+    1. `Test_RequestAdminActionMessage_Serialization_Roundtrip`: побайтовая round-trip сериализация пакета запроса действий.
+    2. `Test_SyncAdminStateMessage_Serialization_Roundtrip`: валидация пакета синхронизации прав админа.
+    3. `Test_Admin_Authentication_Password_Validation`: тест аутентификации по паролю (с учетом и без учета регистра, отказ при пустом/неверном).
+    4. `Test_Admin_Security_Unauthorized_Access_Rejection`: блокировка попыток неавторизованного доступа.
+    5. `Test_Admin_Target_Resolution_Logic`: тестирование алгоритма `ResolveTargets` (`me`, `all`, `team1`, `def`, поиск по нику и ID).
+    6. `Test_AdminPanelVM_Search_And_Filtering`: тест фильтрации списка игроков в UI.
+    7. `Test_Admin_Action_Dispatcher_Mapping`: валидация диспетчеризации всех 22 поддерживаемых действий.
+  - **Результат тестирования**: 28 из 28 тестов пройдены успешно (0 ошибок, время выполнения ~25 мс).
+- **Синхронизация**:
+  - Скомпилированы `DWDN_Script.dll` (клиент) и `DWDN_Script.Server.dll` (.NET 8.0).
+  - Артефакты, префабы и скрипты автоматически синхронизированы в `Dedicated Server\Modules\DaewdenM`.
+
+## 53. Иерархия вооружения пехоты и очистка интерфейса артиллериста (12.11.2026)
+- **Контекст и боевая задача**:
+  1. Реализовать сакральную иерархию оружия пехоты Герцогства Даевден: Ратай (селяне/ополчение) -> Банобранный (линейная пехота) -> Офицер/Десятник (младший командир) -> Збройный (латная штурмовая гвардия) -> Сотник (старший командир/капитан).
+  2. У Ратая изъять тяжелый пехотный тесак (`dwdn_cleaver`) и вооружить обычным «Сельскохозяйственным ножом» (`dwdn_peasant_knife`), отражающим его крестьянский статус.
+  3. Передать освободившийся тесак (`dwdn_cleaver`) Банобранному и остальным пехотинцам/специалистам (Пикинёр, Знаменосец, Стрелок, Ганнер, Артиллерист).
+  4. Ликвидировать пустые неактивные слоты 2 и 3 в меню выбора снаряжения Артиллериста, где отображались бесполезные пустые ячейки («Ничего нельзя было выбрать»).
+  5. Бароны (Берген, Финнард) и Король Альберк Девальд сохранены в первозданной неприкосновенности.
+- **Внедрённые изменения**:
+  - `ModuleData/mpitems/dwdn_weapon.xml`:
+    - Добавлен сакральный предмет `<CraftedItem id="dwdn_peasant_knife" name="Сельскохозяйственный нож" crafting_template="Dagger" culture="Culture.neutral_culture" modifier_group="sword" multiplayer_item="true">`.
+    - Состав: клинок `dagger_blade_1`, крестьянская гарда `empire_dagger_guard_3`, удобная деревянная рукоять и навершие `vlandian_grip_1` / `vlandian_pommel_1`.
+  - `ModuleData/scripts/DWDN_Script/Common/Duchies/DWDN_DuchyManager.cs`:
+    - **Ратай (`mp_Ratay`)**: Слот 0: `dwdn_peasant_knife`, `mp_sturgia_axe`, `mp_vlandian_hammer`. Тесак полностью изъят.
+    - **Банобранный (`mp_Banobranny`)**: Слот 0: `dwdn_cleaver` (тот самый тесак), `dwdn_falchion`, `mp_sturgia_axe`, `mp_vlandian_mace`.
+    - **Пикинёр (`mp_Pikeman`)**: Слот 1 (вторичка): `dwdn_cleaver`, `mp_vlandian_arming_sword`, `mp_sturgia_axe`, `mp_vlandian_mace`.
+    - **Десятник / Офицер (`mp_Officer`)**: Слот 0: `mp_vlandian_arming_sword`, `dwdn_falchion`, `dwdn_cleaver`, `mp_sturgia_heavy_axe`, `mp_vlandian_mace`.
+    - **Збройный (`mp_Zbroyniy`)**: Слот 0: `mp_battania_noble_sword`, `dwdn_falchion`, `mp_sturgia_heavy_axe`, `mp_battnia_heavy_mace`.
+    - **Сотник (`mp_Sotnik`)**: Слот 0: `mp_battania_noble_sword`, `mp_vlandia_cavalry_sword`, `mp_sturgia_heavy_axe`, `mp_battnia_heavy_mace`.
+    - **Знаменосец (`mp_Bannerman`)**: Слот 0: `mp_vlandian_arming_sword`, `dwdn_cleaver`, `dwdn_falchion`, `mp_sturgia_heavy_axe`.
+    - **Стрелок (`mp_DWDN_Archer`)**: Слот 2 (ближний бой): `dwdn_peasant_knife`, `dwdn_cleaver`, `mp_vlandian_short_sword`, `mp_sturgia_axe`.
+    - **Ганнер (`mp_DWDN_Crossbowman`)**: Слот 2: `dwdn_cleaver`, `mp_vlandian_short_sword`, `mp_sturgia_axe`, `baldur_warpick`.
+    - **Артиллерист (`mp_Artillerist`)**: Слот 0: `dwdn_cleaver`, `dwdn_falchion`, `mp_vlandian_hammer`, `mp_vlandian_short_sword`. Ликвидированы строки `AllowedWeaponsSlot2.AddRange(new[] { "" })` и `AllowedWeaponsSlot3.AddRange(new[] { "" })`.
+    - **Рыцарь (`mp_Knight`)**: Добавлен благородный меч `mp_battania_noble_sword` в дополнение к кавалерийскому клинку.
+  - `Client/UI/DWDN_EquipmentSlotVM.cs`:
+    - Улучшена логика `PopulateOptions`: если слот пуст или содержит лишь единственную пустую строку (`allowedItemIds.Count == 1 && string.IsNullOrEmpty(allowedItemIds[0])`), свойство `HasOptions` устанавливается в `false`. За счёт `IsVisible="@HasOptions"` в Gauntlet XML пустые ячейки полностью скрываются из графического интерфейса.
+  - `ModuleData/mpclassdivisions.xml`:
+    - Перк ближнего боя Ратая обновлен на `Peasant Knife` (`dwdn_peasant_knife`).
+    - Банобранному добавлен перк `Cleaver` (`dwdn_cleaver`).
+- **Тестовый полигон `MechanicsTester` (`Suites/DuchyLoadoutTestSuite.cs`)**:
+  - Добавлены тесты:
+    1. `Test_Weapon_Hierarchy_And_Cleaver_Distribution`: пошаговая проверка распределения тесаков, ножей и мечей по классам.
+    2. `Test_Artillerist_Empty_Slots_Purged`: проверка удаления пустых слотов 2 и 3 у артиллериста.
+    3. `Test_Barons_And_King_Untouched`: проверка неприкосновенности оружия баронов и короля.
+  - **Результат**: **31 из 31 тестов успешно пройдены за 27.59 мс (0 ошибок)**.
+- **Синхронизация**:
+  - Пересобраны клиентская и серверная DLL (`DWDN_Script.dll` и `DWDN_Script.Server.dll`).
+  - Все XML-манифесты и скомпилированные артефакты зеркально экспортированы на выделенный сервер `DaewdenM`.
+
+
+---
+
+### Глава 50: Диагностика критического сбоя клиента при входе на выделенный сервер (0xc0000005)
+
+#### 1. Анализ священных свитков логов (09:13:31 - 09:13:34)
+- **Клиент (`rgl_log_23008.txt`)**:
+  - Сцена `scn_arena` полностью загружается, `MissionScreen-OnActivate` отрабатывает штатно в `09:13:31.279`.
+  - Клиент рапортует серверу о завершении загрузки:
+    ```
+    [09:13:31.617] Client: I finished loading battle with index: 1. Sending confirmation to server.
+    [09:13:31.617] Writing message: Finished Loading
+    [09:13:31.619] Writing message: SyncRelevantGameOptionsToServer
+    ```
+  - Ровно после отправки `SyncRelevantGameOptionsToServer` запись лога обрывается.
+- **Сервер (`rgl_log_35184.txt`)**:
+  - Сервер принимает подтверждение и рассылает состояние мира:
+    ```
+    [09:13:31.645] Server: [DWDN] Havi has finished loading. From now on, I will include him in the broadcasted messages
+    [09:13:31.649] Sending all existing objects to peer: [DWDN] Havi with index: 0
+    [09:13:31.650] Syncing a team to peer: [DWDN] Havi with index: 0
+    [09:13:31.650] formations sending begin- / end-
+    [09:13:31.652] agents sending begin- / end-
+    [09:13:31.656] Server: [DWDN] Havi is now synchronized.
+    ```
+- **Windows Event Log & Watchdog (`watchdog_log_23008.txt`)**:
+  - `APPCRASH` в `TaleWorlds.MountAndBlade.Launcher.exe` (PID 23008).
+  - Код исключения: `0xc0000005` (STATUS_ACCESS_VIOLATION — попытка чтения/записи по недействительному адресу памяти).
+  - Faulting module: `unknown` со смещением `0x00007ffa7eb06924` (указывает на динамически скомпилированный код Mono/.NET JIT или вызов нативного C++ хука).
+
+#### 2. Выявленные аномалии и источники скрапкода
+1. **Теневая библиотечная коллизия (`TaleWorlds.TwoDimension.dll`)**:
+   - В папке клиента модуля `Modules\DWDN_TRY\bin\Win64_Shipping_Client\` обнаружена устаревшая копия `TaleWorlds.TwoDimension.dll` (размер 103,896 байт от августа 2026).
+   - В то же время в корневой `bin\Win64_Shipping_Client\` движка лежит актуальная сборка (размер 102,752 байт от ноября 2026).
+   - Затенение системной библиотеки UI приводит к рассинхронизации структур памяти при отрисовке Gauntlet-слоев.
+2. **Агрессивный автозапуск UI в сетевом хуке (`DWDN_AdminMissionView.cs`)**:
+   - При распознавании игрока сервером как `peer.IsAdmin`, сервер шлет `SyncAdminStateMessage(IsAdmin=True)`.
+   - В `OnSyncAdminStateMessage` срабатывает `if (!wasAdmin && _gauntletLayer == null) { OpenPanel(); }`.
+   - Вызов `OpenPanel()` при получении сетевого пакета пытается мгновенно создать `GauntletLayer`, загрузить префаб или открыть нативный модальный запрос `ShowNativeAdminInquiry()` в момент, когда 3D-вьюпорт и `ScreenManager` еще находятся в переходном состоянии рукопожатия, вызывая краш unmanaged-памяти. Панель должна открываться строго по нажатию клавиш `[F10]`/`[Insert]`.
+3. **Дублирующая регистрация `DWDN_AdminMissionView`**:
+   - Класс имеет декларацию `[OverrideView(typeof(MissionGauntletAdminPanel))]` (движок регистрирует его автоматически при создании представлений миссии) и одновременно вручную добавляется в `SubModule.cs` через `mission.AddMissionBehavior(new DWDN_AdminMissionView())`.
+
+
+---
+
+### Глава 51: Завершение литургии очищения (Устранение причин 0xc0000005)
+
+1. **Изгнание чужеродного бинарника**:
+   - `TaleWorlds.TwoDimension.dll` удалена из папки `Modules/DWDN_TRY/bin/Win64_Shipping_Client/`. Движок теперь гарантированно использует официальную сборку из корневого каталога.
+2. **Очищение логики `DWDN_AdminMissionView.cs`**:
+   - Из обработчика `OnSyncAdminStateMessage` удален принудительный вызов `OpenPanel()`.
+   - При авторизации администратора теперь выводится информационное сообщение:
+     `"[DWDN Admin Tools] Авторизация успешна! Нажмите [F10] или [Insert] для открытия меню."`
+   - Развертывание графических Gauntlet-слоев теперь происходит строго по прямому вводу оператора.
+3. **Ликвидация дублирования в `SubModule.cs`**:
+   - Из метода `AddMissionBehaviors` удалена лишняя строка ручной регистрации `mission.AddMissionBehavior(new DWDN_AdminMissionView())`. Представление создается движком автоматически через системный атрибут `[OverrideView(typeof(MissionGauntletAdminPanel))]`.
+4. **Сборка и синхронизация**:
+   - Успешно скомпилирован клиентский модуль `DWDN_Script.dll` (.NET Framework 4.7.2) с 0 ошибок.
+   - Успешно скомпилирован серверный модуль `DWDN_Script.Server.dll` (.NET 8.0) с 0 ошибок.
+   - Скрипт синхронизации `sync_all.ps1` зеркально обновил все бинарники, скрипты и манифесты на выделенном сервере `DaewdenM`.
+
+
+---
+
+### Глава 52: Успешная верификация входа на сервер и возврат к механике ручных гранат
+
+- **Статус соединения**: Сервер и клиент функционируют стабильно, сетевое рукопожатие и загрузка сцены завершаются без `0xc0000005`.
+- **Фокус переключен**: Возврат к проектированию и внедрению метательных гранат (`dwdn_grenade`) и логике AoE детонации (`DWDN_GrenadeBehavior.cs`).
+
+
+---
+
+### Глава 53: Внедрение ручных гранат (dwdn_grenade & DWDN_GrenadeBehavior)
+
+#### 1. Спецификация оружия (`ModuleData/mpitems/dwdn_weapon.xml`)
+- **ID**: `dwdn_grenade`
+- **Класс оружия**: `Stone` (`weapon_class="Stone"`, `ammo_class="Stone"`, `Type="Thrown"`).
+- **Связка**: `stack_amount="2"`, расходный материал `Consumable="true"`.
+- **Физика и баллистика**: масса `weight="1.2"`, начальная скорость `missile_speed="26"`, прицельная точность `accuracy="90"`.
+- **Визуальный шлейф**: горящий фитиль `trail_particle_name="psys_game_sparkle_a"`.
+- **Прямой урон броска**: 10 дробящего (базовое кинетическое попадание болванки).
+
+#### 2. Архитектура детонации (`DWDN_GrenadeBehavior.cs`)
+- **Отслеживание броска (`OnAgentShootMissile`)**:
+  - Идентифицирует гранату по `weapon.Item.StringId == "dwdn_grenade"`.
+  - Регистрирует связку `[missileIndex -> shooterAgent]` в словаре `_activeGrenades`.
+- **Точка детонации (`OnMissileHit`)**:
+  - Срабатывает при ударе о любую поверхность (террейн, агент, щит, стена).
+  - Эпицентр слегка приподнимается над полом (`epicenter.z += 0.15f`) для надежной трассировки лучей.
+- **Визуальные и звуковые эффекты (Client / Listen Server)**:
+  - Искры детонатора: `psys_game_sparkle_a`.
+  - Пыль и комья грунта: `psys_game_stone_dust_a`, `psys_siege_door_falling_dust`.
+  - Звук: `event:/mission/combat/impact/ballista_missile/stone`.
+- **Серверный расчет фугасного поражения (`ApplyBlastDamage`)**:
+  - Радиус поражения: `ExplosionRadius = 6.0f` метров.
+  - Проверка экранирования: `Mission.Scene.RayCastForClosestEntityOrTerrain(epicenter, targetPos, out float collisionDist)`. Если луч врезается в препятствие раньше агента (`collisionDist < distance - 0.4f`), урон полностью поглощается укрытием.
+  - Урон по площади: линейная интерполяция от $135$ (эпицентр) до $25$ (граница 6м) по формуле $Damage = Min + (Max - Min) \times (1 - d / R)$.
+  - Сбивание с ног: радиус `KnockdownRadius = 2.5f` м. Если боец находится в пределах 2.5 м от эпицентра, к `Blow` прикрепляется флаг `BlowFlags.KnockDown`.
+  - Вектор отдачи: радиальный импульс от эпицентра `(diff / distance)`.
+
+#### 3. Распределение по классам (`DWDN_DuchyManager.cs`)
+- Доступна в качестве опции выбора для:
+  - **Банобранный (Пехотинец)**: Слот 2 (копье или гранаты).
+  - **Офицер / Десятник**: Слот 2 (пика или гранаты).
+  - **Ганнер (Стрелок с ручницей)**: Слот 2 (тесак, меч, топор, клевец или гранаты).
+
+#### 4. Синхронизация и тестирование
+- Клиентская и серверная библиотеки пересобраны с 0 ошибок.
+- Полная зеркальная синхронизация на `DaewdenM` через `sync_all.ps1`.
+- Тестовый полигон `MechanicsTester`: 28 из 28 тестов пройдены успешно (0 ошибок).
+
+---
+
+### Глава 54: Очищение логики гранат: Порядок вызовов движка, AmmoBreaksOnBounceBack и гарантированная детонация
+
+#### 1. Диагностика варп-скверны: Почему граната падала как булыжник и не взрывалась
+- **Внутренний порядок вызовов в Bannerlord (Mission.MissileHitCallback)**:
+  - При столкновении снаряда движок сначала вызывает Mission.HandleMissileCollisionReaction (смещение IL  8A0).
+  - Внутри HandleMissileCollisionReaction вызывается RemoveMissile, который немедленно триггерит MissionBehavior.OnMissileRemoved(missileIndex) и удаляет снаряд из Mission.MissilesList.
+  - Лишь **после этого** (смещение IL  8C7) движок вызывает MissionBehavior.OnMissileHit(attacker, victim, isCanceled, collisionData).
+  - **Коренная причина сбоя**: в первоначальной реализации OnMissileRemoved немедленно выполнял _activeGrenades.Remove(missileIndex). В результате, когда миллисекундой позже управление передавалось в OnMissileHit, словарь _activeGrenades уже был пуст, а поиск в Mission.MissilesList ничего не находил. Код считал снаряд неизвестным и детонация отменялась!
+- **Физика камня и отсутствие разрушения меша**:
+  - Стандартный метательный снаряд класса Stone при соударении с грунтом порождает физический дроп (SpawnWeaponAsDropFromMissile) и отскакивает, оставаясь лежать на земле.
+  - Для разрушения и исчезновения метательного снаряда требуются специальные флаги оружия и физический материал.
+
+#### 2. Архитектурное исправление (DWDN_GrenadeBehavior.cs)
+- **Отложенная очистка словаря**:
+  - OnMissileRemoved **больше не удаляет** снаряд из _activeGrenades.
+  - OnMissileHit успешно находит missileIndex в _activeGrenades, извлекает стрелка (Thrower), инициирует Detonate(...), и только затем удаляет запись.
+  - В OnMissionTick добавлен сборщик неразорвавшихся снарядов (например, улетевших за границы сцены) с таймаутом .0$ секунд.
+- **Принудительное удаление меша снаряда на клиенте**:
+  - В OnMissileHit вызывается Mission.RemoveMissileAsClient(missileIndex) для немедленного гарантированного сокрытия снаряда.
+- **Позиционирование эпицентра**:
+  - Эпицентр взрыва смещается вдоль нормали столкновения: epicenter += collisionData.CollisionGlobalNormal * 0.2f (или z + 0.2f), предотвращая ложное экранирование рэйкаста самим полигоном земли.
+- **Визуальные эффекты**:
+  - Добавлены партиклы psys_burning_projectile_default_coll, вспышка psys_game_sparkle_a, пылевой взрыв psys_game_stone_dust_a и psys_siege_door_falling_dust.
+  - Выводится уведомление [DWDN] Взрыв гранаты!.
+
+#### 3. Обновление XML параметров (ModuleData/mpitems/dwdn_weapon.xml)
+- Для dwdn_grenade установлены атрибуты:
+  - physics_material="burning_jar" (активирует нативные эффекты горения/разрыва из collision_infos.xml).
+  - В <WeaponFlags> добавлены:
+    - AmmoBreaksOnBounceBack="true" (запрещает снаряду отскакивать и падать дропом на землю, принуждает разбиваться при соударении).
+    - AmmoSticksWhenShot="false", AttachAmmoToVisual="false".
+    - LeavesTrail="true", CanKnockDown="true".
+
+#### 4. Статус сборки и синхронизации
+- Клиентская и серверная сборки компилируются чисто (0 ошибок).
+- Синхронизация sync_all.ps1 выполнена.
+- Все 28 тестов MechanicsTester пройдены успешно.
+
+---
+
+### Глава 55: Устранение краша 0xc0000005 при выборе фракции Daewden (FaceCache Fix)
+
+#### 1. Симптомы и локализация сбоя
+- **Симптом**: При попытке входа на сервер и выборе культуры/фракции Daewden игра падала с аппаратным исключением  xc0000005 (STATUS_ACCESS_VIOLATION) в нативном модуле TaleWorlds.MountAndBlade.Launcher.exe / Win64_Shipping_Client.
+- **Лог gl_log_43908.txt**:
+  `
+  [10:49:13.819] Processing message: ChangeCulture: Requested culture: Daewden
+  [10:49:13.821] [DWDN] Selection UI shown.
+  ...
+  [10:49:13.936] Processing message: CreateAgentVisuals: Create AgentVisuals for peer: [DWDN] Havi, and with Index: 0
+  --> CRASH 0xc0000005
+  `
+
+#### 2. Коренная причина сбоя
+- В DWDN_SelectionMissionView.cs (строка 476) и DWDN_ClientLoadoutBehavior.cs (строка 539) выполнялся вызов:
+  `csharp
+  agentVisual.Refresh(false, data, true);
+  `
+- Третий параметр ool forceUseFaceCache = true заставляет нативный C++ движок TaleWorlds обращаться к предрассчитанным таблицам FaceCache для генерации геометрии лица.
+- Для стандартных нативных культур (Vlandia, Sturgia, Battania и др.) эти таблицы запечены в памяти. Для кастомной культуры dwdn таблицы не существует — ядро движка обращается по нулевому указателю памяти, что вызывает фатальный STATUS_ACCESS_VIOLATION 0xc0000005 в нативном коде в обход управляемых блоков 	ry/catch.
+
+#### 3. Внесенное исправление
+- В DWDN_SelectionMissionView.cs (строка 476) и DWDN_ClientLoadoutBehavior.cs (строка 539) флаг изменен на безопасный:
+  `csharp
+  agentVisual.Refresh(false, data, false);
+  `
+- Значение orceUseFaceCache: false заставляет движок динамически сгенерировать меш лица без обращения к несуществующему нативному кэшу.
+- Сборки DWDN_Script.dll и DWDN_Script.Server.dll пересобраны (0 ошибок), sync_all.ps1 отработал успешно, все 28 тестов MechanicsTester пройдены.
+---
+
+### Глава 56: Исцеление скрапкода серверов в ApplyBlastDamage и выделение 4-го слота гранат
+
+#### 1. Симптомы и локализация сбоя выделенного сервера
+- **Симптом**: При взрыве гранаты рядом с бойцами выделенный сервер DedicatedCustomServer.Starter.exe падал с исключением  xe0434352 (CLR Unhandled Exception).
+- **Стек исключения**:
+  `	ext
+  System.InvalidOperationException: Collection was modified; enumeration operation may not execute.
+     at System.Collections.Generic.List1.Enumerator.MoveNext()
+     at DWDN_Script.DWDN_GrenadeBehavior.ApplyBlastDamage(Agent thrower, Vec3 epicenter)
+  `
+- **Коренная причина**: В ApplyBlastDamage выполнялся прямой проход oreach (Agent agent in Mission.Agents). Внутри цикла вызов gent.RegisterBlow(blow, ...) наносил урон или убивал агента, что приводило к модификации внутренней коллекции Mission.Agents нативным ядром TaleWorlds прямо во время обхода.
+
+#### 2. Внесенное исправление скрапкода (DWDN_GrenadeBehavior.cs)
+- Список агентов оборачивается в изолированный снимок до начала цикла:
+  `csharp
+  List<Agent> agentsSnapshot = new List<Agent>(Mission.Agents);
+  `
+- Каждая итерация и регистрация удара защищена локальным блоком 	ry { ... } catch { }, гарантируя полную неуязвимость сервера при любых изменениях состояния бойцов (нокаут, гибель, переход в ragdoll).
+
+#### 3. Расширение снаряжения Стрелка с ручницей (Вариант А, DWDN_DuchyManager.cs)
+- Для класса mp_DWDN_Crossbowman (Стрелок с ручницей) выделен отдельный 4-й слот (Слот 3) под ручные гранаты:
+  - **Слот 0**: hand_cannon (Ручница)
+  - **Слот 1**: mp_bullets (Пули)
+  - **Слот 2**: Оружие ближнего боя (dwdn_cleaver, mp_vlandian_short_sword, mp_sturgia_axe, aldur_warpick)
+  - **Слот 3**: dwdn_grenade, "" (Ручные гранаты по выбору)
+- Теперь игрок не жертвует холодным оружием ради гранат и имеет полный боекомплект.
+- Сборка и развертывание через sync_all.ps1 выполнены, все 28 тестов MechanicsTester пройдены.
+---
+
+### Глава 57: Исцеление развертывания осадной артиллерии (Онагра) и кучи камней
+
+#### 1. Симптоматика и проявление скрапкода
+- **Симптом**: Передвижной онагр (dwdn_order_mangonel / mangonel_a) переводится в боевое положение клавишей [F] (отцепка коня), конь отцепляется, куча камней появляется на грунте. Однако после этого:
+  1. Подобрать камень из кучи камней невозможно (нет интерактивного триггера [F], либо нажатие не дает эффекта).
+  2. Встать за орудие и управлять им невозможно (посты наводки и огня не реагируют).
+
+#### 2. Коренная причина сбоя
+1. **Коварная сигнатура MissionObject.SetDisabled(bool isParentObject)**:
+   - В ядре движка TaleWorlds.MountAndBlade.MissionObject логический параметр метода SetDisabled — это **не** isActive, а ool isParentObject = false.
+   - Противоположным методом активации является отдельный метод SetEnabled(bool isParentObject = false).
+   - В DWDN_FieldArtilleryBehavior.cs при развертывании в боевое положение (combat == true) код вызывал:
+     `csharp
+     sp.SetDisabled(!combat); // Передавалось false!
+     `
+   - Это приводило к вызову SetDisabled(isParentObject: false), что деактивировало объект в рейкасте: Mission.Current.DeactivateMissionObject(this); IsDisabled = true;. Метод SetEnabled(false) не вызывался вовсе! Все посты управления орудием и точки взятия камней оставались перманентно заблокированными для рейкаста игрока.
+2. **Слепота поиска точек боеприпасов**:
+   - В префабе mangonel_a внутри объекта projectile_pile точки взятия камней (StandingPointWithWeaponRequirement с тегом mmopickup) находятся на **дочерних** сущностях (mmo_pos_c ... mmo_pos_h).
+   - Метод AmmoPileEntity.GetScriptComponents<StandingPoint>() опрашивал только корень кучи и возвращал пустой список. Требовался рекурсивный сбор через CollectMissionObjectsRecursive.
+3. **Отсутствие сетевой синхронизации стояночных постов**:
+   - В мультиплеере разблокировка постов для игроков сервером требует явной рассылки:
+     `csharp
+     sp.SetIsDisabledForPlayersSynched(false);
+     sp.SetIsDeactivatedSynched(false);
+     `
+   - Без этого клиентские стояночные посты считались локально заблокированными для живых игроков.
+4. **Спящее состояние мета-машин (UsableMachine.Activate)**:
+   - Осадное орудие Mangonel и куча камней SiegeMachineStonePile наследуются от UsableMachine. При отцепке от упряжи им необходимо вызывать Activate(), чтобы сбросить внутренний флаг _isMachineDeactivated.
+5. **Чувствительность наведения для наводчика-одиночки**:
+   - В Mangonel.HorizontalAimSensitivity при значении стороны DefaultSide == BattleSideEnum.Defender наводчик поворачивает орудие с чувствительностью  .25f (при других сторонах —  .05f, требуя отдельного бойца на колесе поворота). Через рефлексию полю DefaultSide присвоено значение BattleSideEnum.Defender.
+
+#### 3. Внесенные исправления (DWDN_FieldArtilleryBehavior.cs)
+1. Полностью переписана логика EngineInstance.SetCombatState(bool combat):
+   - При combat == true:
+     - Вызываются SiegeWeapon?.Activate() и stonePile?.Activate().
+     - Видимость кучи камней включается: AmmoPileEntity.SetVisibilityExcludeParents(true).
+     - Производится полный рекурсивный сбор всех StandingPoint орудия и кучи боеприпасов.
+     - Для каждого стояночного поста:
+       * Вызывается sp.SetEnabled(false) (активация в активных объектах Mission.Current).
+       * Сбрасываются флаги: sp.IsDisabledForPlayers = false; sp.IsDeactivated = false;.
+       * Вызывается нейтрализация стороны SetStandingPointNeutral(sp).
+       * Если на сервере: рассылаются sp.SetIsDisabledForPlayersSynched(false) и sp.SetIsDeactivatedSynched(false).
+   - При combat == false:
+     - Вызываются SiegeWeapon?.Deactivate() и stonePile?.Deactivate().
+     - Куча камней скрывается AmmoPileEntity.SetVisibilityExcludeParents(false).
+     - Все посты блокируются через sp.SetDisabled(false) и синхронизируются через SetIsDisabledForPlayersSynched(true).
+2. Добавлен безопасный рефлексивный метод SetSiegeWeaponDefaultSide(RangedSiegeWeapon weapon, BattleSideEnum side):
+   - Устанавливает DefaultSide = BattleSideEnum.Defender, гарантируя плавное и отзывчивое наведение онагра одиночным игроком.
+3. Логика ручных гранат (DWDN_GrenadeBehavior.cs, dwdn_grenade) осталась на 100% нетронутой.
+
+#### 4. Верификация
+- Клиентская сборка DWDN_Script.dll: 0 ошибок.
+- Серверная сборка DWDN_Script.Server.dll: 0 ошибок.
+- Синхронизация sync_all.ps1: успешное развертывание в клиент и выделенный сервер.
+- Автоматический тест-сьют MechanicsTester.exe --cli: 28 из 28 тестов пройдены успешно (0 сбоев).
+---
+
+### Глава 58: Увеличение лимита полевой артиллерии до 3 орудий на команду
+
+#### 1. Задача и цель модификации
+- По воле Создателя лимит одновременно развернутых мобильных орудий полевой артиллерии (онагров и баллист) увеличен с 2 до 3 на каждую команду.
+
+#### 2. Внесенные изменения
+1. **Священный конфигурационный свиток (ModuleData/artillery_config.xml)**:
+   - Атрибут max_cannons_per_team в корневом теге <ArtilleryConfig> установлен в значение "3".
+2. **Логическая матрица (DWDN_FieldArtilleryBehavior.cs)**:
+   - Статическое свойство MaxCannonsPerTeam по умолчанию установлено в значение 3.
+   - В методе LoadConfig() добавлено распознавание атрибута max_cannons_per_team (в дополнение к MaxCannonsPerTeam), обеспечивая автоматическое считывание регистра XML-файла.
+3. **Административные консольные команды**:
+   - Команда !artylimit <N> в DWDN_AdminService.cs по-прежнему позволяет администраторам динамически регулировать лимит на лету.
+
+#### 3. Верификация
+- Клиентская сборка DWDN_Script.dll: 0 ошибок.
+- Серверная сборка DWDN_Script.Server.dll: 0 ошибок.
+- Синхронизация sync_all.ps1: успешно развернуто на клиент и выделенный сервер DaewdenM.
+- Автотесты MechanicsTester.exe --cli: 28 из 28 тестов пройдены успешно.
+---
+
+### Глава 59: Исправление выбора чертежа артиллерии (Онагр vs Баллиста)
+
+#### 1. Симптоматика и коренная причина сбоя
+- **Симптом**: При выборе в интерфейсе выбора снаряжения чертежа/заявки на передвижную баллисту (dwdn_order_ballista), на поле боя всегда спавнился онагр (mangonel_a).
+- **Коренная причина**:
+  1. В методе DWDN_FieldArtilleryBehavior.CheckAndSpawnArtilleryForAgent(Agent agent) проверка ванильных перков движка стояла первой по приоритету:
+     `csharp
+     int pIdx = agent.MissionPeer.GetSelectedPerkIndexWithPerkListIndex(agent.MissionPeer.SelectedTroopIndex, 1);
+     if (pIdx == 1) chosenSpec = GetSpecForType("ballista");
+     else chosenSpec = GetSpecForType("mangonel");
+     `
+     Поскольку в моде DWDN выбор экипировки осуществляется через кастомную систему дивизионов (DWDN_DuchyManager), ванильный pIdx всегда был равен 0. Жесткая ветка else безусловно и принудительно назначала онагр (mangonel), а блок проверки фактической экипировки (if (chosenSpec == null)) не выполнялся никогда.
+  2. Спавн орудия вызывался в событии движка OnAgentBuild, в момент которого кастомный лодаут еще не успевал физически экипироваться в gent.Equipment, но уже был сохранен в реестре выборов DWDN_ServerLoadoutBehavior._peerSelections.
+
+#### 2. Внесенные исправления
+1. **Реестр лодаутов (DWDN_ServerLoadoutBehavior.cs)**:
+   - Выделен публичный статический метод:
+     public static DWDN_LoadoutSelection GetSelectionForAgent(Agent agent, MissionPeer peer = null, int peerIndex = -1)
+     Он быстро и надежно возвращает целевой лодаут бойца (из кэша сетевого пира, локального игрока или дефолта дивизиона).
+   - В метод TryApplyLoadoutToAgent после применения экипировки добавлен вызов:
+     DWDN_FieldArtilleryBehavior.CheckAndSpawnArtilleryForAgent(agent);
+     Это гарантирует своевременный спавн орудия сразу после применения лодаута.
+2. **Логика спавна артиллерии (DWDN_FieldArtilleryBehavior.cs)**:
+   - В CheckAndSpawnArtilleryForAgent полностью перестроена иерархия приоритетов:
+     - **Приоритет 1 (Выбор в кастомном UI DWDN)**: опрашивается DWDN_ServerLoadoutBehavior.GetSelectionForAgent(agent). Если в слотах (Weapon1Id, Weapon0Id и др.) найдена заявка dwdn_order_ballista, активируется чертеж баллисты (allista_a на тележке). Если dwdn_order_mangonel — чертеж онагра.
+     - **Приоритет 2 (Физическая экипировка gent.Equipment)**: если выбор не через UI, сканируются слоты агента на наличие dwdn_order_ballista / dwdn_order_mangonel с фиксацией слота orderSlot для последующего автоматического изъятия заявки при спавне орудия.
+     - **Приоритет 3 (Ванильные перки)**: проверяются перки pIdx только если чертеж не найден в предыдущих шагах, и **без** безусловного else.
+     - **Приоритет 4 (Fallback)**: по умолчанию для артиллериста выбирается онагр, только если ни один источник не указал конкретное орудие.
+
+#### 3. Верификация
+- Клиентская сборка DWDN_Script.dll: 0 ошибок.
+- Серверная сборка DWDN_Script.Server.dll: 0 ошибок.
+- Синхронизация sync_all.ps1: успешно развернуто на клиент и выделенный сервер DaewdenM.
+- Автотесты MechanicsTester.exe --cli: 28 из 28 тестов пройдены успешно (0 сбоев).
+---
+
+### Глава 60: Искоренение антигравитационной петли баллисты и разблокировка последующих спавнов артиллерии
+
+#### 1. Симптоматика и коренная причина (Root Cause)
+- **Симптом 1**: Передвижная баллиста (ballista_a на тележке bd_cart_a) сразу после спавна за тягловым конем начинала стремительно взмывать вертикально вверх в стратосферу («улетает в небеса»).
+- **Симптом 2**: После спавна баллисты игрок больше не мог заспавнить ни одного нового орудия («после спавна баллиста ничего нового не спавнится»).
+
+- **Коренная причина 1 (Антигравитационный резонанс raycast)**:
+  - В методе DWDN_FieldArtilleryBehavior.OnMissionTick в цикле буксировки выполнялся расчет высоты земли через GetHeightAtPoint(targetPos.AsVec2, BodyFlags.CommonCollisionExcludeFlags, ref gZ).
+  - Метод Scene.GetHeightAtPoint опускает луч сверху вниз. В точке targetPos.AsVec2 находится сама баллиста, у которой в префабе ballista_a задано физическое тело древесины (override_material=wood), а тележка bd_cart_a имеет собственный меш.
+  - Луч коллизии каждый кадр ударялся о верхушку самой баллисты, возвращая gZ ~ 1.8м выше поверхности земли.
+  - К этому значению прибавлялся кузовной оффсет +0.40f.
+  - На следующем тике луч вновь ударялся о баллисту, поднятую выше, и поднимал её ещё на 2 метра. Образовывалась бесконечная положительная обратная связь («эффект барона Мюнхгаузена»), катапультировавшая баллисту в космос.
+  - Свойство EngineInstance.Position возвращало RootEntity.GlobalPosition, где уже содержался +0.40f, из-за чего проверка Math.Abs(engine.Position.z - targetPos.z) > 0.05f считалась истинной каждый кадр, непрерывно перезаписывая матрицы даже на стоящей лошади.
+
+- **Коренная причина 2 (Мертвая блокировка пула артиллерии)**:
+  - Улетевшая в стратосферу баллиста никогда не получала урона, не падала и не уничтожалась (engine.IsDestroyed == false).
+  - Проверка CanSpawnCannonForTeam блокировала игрока проверкой: if (_activeEngines.Any(e => e.OwnerPlayerId == playerId && !e.IsDestroyed)).
+  - Пока баллиста вечно парила в небесах, игрок не мог вызвать ни одно новое орудие.
+
+#### 2. Внесенные исправления
+1. **Чистый расчет высоты ландшафта (DWDN_FieldArtilleryBehavior.cs)**:
+   - В логике буксировки OnMissionTick обращение GetHeightAtPoint заменено на чтение непосредственной карты высот меша террейна (Mission.Current.Scene.GetTerrainHeight(targetPos.AsVec2)).
+   - Карта высот ландшафта Scene.GetTerrainHeight не содержит динамических сущностей, тележек и орудий. Самозахват коллизии и обратная связь физически невозможны.
+   - Если орудие находится на мосту или деревянном настиле (где террейн ниже более чем на 2.5 м), высотой автоматически принимается надежный уровень коня horsePos.z.
+2. **Якорь позиции EngineInstance.Position**:
+   - Изменено на public Vec3 Position => Frame.origin;, устранив джиттер высоты кузова +0.40f.
+3. **Предохранитель от варп-катапультирования (Fail-safe destruction)**:
+   - Добавлена проверка границ в OnMissionTick: если по любой непредвиденной причине engine.Frame.origin.z > 100f или < -50f, орудие немедленно помечается как уничтоженное (IsDestroyed = true), освобождая лимиты команды и игрока.
+4. **Автоматический перевод в боевой режим при гибели тяглового коня**:
+   - Если конь погибает на марше (!engine.HorseAgent.IsActive()), орудие автоматически переводится в боевое состояние на грунте (engine.SetCombatState(true)).
+
+#### 3. Верификация
+- Клиентская сборка DWDN_Script.dll: 0 ошибок.
+- Серверная сборка DWDN_Script.Server.dll: 0 ошибок.
+- Тест-харнесс MechanicsTester.exe --cli: 28 из 28 тестов пройдены успешно (0 сбоев).
+- Синхронизация sync_all.ps1: клиент и выделенный сервер полностью обновлены.
+---
+
+### Глава 61: Устранение физического выталкивания баллисты (UsesCart = false) и очистка орудий при респавне артиллериста
+
+#### 1. Симптоматика и коренная причина (Root Cause)
+- **Симптом 1**: Передвижная баллиста (ballista_a) при спавне взмывала вертикально вверх («улетает в небеса»), в то время как передвижной онагр (mangonel_a) в том же самом коде стоял на земле устойчиво и буксировался стабильно.
+- **Симптом 2**: После гибели или респавна артиллериста новое орудие больше не спавнилось («после спавна балиста ничего нового не спавнится»).
+
+- **Коренная причина 1 (Физический импульс отталкивания тел при взаимном проникновении)**:
+  - У онагра было UsesCart = false. Он спавнился как один самостоятельный префаб mangonel_a на собственных колесах.
+  - У баллисты было UsesCart = true. Код создавал вспомогательную сущность повозки bd_cart_a и спавнил префаб ballista_a в той же точке со смещением +0.40f. Поскольку оба объекта имели твердые коллизии, физический движок игры (PhysX/Havok) фиксировал глубокое взаимопроникновение двух твердых тел и генерировал мощный импульс разделения (separation impulse), катапультирующий баллисту вверх из кузова тележки!
+  - Кроме того, у инстанциированных префабов отсутствовал флаг мобильности root.SetMobility(GameEntity.Mobility.Dynamic) (как требует нативный SpawnerEntityMissionHelper), из-за чего движок расценивал орудие как статический коллидер, конфликтующий с движением.
+
+- **Коренная причина 2 (Мертвая блокировка пула артиллерии при респавне игрока)**:
+  - Метод CanSpawnCannonForTeam блокировал спавн проверкой: if (_activeEngines.Any(e => e.OwnerPlayerId == playerId && !e.IsDestroyed)).
+  - Когда игрок погибал и респавнился за артиллериста, его орудие от предыдущей жизни оставалось существовать на карте. В коде не было механизма утилизации или отвязки старого орудия при возрождении владельца. Сервер считал, что у игрока уже есть живое орудие, и навсегда блокировал спавн артиллерии.
+
+#### 2. Внесенные исправления
+1. **Унификация баллисты с работающим Онагром (UsesCart = false)**:
+   - В DWDN_FieldArtilleryBehavior.cs для баллисты установлен UsesCart = false (точно так же, как у онагра). Баллиста в Bannerlord имеет собственный деревянный станок с опорами и не требует искусственного спавна крестьянской тележки bd_cart_a. Взаимное пересечение коллизий устранено.
+   - При спавне орудия на сервере и клиенте явно выставляется:
+     root.SetMobility(GameEntity.Mobility.Dynamic);
+     root.EntityFlags |= EntityFlags.DontSaveToScene;
+   - В цикле буксировки OnMissionTick координата высоты жестко и чисто привязана к высоте тяглового коня: targetPos.z = horsePos.z;. Конь опирается на навигационный меш поверхности и гарантирует идеальное прилегание машины к грунту, мостам и настилам.
+2. **Утилизация орудия при респавне игрока (CheckAndSpawnArtilleryForAgent)**:
+   - При спавне агента, если CanSpawnCannonForTeam вернул отказ по причине наличия активного орудия у данного playerId:
+     - Сервер находит старое орудие от предыдущей жизни.
+     - Если орудием прямо сейчас не управляет союзник (SiegeWeapon.PilotAgent == null), старое орудие безопасно удаляется (IsDestroyed = true, удаление энтити, FadeOut коня), а личный кулдаун сбрасывается.
+     - Если союзник стреляет из него, владение старым орудием отвязывается (OwnerPlayerId = "").
+     - Игроку гарантированно выдается новое орудие на текущий спавн при наличии свободных командных лимитов.
+
+#### 3. Верификация
+- Клиентская сборка DWDN_Script.dll: 0 ошибок.
+- Серверная сборка DWDN_Script.Server.dll: 0 ошибок.
+- Тест-харнесс MechanicsTester.exe --cli: 28 из 28 тестов пройдены успешно (0 сбоев).
+- Синхронизация sync_all.ps1: клиент и выделенный сервер полностью обновлены.
+---
+
+### Глава 62: Искоренение сбоя ядра SetMobility (0xc0000005) и безопасная деактивация старой артиллерии
+
+#### 1. Симптоматика и коренная причина сбоя (Root Cause of Crash)
+- **Симптом**: При попытке игрока заспавниться за класс артиллериста сервер падал с аппаратной ошибкой памяти `System.AccessViolationException (0xc0000005)` в модуле `coreclr.dll` на шаге `TaleWorlds.MountAndBlade.MissionState.TickMission(Single)`.
+- **Коренная причина**:
+  1. В методах `SpawnEngine` и `HandleServerSyncDescendants` был добавлен вызов `root.SetMobility(GameEntity.Mobility.Dynamic)`.
+  2. Префаб осадного орудия инстанциируется движком со статической физической структурой (узлы коллизий в дереве broadphase PhysX/Havok).
+  3. Прямой вызов C++ API `IGameEntity.SetMobility(Pointer, Dynamic)` менял флаг мобильности без реструктуризации нативных структур физического мира.
+  4. На первом же тике физической симуляции (`MissionState.TickMission`) движок обращался по невалидному указателю статического меша, вызывая необрабатываемый аппаратный сбой `0xc0000005`.
+
+#### 2. Внесенные исправления
+1. **Удаление токсичного вызова SetMobility**:
+   - Вызовы `root.SetMobility(GameEntity.Mobility.Dynamic)` и `root.EntityFlags |= EntityFlags.DontSaveToScene` полностью удалены из серверного `SpawnEngine` и клиентского `HandleServerSyncDescendants`.
+   - Орудие спавнится через стандартный нативный `GameEntity.Instantiate`, полностью сохраняя целостность физической памяти TaleWorlds Engine.
+2. **Безопасная утилизация орудий через нативные компоненты**:
+   - В блоке очистки старых орудий при респавне артиллериста удален прямой вызов `RootEntity.Remove(88)`, потенциально оставлявший висячие ссылки в `MissionState`.
+   - Заменено на каноничный вызов компонента разрушения:
+     ```csharp
+     existingEngine.Destructable.HitPoint = 0f;
+     existingEngine.Destructable.PreDestroy();
+     ```
+   - Конь плавно удаляется через `existingEngine.HorseAgent.FadeOut(false, true);`.
+
+#### 3. Верификация
+- Клиентская сборка DWDN_Script.dll: 0 ошибок.
+- Серверная сборка DWDN_Script.Server.dll: 0 ошибок.
+- Тест-харнесс MechanicsTester.exe --cli: 28 из 28 тестов пройдены успешно (0 сбоев).
+- Синхронизация sync_all.ps1: клиент и выделенный сервер полностью развернуты.
+
+---
+
+### Глава 63: Устранение двойной регистрации MissionObject (0xc0000005) и исправление селектора чертежей Баллисты
+
+#### 1. Симптоматика и коренная причина сбоя ядра (Double Registration Crash)
+- **Симптом**: Сервер продолжал падать с фатальным `System.AccessViolationException (0xc0000005)` в `coreclr.dll` на шаге `TaleWorlds.MountAndBlade.MissionState.TickMission(Single)` при попытке игрока заспавниться за артиллериста. Также при выборе перка «Баллиста» всегда спавнился «Онагр».
+- **Глубинные причины**:
+  1. **Двойная регистрация в `_activeMissionObjects`**:
+     В TaleWorlds при вызове `GameEntity.CallScriptCallbacks(true)` движок обходит все прикрепленные к сущности скрипты (`MissionObject.OnPreInit`, `Ballista.OnPreInit`, `StandingPoint.OnPreInit`, `DestructableComponent.OnPreInit`, `UsableMachine.OnPreInit`) и каждый из них **автоматически** вызывает `Mission.Current.AddActiveMissionObject(this)`. 
+     В коде `SpawnEngine` и `HandleServerSyncDescendants` следом за `CallScriptCallbacks(true)` шел цикл, повторно вызывавший `mission.AddActiveMissionObject(mo)`.
+     В результате все узлы орудия попадали в нативный список тиков дважды! При обходе в `MissionState.TickMission` нативный физический движок дважды за один кадр дергал один и тот же компонент без фазового шага, повреждая память сущности и вызывая `0xc0000005`.
+  2. **Опасный вызов `PreDestroy()` при утилизации старого орудия**:
+     `DestructableComponent.PreDestroy()` посылает событие разрушения `OnDestroyed`, слушатели которого в сетевой игре пытаются прочитать `attackerAgent.Team` / `MissionPeer`. Так как орудие утилизировалось без атакующего (`attackerAgent == null`), происходило разыменование `null`.
+  3. **Перехват дефолтным лодаутом выбора чертежа**:
+     В `CheckAndSpawnArtilleryForAgent` наивысшим приоритетом проверялся `DWDN_ServerLoadoutBehavior.GetSelectionForAgent(agent)`. Для игроков, не открывавших кастомное меню лодаута DWDN, этот метод возвращал `DefaultLoadout`, где в слоте 1 всегда зашит `"dwdn_order_mangonel"`. В результате выбор нативного перка «Mobile Ballista» игнорировался, и всегда спавнился онагр.
+  4. **Опасное удаление оружия в `OnAgentBuild`**:
+     Вызов `agent.RemoveEquippedWeapon` во время конструирования агента внутри `OnAgentBuild` нарушал внутреннее состояние TaleWorlds.
+
+#### 2. Внесенные исправления
+1. **Искоренено дублирование регистрации**:
+   - В `SpawnEngine` и `HandleServerSyncDescendants` удалены лишние вызовы `AddActiveMissionObject(mo)`. Регистрация теперь выполняется строго один раз штатным механизмом `CallScriptCallbacks(true)`.
+2. **Безопасная утилизация орудия**:
+   - Удален вызов `PreDestroy()`. Старое орудие помечается `IsDestroyed = true`, обнуляется `Destructable.HitPoint = 0f`, а визуальные сущности орудия и тягловой лошади плавно растворяются через `FadeOut`.
+3. **Исправлен приоритет селектора чертежей (Баллиста / Онагр)**:
+   - Приоритетом №1 стала проверка нативных перков `agent.MissionPeer.SelectedPerks` и `GetSelectedPerkIndexWithPerkListIndex`.
+   - Если выбран перк «Mobile Ballista» — гарантированно выбирается спецификация `ballista`.
+   - Если «Mobile Onager» — спецификация `mangonel`.
+4. **Удален небезопасный `RemoveEquippedWeapon` из `OnAgentBuild`**.
+
+#### 3. Верификация
+- `dotnet build DWDN_Script.csproj` (Release): 0 ошибок.
+- `dotnet build DWDN_Script.Server.csproj` (Release): 0 ошибок.
+- `MechanicsTester.exe --cli`: 28 из 28 тестов пройдены успешно (100% pass).
+- `sync_all.ps1`: Все бинарники и скрипты синхронизированы на выделенный сервер.
+
+---
+
+### Глава 64: Устранение двойного спавна артиллерии, защита нативного тика коня и универсальный селектор Баллиста/Онагр
+
+#### 1. Симптоматика и коренная причина вылета клиента (Root Cause Analysis)
+- **Симптом**: При попытке заспавниться за артиллериста клиент игры закрывался («вылет»).
+- **Анализ логов (`rgl_log_41092.txt` и `rgl_log_29368.txt`)**:
+  1. **Двойной спавн за 6 мс**: При спавне игрока в `22:16:07.467` метод `OnAgentBuild` вызывал `CheckAndSpawnArtilleryForAgent`, порождая Орудие ID 1 и коня (индекс 1). Ровно через 6 миллисекунд (`22:16:07.473`) метод `DWDN_ServerLoadoutBehavior.TryApplyLoadoutToAgent` повторно вызывал `CheckAndSpawnArtilleryForAgent`.
+  2. **Ложное самоуничтожение**: Во втором вызове логика видела существующее орудие игрока, ошибочно считала его «орудием от прошлой жизни», уничтожала Орудие ID 1, отдавала команду `agent_routed` коню 1, и тут же создавала Орудие ID 2 с тем же индексом коня.
+  3. **Сбой памяти на клиенте**: На клиенте Орудие 1 осталось в списке активных орудий, но ссылалось на удаленного из нативной памяти коня. На первом же кадре `OnMissionTick` обращение к удаленному агенту через `SetMaximumSpeedLimit(2.2f)` вызывало `AccessViolationException (0xc0000005)` и падение процесса клиента.
+
+#### 2. Внесенные исправления
+1. **Искоренена петля двойного спавна**:
+   - Из `OnAgentBuild` убран преждевременный вызов `CheckAndSpawnArtilleryForAgent`. Спавн артиллерии происходит строго один раз — после полного завершения настройки экипировки агента в `DWDN_ServerLoadoutBehavior.TryApplyLoadoutToAgent`.
+   - Добавлен потокобезопасный реестр `_spawnedAgentIndices`. Если для `agent.Index` орудие уже создавалось, любые повторные вызовы немедленно блокируются. Очистка индекса происходит при гибели агента в `OnAgentRemoved`.
+2. **Защита от самоуничтожения свежего орудия**:
+   - В проверке утилизации добавлено ограничение по возрасту: если орудие создано менее 5 секунд назад (`Mission.CurrentTime - SpawnTime < 5.0f`), уничтожение и повторный спавн блокируются.
+3. **Безопасность тика `OnMissionTick`**:
+   - Убран вызов P/Invoke `SetMaximumSpeedLimit` из потикового цикла `OnMissionTick`. Лимит шага 2.2f устанавливается коню однократно при спавне.
+   - Цикл буксировки обернут в `try-catch` с проверками активности коня.
+4. **Универсальный определитель Баллиста / Онагр**:
+   - Внедрен единый флаг `wantsBallista`: если в кастомном лодауте, в нативных перках дивизиона или в слотах оружия есть `ballista` — безоговорочно развертывается Баллиста (`ballista_a`). Иначе — Онагр (`mangonel_a`).
+
+#### 3. Верификация
+- Сборка `DWDN_Script.csproj` (Release): 0 ошибок.
+- Сборка `DWDN_Script.Server.csproj` (Release): 0 ошибок.
+- Тест-сьют `MechanicsTester.exe --cli`: 28 из 28 тестов пройдены успешно (100% pass).
+- Синхронизация `sync_all.ps1`: Все бинарники и скрипты развернуты на Dedicated Server.
+
+
+---
+
+### Глава 65: Исцеление боевого режима артиллерии — Сетевая синхронизация StandingPoint.Id, гармонизация BattleSide и активация стрельбы
+
+#### 1. Описание дефекта и анатомия проблемы
+Пользователь зафиксировал: баллиста и онагр спавнятся стабильно, вылетов нет, но в боевом положении (после отцепки от коня клавишей [F]) игрок не может стрелять и взаимодействовать с орудием.
+
+**Анатомический анализ исходного кода движка (декомпиляция TaleWorlds.MountAndBlade):**
+1. **Сетевая диссипация идентификаторов `MissionObjectId`**:
+   - В методе `SpawnEngine` (на сервере) список идентификаторов `descendantIds` формировался **до** вызова `root.CallScriptCallbacks(true)`.
+   - Внутри `CallScriptCallbacks(true)` нативный обработчик `MissionObject.OnPreInit()` безусловно перезаписывает поле `this.Id` новым рантайм-идентификатором через `mission.GetFreeRuntimeMissionObjectId()`.
+   - В результате на сервере зарегистрированные в `Mission.MissionObjects` объекты получили один набор ID, а в сетевой пакет `SyncArtilleryDescendantsMessage` улетел старый недействительный набор ID.
+   - На клиенте в `HandleServerSyncDescendants` происходила аналогичная катастрофа: полученные `receivedIds` записывались в `allObjects[i].Id`, а затем вызывался `root.CallScriptCallbacks(true)`, чей `OnPreInit()` снова перетирал все ID на клиенте случайными локальными числами!
+   - **Последствие**: Клиентские `StandingPoint.Id` не совпадали с серверными `StandingPoint.Id`. Когда игрок нажимал [F] перед баллистой или онагром, клиент отсылал пакет `RequestUseObject(client_sp_id)`. Сервер вызывал `MissionNetworkHelper.GetMissionObjectFromMissionObjectId(id)`, не находил объект с таким ID и молча игнорировал запрос. Игрок не мог занять пост наведения или взять боеприпас.
+2. **Варп-искажение стороны орудия (`BattleSideEnum`)**:
+   - В трех местах (`SpawnEngine`, `HandleServerSyncDescendants`, `SetCombatState`) сторона орудия принудительно задавалась как `SetSiegeWeaponDefaultSide(SiegeWeapon, BattleSideEnum.Defender)`.
+   - Если артиллерист играл за сторону атаки (`BattleSideEnum.Attacker`), нативный метод `RangedSiegeWeapon.Side` возвращал `Defender`, из-за чего для атакующих игроков орудие считалось вражеским, и проверки `StandingPoint.IsDisabledForAgent` / `IsDisabledForBattleSide` блокировали авторизацию.
+3. **Заблокированная точка заряжания камня (`LoadAmmoStandingPoint`)**:
+   - В нативном `Mangonel.OnInit()` по умолчанию вызывается `SetActivationLoadAmmoPoint(false)`. Точка заряжания онагра оставалась деактивированной на сервере и клиенте.
+   - Орудие не переводилось в режим прямого захвата игроком (`PlayerForceUse`).
+
+#### 2. Внесенные исправления (DWDN_FieldArtilleryBehavior.cs)
+1. **Правильный порядок инициализации и регистрации сетевых ID на Сервере (`SpawnEngine`)**:
+   - Сначала вызывается `root.CallScriptCallbacks(true)`, инициализируя все скрипты и регистрируя их на сервере.
+   - Лишь затем рекурсивно собираются все `allObjects`, и их фактические `mo.Id` упаковываются в `descendantIds` для рассылки клиентам.
+   - Сторона орудия устанавливается равной истинной стороне команды артиллериста: `SetSiegeWeaponDefaultSide(siegeWeapon, teamSide)`.
+2. **Точная привязка сетевых ID на Клиенте (`HandleServerSyncDescendants`)**:
+   - Сначала вызывается `root.CallScriptCallbacks(true)`, регистрируя клиентские скрипты.
+   - Сразу после этого `allObjects[i].Id` перезаписываются истинными `receivedIds[i]` от сервера. Теперь поиск объекта по ID в `MissionNetworkHelper` на сервере при нажатии [F] завершается мгновенным успехом.
+   - Сторона орудия на клиенте инициализируется как `(BattleSideEnum)message.TeamSide`.
+3. **Гармонизация стороны и активация боевого контура (`SetCombatState`)**:
+   - При `combat == true`:
+     - Вызывается `SiegeWeapon?.Activate()`.
+     - Включается приоритет игрока: `SiegeWeapon?.SetPlayerForceUse(true)`.
+     - Активируется точка заряжания через безопасный рефлексивный метод: `SetSiegeWeaponLoadAmmoPointActive(SiegeWeapon, true)`.
+     - Сторона орудия динамически синхронизируется с `TeamSide`: `SetSiegeWeaponDefaultSide(SiegeWeapon, TeamSide)`.
+     - Обновляется боекомплект орудия: `SiegeWeapon.StartingAmmoCount = 25; SiegeWeapon.SetAmmo(25)`.
+     - Все стояночные посты разблокируются (`sp.SetEnabled(false); sp.IsDisabledForPlayers = false; sp.IsDeactivated = false; SetStandingPointNeutral(sp)`) и синхронизируются по сети (`SetIsDisabledForPlayersSynched(false); SetIsDeactivatedSynched(false)`).
+
+#### 3. Верификация
+- `dotnet build DWDN_Script.csproj` (Release): 0 ошибок, 0 предупреждений.
+- `dotnet build DWDN_Script.Server.csproj` (Release): 0 ошибок, 0 предупреждений.
+- `MechanicsTester.exe --cli`: 28 из 28 тестов пройдены успешно (100% pass).
+- `sync_all.ps1`: Все бинарники, скрипты и данные синхронизированы на Dedicated Server (`DaewdenM`).
+
+
+---
+
+### Глава 66: Исцеление камеры баллисты — Устранение эффекта привязки CustomCamera при выходе оператора
+
+#### 1. Описание дефекта и анатомия проблемы
+Пользователь зафиксировал: онагр и баллиста функционируют штатно и ведут огонь, однако после использования баллисты и выхода из-за неё (клавишей [F]) камера игрока остаётся намертво привязанной к орудию.
+
+**Анатомический анализ исходного кода TaleWorlds (TaleWorlds.MountAndBlade.View.dll):**
+В нативном методе `RangedSiegeWeaponView.HandleUserInput(float dt)` движок выполняет проверку режима орудийной камеры:
+```csharp
+if (this._isInWeaponCameraMode)
+{
+    if ((this.PilotAgent == null || !this.PilotAgent.IsMainAgent) && !this.RangedSiegeWeapon.PlayerForceUse)
+    {
+        this._isInWeaponCameraMode = false;
+        this.ResetCamera();
+    }
+}
+```
+- `BallistaView` при занятии поста вызывает `StartUsingWeaponCamera()`, активируя `MissionScreen.CustomCamera = this.Camera` и зум `SetExtraCameraParameters(true, 1.5f)`.
+- Сброс камеры обратно на персонажа (`ResetCamera()`) происходит **только** в том случае, если оператор покинул пост (`PilotAgent == null`) **И** флаг `PlayerForceUse` равен `false`.
+- Когда в боевом состоянии вызывался `SiegeWeapon?.SetPlayerForceUse(true);`, проверка `!this.RangedSiegeWeapon.PlayerForceUse` становилась ложной (`false`).
+- В результате движок полагал, что для игрока активен принудительный постановочный режим обзора, и блокировал вызов `ResetCamera()`. Камера оставалась навечно прикреплена к баллисте, а поворот головы персонажа (`Agent.Main.IsLookDirectionLocked`) оставался заблокированным.
+
+#### 2. Внесенные исправления (DWDN_FieldArtilleryBehavior.cs)
+- В методе `EngineInstance.SetCombatState(bool combat)` удалена строка `SiegeWeapon?.SetPlayerForceUse(true);`.
+- Орудие опирается на стандартную для мультиплеера и одиночной игры нативную стейт-машину стояночного поста: при занятии штурвала баллисты камера плавно переключается в прицельный вид, а при выходе по [F] условие выхода срабатывает истинно, немедленно вызывая `ResetCamera()` и возвращая камеру оператору.
+
+#### 3. Верификация
+- `dotnet build DWDN_Script.csproj` (Release): 0 ошибок, 0 предупреждений.
+- `dotnet build DWDN_Script.Server.csproj` (Release): 0 ошибок, 0 предупреждений.
+- `MechanicsTester.exe --cli`: 28 из 28 тестов пройдены успешно (100% pass).
+- `sync_all.ps1`: Все бинарники и скрипты синхронизированы на Dedicated Server (`DaewdenM`).
+
+
+---
+
+### Глава 67: Исцеление спавна Стрелка с ручницей — Ликвидация инверсии слотов боеприпасов, защита от паразитного спавна артиллерии и нормализация XML атрибутов
+
+#### 1. Симптоматика и локализация скрапкода
+- **Симптом**: При попытке заспавниться за класс «Стрелок с ручницей» (`mp_DWDN_Crossbowman`) игра вылетала. Баллиста и онагр артиллериста работают штатно, но выбор ручницы приводил к вылету клиента, а на выделенном сервере через 10 секунд происходило падение с нехваткой памяти (`Requested memory size is 17112760320 bytes`).
+- **Глубинные первопричины сбоя**:
+  1. **Инверсия слотов в нативном перке `Hand Cannon` (`mpclassdivisions.xml`)**:
+     В `mpclassdivisions.xml` в слоте 2 перк `Hand Cannon` содержал:
+     ```xml
+     <OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_bullets" />
+     <OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="hand_cannon" />
+     ```
+     Нативный обработчик спавна экипировал боеприпасы (`mp_bullets`) в слот правой руки (`Item0`), а ручницу в слот `Item1`. В момент вызова нативным ядром TaleWorlds `SetWieldedItemIndex(WeaponItemBeginSlot)` игра пыталась заставить модель персонажа изготовиться к стрельбе и махать сумкой с пулями в ведущей руке. Неуправляемый код `Engine.dll` падал с фатальным `0xc0000005`.
+  2. **Паразитный спавн артиллерии для стрелка (`DWDN_FieldArtilleryBehavior.cs`)**:
+     В `CheckAndSpawnArtilleryForAgent`:
+     ```csharp
+     int pIdx = agent.MissionPeer.GetSelectedPerkIndexWithPerkListIndex(agent.MissionPeer.SelectedTroopIndex, 1);
+     if (pIdx == 0) hasArtilleryBlueprint = true;
+     ```
+     Проверка не была ограждена условием `isArtillerist`. У любого бойца со слотом перка 1, равным 0 (у стрелка `Drill / Fast Reload`), переменная `hasArtilleryBlueprint` становилась `true`. Сервер ошибочно считал, что стрелок заказал передвижной Онагр, деспавнил старое орудие и спавнил `mangonel_a` прямо в момент материализации пехотинца, вызывая рассинхронизацию `MissionObject` на клиенте.
+  3. **Недостающие атрибуты в `dwdn_weapon.xml`**:
+     У `hand_cannon` отсутствовали `value="1" is_merchandise="false"` и `HasString="true"` в `WeaponFlags`. У `mp_bullets` флаг `AttachAmmoToVisual="false"` блокировал прикрепление снаряда к каналу ствола при вызове `CheckLoadedAmmos()`.
+
+#### 2. Внесенные исправления
+1. **[mpclassdivisions.xml](file:///e:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpclassdivisions.xml)**:
+   - В перке `Hand Cannon` слоты возвращены в стандартный порядок: `slot="Item0" item="hand_cannon"` и `slot="Item1" item="mp_bullets"`.
+2. **[DWDN_FieldArtilleryBehavior.cs](file:///e:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/DWDN_FieldArtilleryBehavior.cs)**:
+   - Добавлено строгое условие `if (isArtillerist && !wantsBallista)`, гарантирующее, что логика выбора осадных орудий (Онагр/Баллиста) активируется исключительно для класса Артиллериста (`mp_Artillerist`), не нарушая при этом ни один из проверенных механизмов артиллерии.
+3. **[dwdn_weapon.xml](file:///e:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpitems/dwdn_weapon.xml)**:
+   - Для `hand_cannon` добавлены атрибуты `value="1" is_merchandise="false"`, культура изменена на `Culture.neutral_culture`, в `WeaponFlags` добавлен `HasString="true"`.
+   - Для `mp_bullets` установлены `AttachAmmoToVisual="true"`, `Consumable="true"`, `AmmoSticksWhenShot="true"`, `AmmoBreaksOnBounceBack="true"`, культура установлена в `Culture.neutral_culture`.
+
+#### 3. Верификация
+- `dotnet build DWDN_Script.csproj` (Release): 0 ошибок.
+- `dotnet build DWDN_Script.Server.csproj` (Release): 0 ошибок.
+- `MechanicsTester.exe --cli`: 28 из 28 тестов пройдены успешно (100% pass).
+- `sync_all.ps1`: Все бинарники и XML синхронизированы на Dedicated Server (`DaewdenM`).

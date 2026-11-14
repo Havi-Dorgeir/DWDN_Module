@@ -128,7 +128,7 @@ namespace DWDN_Script.Server.Behaviors
                                         {
                                             if (cultClass == hc)
                                             {
-                                                int targetIdx = string.IsNullOrEmpty(selection.HorseId) ? 0 : idx;
+                                                int targetIdx = idx;
                                                 missionPeer.SelectedTroopIndex = targetIdx;
                                                 missionPeer.NextSelectedTroopIndex = targetIdx;
                                                 try
@@ -242,14 +242,11 @@ namespace DWDN_Script.Server.Behaviors
         }
 
         /// <summary>
-        /// Применяет кастомный выбор экипировки к агенту.
+        /// Возвращает целевой лодаут для агента на основе выбора игрока или класса.
         /// </summary>
-        public void TryApplyLoadoutToAgent(Agent agent, MissionPeer peer = null, int peerIndex = -1)
+        public static DWDN_LoadoutSelection GetSelectionForAgent(Agent agent, MissionPeer peer = null, int peerIndex = -1)
         {
-            if (agent == null || !agent.IsHuman || !agent.IsActive()) return;
-
-            if (_customizedAgentIndices.Contains(agent.Index))
-                return;
+            if (agent == null) return null;
 
             try
             {
@@ -343,7 +340,7 @@ namespace DWDN_Script.Server.Behaviors
                     targetSelection = _localPlayerSelection;
                 }
 
-                // 4. ЖЕЛЕЗОБЕТОННЫЙ FALLBACK: если лодаут все еще null (например, культура empire у Defender), берем дефолтный класс Баннрайха
+                // 4. ЖЕЛЕЗОБЕТОННЫЙ FALLBACK: если лодаут все еще null, берем дефолтный класс Баннрайха
                 if (targetSelection == null)
                 {
                     var defaultDuchy = DWDN_DuchyManager.GetDuchy("banreich") ?? (DWDN_DuchyManager.Duchies.Count > 0 ? DWDN_DuchyManager.Duchies[0] : null);
@@ -351,9 +348,31 @@ namespace DWDN_Script.Server.Behaviors
                     {
                         var defaultClass = defaultDuchy.Classes[0];
                         targetSelection = defaultClass.DefaultLoadout ?? defaultClass.CreateDefaultLoadout(defaultDuchy.Id);
-                        Debug.Print($"[DWDN Server] Использован аварийный дефолтный лодаут {defaultClass.Id} для {agent.Name}");
                     }
                 }
+
+                return targetSelection;
+            }
+            catch (Exception ex)
+            {
+                Debug.Print($"[DWDN Server ERROR] GetSelectionForAgent: {ex}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Применяет кастомный выбор экипировки к агенту.
+        /// </summary>
+        public void TryApplyLoadoutToAgent(Agent agent, MissionPeer peer = null, int peerIndex = -1)
+        {
+            if (agent == null || !agent.IsHuman || !agent.IsActive()) return;
+
+            if (_customizedAgentIndices.Contains(agent.Index))
+                return;
+
+            try
+            {
+                DWDN_LoadoutSelection targetSelection = GetSelectionForAgent(agent, peer, peerIndex);
 
                 // 5. Применяем экипировку
                 if (targetSelection != null)
@@ -393,6 +412,12 @@ namespace DWDN_Script.Server.Behaviors
                     agent.UpdateWeapons();
                     agent.WieldInitialWeapons();
 
+                    // Если первичное оружие не взято в руки, гарантированно берем оружие из слота 0 (оружие ближнего боя)
+                    if (agent.GetPrimaryWieldedItemIndex() == EquipmentIndex.None && !agent.Equipment[EquipmentIndex.WeaponItemBeginSlot].IsEmpty)
+                    {
+                        agent.TryToWieldWeaponInSlot(EquipmentIndex.WeaponItemBeginSlot, Agent.WeaponWieldActionType.Instant, false);
+                    }
+
                     // Гарантированно берем оффхенд предмет (знамя/щит в слоте 1) в левую руку
                     if (agent.GetOffhandWieldedItemIndex() == EquipmentIndex.None && !agent.Equipment[EquipmentIndex.Weapon1].IsEmpty)
                     {
@@ -425,6 +450,13 @@ namespace DWDN_Script.Server.Behaviors
 
                     _customizedAgentIndices.Add(agent.Index);
                     Debug.Print($"[DWDN Server] Loadout applied to {agent.Name} (Index: {agent.Index}) for class {targetSelection.ClassId}");
+
+                    // Проверяем заявку на полевую артиллерию после применения кастомного лодаута
+                    try
+                    {
+                        DWDN_FieldArtilleryBehavior.CheckAndSpawnArtilleryForAgent(agent);
+                    }
+                    catch { }
                 }
             }
             catch (Exception ex)
@@ -448,11 +480,22 @@ namespace DWDN_Script.Server.Behaviors
                 ItemObject item = MBObjectManager.Instance?.GetObject<ItemObject>(itemId);
                 if (item != null)
                 {
+                    // Защита от скрапкода: в оружейных слотах предмет должен иметь PrimaryWeapon либо быть предметом для левой руки / щитом / знаменем
+                    if (index >= EquipmentIndex.WeaponItemBeginSlot && index <= EquipmentIndex.ExtraWeaponSlot)
+                    {
+                        if (item.PrimaryWeapon == null && !item.ItemFlags.HasAnyFlag(ItemFlags.HeldInOffHand) && item.ItemType != ItemObject.ItemTypeEnum.Banner && item.ItemType != ItemObject.ItemTypeEnum.Shield)
+                        {
+                            Debug.Print($"[DWDN Server ERROR] Оружие '{itemId}' в слоте {index} имеет PrimaryWeapon == null! Слот очищен для предотвращения краша.");
+                            equip[index] = EquipmentElement.Invalid;
+                            return;
+                        }
+                    }
                     equip[index] = new EquipmentElement(item);
                 }
                 else
                 {
                     Debug.Print($"[DWDN Server WARNING] Предмет с id='{itemId}' не найден в MBObjectManager для слота {index}!");
+                    equip[index] = EquipmentElement.Invalid;
                 }
             }
 
@@ -468,6 +511,7 @@ namespace DWDN_Script.Server.Behaviors
             SetSlot(EquipmentIndex.WeaponItemBeginSlot + 1, selection.Weapon1Id);
             SetSlot(EquipmentIndex.WeaponItemBeginSlot + 2, selection.Weapon2Id);
             SetSlot(EquipmentIndex.WeaponItemBeginSlot + 3, selection.Weapon3Id);
+            equip[EquipmentIndex.ExtraWeaponSlot] = EquipmentElement.Invalid;
 
             // Человек-всадник никогда не должен нести слоты Horse / HorseHarness в своём SpawnEquipment!
             // Иначе при UpdateSpawnEquipmentAndRefreshVisuals движок Native вызывает

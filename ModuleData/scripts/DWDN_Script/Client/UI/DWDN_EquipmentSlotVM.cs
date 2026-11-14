@@ -148,7 +148,7 @@ namespace DWDN_Script.Client.UI
                 SlotName = DetermineWeaponSlotName(allowedItemIds, _initialSlotName);
             }
 
-            if (allowedItemIds == null || allowedItemIds.Count == 0)
+            if (allowedItemIds == null || allowedItemIds.Count == 0 || (allowedItemIds.Count == 1 && string.IsNullOrEmpty(allowedItemIds[0])))
             {
                 HasOptions = false;
                 SelectedItemName = "Недоступно";

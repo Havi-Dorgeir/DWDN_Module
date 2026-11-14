@@ -1,0 +1,98 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Серверная сборка мода — DWDN_Script.Server.dll для выделенного сервера.
+
+    С Bannerlord v1.5.7 (сборка сервера 26569029, 11.11.2026) выделенный сервер
+    работает на .NET 8, а не на .NET Framework 4.7.2. Сборка под net472, как
+    прежде, на нём не загружается, поэтому сервер собирается отдельным
+    проектом под net8.0 и против библиотек САМОГО выделенного сервера, а не
+    клиента: у них разный набор сборок и местами разный API.
+
+    Исходники общие с клиентом (папка ../DWDN_Script), берутся только общие и
+    серверные; клиентские отсекает символ SERVER (#if !SERVER).
+
+    Где лежит выделенный сервер, задаётся так (по убыванию):
+      dotnet build -p:BannerlordServerDir="D:\...\Mount & Blade II Dedicated Server"
+      переменная окружения BANNERLORD_SERVER_DIR
+      по умолчанию — рядом с клиентом в той же библиотеке Steam:
+      <steamapps/common>/Mount & Blade II Dedicated Server
+    Библиотеки ищутся в bin/Win64_Shipping_Server, bin/Linux64_Shipping_Server
+    или прямо в указанной папке (так удобно держать выгруженный набор).
+  -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>DWDN_Script.Server</AssemblyName>
+    <RootNamespace>DWDN_Script</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <DefineConstants>$(DefineConstants);SERVER</DefineConstants>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateDependencyFile>false</GenerateDependencyFile>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <Deterministic>true</Deterministic>
+    <DebugType>portable</DebugType>
+    <OutputPath>..\..\..\bin\Win64_Shipping_Server\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <BannerlordServerDir Condition=" '$(BannerlordServerDir)' == '' ">$(BANNERLORD_SERVER_DIR)</BannerlordServerDir>
+    <BannerlordServerDir Condition=" '$(BannerlordServerDir)' == '' ">$(MSBuildProjectDirectory)\..\..\..\..\..\..\Mount &amp; Blade II Dedicated Server</BannerlordServerDir>
+    <ServerBin Condition=" Exists('$(BannerlordServerDir)\bin\Win64_Shipping_Server\TaleWorlds.MountAndBlade.dll') ">$(BannerlordServerDir)\bin\Win64_Shipping_Server</ServerBin>
+    <ServerBin Condition=" '$(ServerBin)' == '' and Exists('$(BannerlordServerDir)\bin\Linux64_Shipping_Server\TaleWorlds.MountAndBlade.dll') ">$(BannerlordServerDir)\bin\Linux64_Shipping_Server</ServerBin>
+    <ServerBin Condition=" '$(ServerBin)' == '' ">$(BannerlordServerDir)</ServerBin>
+    <!-- Мультиплеерная сборка на сервере лежит то в bin, то в модуле Multiplayer. -->
+    <MultiplayerDll>$(ServerBin)\TaleWorlds.MountAndBlade.Multiplayer.dll</MultiplayerDll>
+    <MultiplayerDll Condition=" !Exists('$(MultiplayerDll)') ">$(BannerlordServerDir)\Modules\Multiplayer\bin\Win64_Shipping_Server\TaleWorlds.MountAndBlade.Multiplayer.dll</MultiplayerDll>
+  </PropertyGroup>
+
+  <Target Name="DWDN_CheckServerLibs" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition=" !Exists('$(ServerBin)\TaleWorlds.MountAndBlade.dll') "
+           Text="Не найдены библиотеки выделенного сервера Bannerlord в '$(ServerBin)'. Укажите папку сервера: dotnet build -p:BannerlordServerDir=&quot;...\Mount &amp; Blade II Dedicated Server&quot; или переменной BANNERLORD_SERVER_DIR." />
+  </Target>
+
+  <ItemGroup>
+    <Compile Include="..\DWDN_Script\SubModule.cs" />
+    <Compile Include="..\DWDN_Script\DWDN_FirearmsBehavior.cs" />
+    <Compile Include="..\DWDN_Script\DWDN_GrenadeBehavior.cs" />
+    <Compile Include="..\DWDN_Script\DWDN_BannerAuraBehavior.cs" />
+    <Compile Include="..\DWDN_Script\DWDN_FieldArtilleryBehavior.cs" />
+    <Compile Include="..\DWDN_Script\Common\**\*.cs" />
+    <Compile Include="..\DWDN_Script\Server\**\*.cs" />
+    <Compile Include="..\DWDN_Script\Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="TaleWorlds.Core"><HintPath>$(ServerBin)\TaleWorlds.Core.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="TaleWorlds.DotNet"><HintPath>$(ServerBin)\TaleWorlds.DotNet.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="TaleWorlds.Engine"><HintPath>$(ServerBin)\TaleWorlds.Engine.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="TaleWorlds.InputSystem"><HintPath>$(ServerBin)\TaleWorlds.InputSystem.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="TaleWorlds.Library"><HintPath>$(ServerBin)\TaleWorlds.Library.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="TaleWorlds.Localization"><HintPath>$(ServerBin)\TaleWorlds.Localization.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="TaleWorlds.MountAndBlade"><HintPath>$(ServerBin)\TaleWorlds.MountAndBlade.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="TaleWorlds.MountAndBlade.Diamond"><HintPath>$(ServerBin)\TaleWorlds.MountAndBlade.Diamond.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="TaleWorlds.MountAndBlade.Multiplayer"><HintPath>$(MultiplayerDll)</HintPath><Private>false</Private></Reference>
+    <Reference Include="TaleWorlds.Network"><HintPath>$(ServerBin)\TaleWorlds.Network.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="TaleWorlds.ObjectSystem"><HintPath>$(ServerBin)\TaleWorlds.ObjectSystem.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="TaleWorlds.PlayerServices"><HintPath>$(ServerBin)\TaleWorlds.PlayerServices.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="TaleWorlds.ScreenSystem"><HintPath>$(ServerBin)\TaleWorlds.ScreenSystem.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+
+  <!--
+    Linux-сервер (арена Даэвдена) ищет DLL модуля в bin/Linux64_Shipping_Server.
+    Управляемая сборка одна на обе системы — кладём её и туда.
+    Если рядом стоит локальный выделенный сервер с модулем DaewdenM — копируем
+    и в него, как делал прежний пост-билд.
+  -->
+  <Target Name="DWDN_CopyServerBuild" AfterTargets="Build">
+    <ItemGroup>
+      <DWDN_ServerOut Include="$(TargetPath);$(TargetDir)$(TargetName).pdb" />
+    </ItemGroup>
+    <Copy SourceFiles="@(DWDN_ServerOut)" DestinationFolder="$(MSBuildProjectDirectory)\..\..\..\bin\Linux64_Shipping_Server\" SkipUnchangedFiles="true" />
+    <Copy Condition=" Exists('$(BannerlordServerDir)\Modules\DaewdenM\') "
+          SourceFiles="@(DWDN_ServerOut)" DestinationFolder="$(BannerlordServerDir)\Modules\DaewdenM\bin\Win64_Shipping_Server\" SkipUnchangedFiles="true" />
+  </Target>
+</Project>

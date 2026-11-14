@@ -1,0 +1,197 @@
+<Prefab>
+  <Window>
+    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent">
+      <Children>
+        <!-- Полупрозрачная затемняющая подложка -->
+        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#050403B0" />
+
+        <!-- Основная панель -->
+        <Widget SuggestedWidth="1400" SuggestedHeight="820" HorizontalAlignment="Center" VerticalAlignment="Center" Sprite="panel_dent_9" AlphaFactor="0.95">
+          <Children>
+            <!-- Заголовок -->
+            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginTop="12" Brush="MPLobby.Clan.Title.Text" Brush.FontSize="32" Brush.TextHorizontalAlignment="Center" Text="@TitleText" />
+            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginTop="46" Brush="MPLobby.Clan.Paragraph.Text" Brush.FontSize="15" Brush.TextHorizontalAlignment="Center" Text="@SubtitleText" />
+
+            <!-- Кнопка Закрыть (Крестик) -->
+            <ButtonWidget DoNotPassEventsToChildren="true" SuggestedWidth="100" SuggestedHeight="34" HorizontalAlignment="Right" MarginRight="24" MarginTop="16" Brush="ButtonBrush2" Command.Click="ExecuteClose">
+              <Children>
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="OverlayPopup.ButtonText" Brush.FontSize="17" Brush.TextVerticalAlignment="Center" Brush.TextHorizontalAlignment="Center" Text="Закрыть" />
+              </Children>
+            </ButtonWidget>
+
+            <!-- Двухколоночный макет -->
+            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="24" MarginRight="24" MarginTop="80" MarginBottom="20" StackLayout.LayoutMethod="HorizontalLeftToRight">
+              <Children>
+                
+                <!-- ЛЕВАЯ КОЛОНКА: Быстрые глобальные действия и консоль -->
+                <Widget SuggestedWidth="380" HeightSizePolicy="StretchToParent" MarginRight="20" Sprite="frame_small_9" AlphaFactor="0.95">
+                  <Children>
+                    <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginTop="10" Brush="MPLobby.Clan.Title.Text" Brush.FontSize="22" Brush.TextHorizontalAlignment="Center" Text="Быстрые команды" />
+
+                    <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="16" MarginRight="16" MarginTop="45" StackLayout.LayoutMethod="VerticalTopToBottom">
+                      <Children>
+                        <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="StretchToParent" SuggestedHeight="40" MarginBottom="8" Brush="ButtonBrush2" Command.Click="ExecuteBringAll">
+                          <Children>
+                            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="OverlayPopup.ButtonText" Brush.FontSize="16" Brush.TextVerticalAlignment="Center" Brush.TextHorizontalAlignment="Center" Text="Призвать всех к себе" />
+                          </Children>
+                        </ButtonWidget>
+
+                        <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="StretchToParent" SuggestedHeight="40" MarginBottom="8" Brush="ButtonBrush2" Command.Click="ExecuteHealAll">
+                          <Children>
+                            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="OverlayPopup.ButtonText" Brush.FontSize="16" Brush.TextVerticalAlignment="Center" Brush.TextHorizontalAlignment="Center" Text="Исцелить всех игроков" />
+                          </Children>
+                        </ButtonWidget>
+
+                        <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="StretchToParent" SuggestedHeight="40" MarginBottom="8" Brush="ButtonBrush2" Command.Click="ExecuteKillBots">
+                          <Children>
+                            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="OverlayPopup.ButtonText" Brush.FontSize="16" Brush.TextVerticalAlignment="Center" Brush.TextHorizontalAlignment="Center" Text="Уничтожить ботов" />
+                          </Children>
+                        </ButtonWidget>
+
+                        <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="StretchToParent" SuggestedHeight="40" MarginBottom="8" Brush="ButtonBrush2" Command.Click="ExecuteEndWarmup">
+                          <Children>
+                            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="OverlayPopup.ButtonText" Brush.FontSize="16" Brush.TextVerticalAlignment="Center" Brush.TextHorizontalAlignment="Center" Text="Завершить разминку" />
+                          </Children>
+                        </ButtonWidget>
+
+                        <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="StretchToParent" SuggestedHeight="40" MarginBottom="8" Brush="ButtonBrush2" Command.Click="ExecuteExtendWarmup">
+                          <Children>
+                            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="OverlayPopup.ButtonText" Brush.FontSize="16" Brush.TextVerticalAlignment="Center" Brush.TextHorizontalAlignment="Center" Text="Продлить разминку" />
+                          </Children>
+                        </ButtonWidget>
+
+                        <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="StretchToParent" SuggestedHeight="40" MarginBottom="8" Brush="ButtonBrush2" Command.Click="ExecuteEndRound">
+                          <Children>
+                            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="OverlayPopup.ButtonText" Brush.FontSize="16" Brush.TextVerticalAlignment="Center" Brush.TextHorizontalAlignment="Center" Text="Завершить раунд" />
+                          </Children>
+                        </ButtonWidget>
+
+                        <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="StretchToParent" SuggestedHeight="40" MarginBottom="14" Brush="ButtonBrush2" Command.Click="ExecuteRefresh">
+                          <Children>
+                            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="OverlayPopup.ButtonText" Brush.FontSize="16" Brush.TextVerticalAlignment="Center" Brush.TextHorizontalAlignment="Center" Text="Обновить список" />
+                          </Children>
+                        </ButtonWidget>
+                      </Children>
+                    </ListPanel>
+
+                    <!-- Блок отправки произвольной команды -->
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" VerticalAlignment="Bottom" MarginLeft="16" MarginRight="16" MarginBottom="14">
+                      <Children>
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" Brush="MPLobby.Clan.Paragraph.Text" Brush.FontSize="14" Text="Консольная команда:" />
+                        <Widget WidthSizePolicy="StretchToParent" SuggestedHeight="36" MarginTop="22">
+                          <Children>
+                            <EditableTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Text="@CommandText" Brush="MPLobby.Clan.Paragraph.Text" Brush.FontSize="15" />
+                          </Children>
+                        </Widget>
+                        <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="StretchToParent" SuggestedHeight="34" MarginTop="64" Brush="ButtonBrush2" Command.Click="ExecuteSendCommand">
+                          <Children>
+                            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="OverlayPopup.ButtonText" Brush.FontSize="15" Brush.TextVerticalAlignment="Center" Brush.TextHorizontalAlignment="Center" Text="Отправить команду" />
+                          </Children>
+                        </ButtonWidget>
+                      </Children>
+                    </Widget>
+                  </Children>
+                </Widget>
+
+                <!-- ПРАВАЯ КОЛОНКА: Список игроков -->
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="frame_small_9" AlphaFactor="0.95">
+                  <Children>
+                    <!-- Верхняя панель поиска и счетчик -->
+                    <Widget WidthSizePolicy="StretchToParent" SuggestedHeight="44" MarginLeft="14" MarginRight="14" MarginTop="10">
+                      <Children>
+                        <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" Brush="MPLobby.Clan.Title.Text" Brush.FontSize="20" Brush.TextVerticalAlignment="Center" Text="@PlayerCountText" />
+                        <Widget SuggestedWidth="320" HeightSizePolicy="StretchToParent" HorizontalAlignment="Right">
+                          <Children>
+                            <EditableTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Text="@SearchText" Brush="MPLobby.Clan.Paragraph.Text" Brush.FontSize="16" />
+                          </Children>
+                        </Widget>
+                      </Children>
+                    </Widget>
+
+                    <!-- Список игроков с полосой прокрутки -->
+                    <ScrollablePanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="14" MarginRight="14" MarginTop="60" MarginBottom="14" AutoHideScrollBars="true">
+                      <Children>
+                        <NavigationScopeTargeter ScopeID="PlayerListScope" ScopeParent="..\PlayerList" />
+                        <ListPanel Id="PlayerList" DataSource="{PlayerRows}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" StackLayout.LayoutMethod="VerticalTopToBottom">
+                          <ItemTemplate>
+                            <Widget WidthSizePolicy="StretchToParent" SuggestedHeight="52" MarginBottom="6" Sprite="BlankWhiteSquare_9" Color="#1E1914D0">
+                              <Children>
+                                <!-- Инфо об игроке -->
+                                <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" MarginLeft="12" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                                  <Children>
+                                    <TextWidget SuggestedWidth="180" HeightSizePolicy="StretchToParent" Brush="MPLobby.Clan.Title.Text" Brush.FontSize="17" Brush.TextVerticalAlignment="Center" Text="@PlayerName" />
+                                    <TextWidget SuggestedWidth="110" HeightSizePolicy="StretchToParent" Brush="MPLobby.Clan.Paragraph.Text" Brush.FontSize="14" Brush.TextVerticalAlignment="Center" Text="@TeamName" />
+                                    <TextWidget SuggestedWidth="90" HeightSizePolicy="StretchToParent" Brush="MPLobby.Clan.Paragraph.Text" Brush.FontSize="14" Brush.TextVerticalAlignment="Center" Text="@StatusText" />
+                                    <TextWidget SuggestedWidth="70" HeightSizePolicy="StretchToParent" Brush="MPLobby.Clan.Paragraph.Text" Brush.FontSize="14" Brush.TextVerticalAlignment="Center" Text="@PingText" />
+                                  </Children>
+                                </ListPanel>
+
+                                <!-- Кнопки быстрых действий над игроком -->
+                                <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" HorizontalAlignment="Right" MarginRight="8" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                                  <Children>
+                                    <ButtonWidget DoNotPassEventsToChildren="true" SuggestedWidth="65" SuggestedHeight="32" MarginRight="4" VerticalAlignment="Center" Brush="ButtonBrush2" Command.Click="ExecuteHeal">
+                                      <Children>
+                                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="OverlayPopup.ButtonText" Brush.FontSize="13" Brush.TextVerticalAlignment="Center" Brush.TextHorizontalAlignment="Center" Text="Лечить" />
+                                      </Children>
+                                    </ButtonWidget>
+
+                                    <ButtonWidget DoNotPassEventsToChildren="true" SuggestedWidth="55" SuggestedHeight="32" MarginRight="4" VerticalAlignment="Center" Brush="ButtonBrush2" Command.Click="ExecuteGodMode">
+                                      <Children>
+                                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="OverlayPopup.ButtonText" Brush.FontSize="13" Brush.TextVerticalAlignment="Center" Brush.TextHorizontalAlignment="Center" Text="Бог" />
+                                      </Children>
+                                    </ButtonWidget>
+
+                                    <ButtonWidget DoNotPassEventsToChildren="true" SuggestedWidth="55" SuggestedHeight="32" MarginRight="4" VerticalAlignment="Center" Brush="ButtonBrush2" Command.Click="ExecuteTeleport">
+                                      <Children>
+                                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="OverlayPopup.ButtonText" Brush.FontSize="13" Brush.TextVerticalAlignment="Center" Brush.TextHorizontalAlignment="Center" Text="К нему" />
+                                      </Children>
+                                    </ButtonWidget>
+
+                                    <ButtonWidget DoNotPassEventsToChildren="true" SuggestedWidth="65" SuggestedHeight="32" MarginRight="4" VerticalAlignment="Center" Brush="ButtonBrush2" Command.Click="ExecuteBring">
+                                      <Children>
+                                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="OverlayPopup.ButtonText" Brush.FontSize="13" Brush.TextVerticalAlignment="Center" Brush.TextHorizontalAlignment="Center" Text="Призвать" />
+                                      </Children>
+                                    </ButtonWidget>
+
+                                    <ButtonWidget DoNotPassEventsToChildren="true" SuggestedWidth="65" SuggestedHeight="32" MarginRight="4" VerticalAlignment="Center" Brush="ButtonBrush2" Command.Click="ExecuteFreeze">
+                                      <Children>
+                                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="OverlayPopup.ButtonText" Brush.FontSize="13" Brush.TextVerticalAlignment="Center" Brush.TextHorizontalAlignment="Center" Text="Фриз" />
+                                      </Children>
+                                    </ButtonWidget>
+
+                                    <ButtonWidget DoNotPassEventsToChildren="true" SuggestedWidth="55" SuggestedHeight="32" MarginRight="4" VerticalAlignment="Center" Brush="ButtonBrush2" Command.Click="ExecuteSlay">
+                                      <Children>
+                                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="OverlayPopup.ButtonText" Brush.FontSize="13" Brush.TextVerticalAlignment="Center" Brush.TextHorizontalAlignment="Center" Text="Убить" />
+                                      </Children>
+                                    </ButtonWidget>
+
+                                    <ButtonWidget DoNotPassEventsToChildren="true" SuggestedWidth="55" SuggestedHeight="32" MarginRight="4" VerticalAlignment="Center" Brush="ButtonBrush2" Command.Click="ExecuteKick">
+                                      <Children>
+                                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="OverlayPopup.ButtonText" Brush.FontSize="13" Brush.TextVerticalAlignment="Center" Brush.TextHorizontalAlignment="Center" Text="Кик" />
+                                      </Children>
+                                    </ButtonWidget>
+
+                                    <ButtonWidget DoNotPassEventsToChildren="true" SuggestedWidth="55" SuggestedHeight="32" VerticalAlignment="Center" Brush="ButtonBrush2" Command.Click="ExecuteBan">
+                                      <Children>
+                                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="OverlayPopup.ButtonText" Brush.FontSize="13" Brush.TextVerticalAlignment="Center" Brush.TextHorizontalAlignment="Center" Text="Бан" />
+                                      </Children>
+                                    </ButtonWidget>
+                                  </Children>
+                                </ListPanel>
+                              </Children>
+                            </Widget>
+                          </ItemTemplate>
+                        </ListPanel>
+                      </Children>
+                    </ScrollablePanel>
+                  </Children>
+                </Widget>
+
+              </Children>
+            </ListPanel>
+          </Children>
+        </Widget>
+      </Children>
+    </Widget>
+  </Window>
+</Prefab>

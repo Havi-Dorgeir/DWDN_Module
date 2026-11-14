@@ -13,8 +13,8 @@
 				<Effect type="DrivenProperty" driven_property="CombatMaxSpeedMultiplier" value="0.10" />
 			</Perk>
 			<!-- Слот 2: Оружие ближнего боя -->
-			<Perk game_mode="All" name="Cleaver" description="Peasant cleaver" icon="PerkSword" perk_list="2">
-				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="dwdn_cleaver" />
+			<Perk game_mode="All" name="Peasant Knife" description="Peasant knife" icon="PerkSword" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="dwdn_peasant_knife" />
 			</Perk>
 			<Perk game_mode="All" name="Axe" description="Woodsman axe" icon="PerkHeavyAxe" perk_list="2">
 				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_sturgia_axe" />
@@ -42,6 +42,9 @@
 				<Effect type="DrivenProperty" driven_property="MaxSpeedMultiplier" value="0.05" />
 			</Perk>
 			<!-- Слот 2: Оружие -->
+			<Perk game_mode="All" name="Cleaver" description="Peasant cleaver" icon="PerkSword" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="dwdn_cleaver" />
+			</Perk>
 			<Perk game_mode="All" name="Falchion" description="Infantry falchion" icon="PerkBetterSwords" perk_list="2">
 				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="dwdn_falchion" />
 			</Perk>
@@ -239,14 +242,37 @@
 				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item2" item="mp_vlandian_short_sword" />
 			</Perk>
 			<Perk game_mode="All" name="Hand Cannon" description="Early siege hand cannon, bullets and a sidearm sword" icon="PerkHeavyCrossbows" perk_list="2">
-				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_bullets" />
-				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="hand_cannon" />
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="hand_cannon" />
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="mp_bullets" />
 				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item2" item="mp_vlandian_short_sword" />
 			</Perk>
 			<Perk game_mode="all" name="{=yRTNfCfm}Faster Crossbow" description="Replaces Crossbow with Heavy Crossbow. Grants extra bolts and a sidearm sword." icon="PerkFasterRelease" perk_list="2">
 				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_heavier_crossbow_faster_draw" />
 				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="mp_bolts_western_extra" />
 				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item2" item="mp_vlandian_short_sword" />
+			</Perk>
+		</Perks>
+	</MPClassDivision>
+	<!-- Artillerist (Полевая Артиллерия и Расчёт) -->
+	<MPClassDivision id="mp_Artillerist" hero="mp_Artillerist_hero" troop="mp_Artillerist_troop" hero_idle_anim="act_empire_mp_archer_militia_idle" troop_idle_anim="act_idle_bow_1" multiplier="0.45" cost="175" icon="Archer_Heavy" melee_ai="65" ranged_ai="100" armor="28" movement_speed="0.72" combat_movement_speed="0.68" acceleration="2.8" hitpoints="100">
+		<Perks>
+			<!-- Слот 1: Оружие ближнего боя на выбор -->
+			<Perk game_mode="All" name="Artillery Falchion" description="Equips an Artillery Falchion for close combat" icon="PerkSwords" perk_list="1">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="dwdn_falchion" />
+			</Perk>
+			<Perk game_mode="All" name="Sapper Cleaver" description="Equips a Heavy Sapper Cleaver" icon="PerkAxes" perk_list="1">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="dwdn_cleaver" />
+			</Perk>
+			<Perk game_mode="All" name="War Hammer" description="Equips an Engineer War Hammer with armor-piercing blunt force" icon="PerkMaces" perk_list="1">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_vlandian_hammer" />
+			</Perk>
+			<Perk game_mode="All" name="Short Sword" description="Equips a nimble Short Sword" icon="PerkSwords" perk_list="1">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="mp_vlandian_short_sword" />
+			</Perk>
+			<!-- Слот 2: Заявка на осадное орудие (Передвижной Онагр или Передвижная Баллиста) -->
+			<Perk game_mode="All" name="Mobile Onager" description="Deploys a Mobile Wheeled Mangonel (Onager) on base. Ammo pile spawns beside." icon="PerkHeavyCrossbows" perk_list="2">
+			</Perk>
+			<Perk game_mode="All" name="Mobile Ballista" description="Deploys a Mobile Wheeled Ballista on base. Bolt crate spawns beside." icon="PerkSharpshooters" perk_list="2">
 			</Perk>
 		</Perks>
 	</MPClassDivision>

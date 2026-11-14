@@ -99,6 +99,10 @@
       <HintPath>..\..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.ObjectSystem.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="TaleWorlds.PlayerServices">
+      <HintPath>..\..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.PlayerServices.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="TaleWorlds.ScreenSystem">
       <HintPath>..\..\..\..\..\bin\Win64_Shipping_Client\TaleWorlds.ScreenSystem.dll</HintPath>
       <Private>False</Private>
@@ -152,7 +156,9 @@
   <!-- Общие и серверные исходники -->
   <ItemGroup>
     <Compile Include="DWDN_FirearmsBehavior.cs" />
+    <Compile Include="DWDN_GrenadeBehavior.cs" />
     <Compile Include="DWDN_BannerAuraBehavior.cs" />
+    <Compile Include="DWDN_FieldArtilleryBehavior.cs" />
     <Compile Include="SubModule.cs" />
     <Compile Include="Common\Duchies\DWDN_Duchy.cs" />
     <Compile Include="Common\Duchies\DWDN_ClassDefinition.cs" />
@@ -161,6 +167,9 @@
     <Compile Include="Common\Network\DWDN_NetworkMessages.cs" />
     <Compile Include="Common\Network\DWDN_NetworkHelper.cs" />
     <Compile Include="Server\Behaviors\DWDN_ServerLoadoutBehavior.cs" />
+    <Compile Include="Server\Admin\DWDN_AdminService.cs" />
+    <Compile Include="Server\Admin\DWDN_AdminGameHandler.cs" />
+    <Compile Include="Server\Admin\DWDN_AdminBehavior.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
 
@@ -177,6 +186,8 @@
     <Compile Include="Client\UI\DWDN_EquipmentSlotVM.cs" />
     <Compile Include="Client\UI\DWDN_ItemOptionVM.cs" />
     <Compile Include="Client\UI\DWDN_ClassSelectionVM.cs" />
+    <Compile Include="Client\UI\Admin\DWDN_AdminPanelVM.cs" />
+    <Compile Include="Client\UI\Admin\DWDN_AdminMissionView.cs" />
   </ItemGroup>
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

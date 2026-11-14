@@ -19,6 +19,12 @@ namespace DWDN_Script.Common.Network
         private static readonly MethodInfo _removeClientMessageHandler =
             typeof(GameNetwork).GetMethod("RemoveClientMessageHandler", BindingFlags.NonPublic | BindingFlags.Static);
 
+        private static readonly MethodInfo _addServerMessageHandler =
+            typeof(GameNetwork).GetMethod("AddServerMessageHandler", BindingFlags.NonPublic | BindingFlags.Static);
+
+        private static readonly MethodInfo _removeServerMessageHandler =
+            typeof(GameNetwork).GetMethod("RemoveServerMessageHandler", BindingFlags.NonPublic | BindingFlags.Static);
+
         public static void RegisterClientMessageHandler<T>(GameNetworkMessage.ClientMessageHandlerDelegate<T> handler)
             where T : GameNetworkMessage
         {
@@ -50,6 +56,40 @@ namespace DWDN_Script.Common.Network
             catch (Exception ex)
             {
                 Debug.Print($"[DWDN_NetworkHelper ERROR] UnregisterClientMessageHandler failed: {ex}");
+            }
+        }
+
+        public static void RegisterServerMessageHandler<T>(GameNetworkMessage.ServerMessageHandlerDelegate<T> handler)
+            where T : GameNetworkMessage
+        {
+            try
+            {
+                if (_addServerMessageHandler != null)
+                {
+                    MethodInfo generic = _addServerMessageHandler.MakeGenericMethod(typeof(T));
+                    generic.Invoke(null, new object[] { handler });
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.Print($"[DWDN_NetworkHelper ERROR] RegisterServerMessageHandler failed: {ex}");
+            }
+        }
+
+        public static void UnregisterServerMessageHandler<T>(GameNetworkMessage.ServerMessageHandlerDelegate<T> handler)
+            where T : GameNetworkMessage
+        {
+            try
+            {
+                if (_removeServerMessageHandler != null)
+                {
+                    MethodInfo generic = _removeServerMessageHandler.MakeGenericMethod(typeof(T));
+                    generic.Invoke(null, new object[] { handler });
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.Print($"[DWDN_NetworkHelper ERROR] UnregisterServerMessageHandler failed: {ex}");
             }
         }
     }
