@@ -11,7 +11,7 @@ namespace DWDN_Script.Client.UI
         private bool _isPromptVisible;
         private string _promptText = "";
         private float _progress;
-        private int _progressFillWidth;
+        private float _progressFillWidth;
         private bool _isMarkerVisible;
         private float _markerX;
         private float _markerY;
@@ -55,18 +55,18 @@ namespace DWDN_Script.Client.UI
                 {
                     _progress = value;
                     OnPropertyChangedWithValue(value, "Progress");
-                    ProgressFillWidth = (int)(value * 320f);
+                    ProgressFillWidth = System.Math.Max(0f, System.Math.Min(320f, value * 320f));
                 }
             }
         }
 
         [DataSourceProperty]
-        public int ProgressFillWidth
+        public float ProgressFillWidth
         {
             get => _progressFillWidth;
             set
             {
-                if (_progressFillWidth != value)
+                if (System.Math.Abs(_progressFillWidth - value) > 0.1f)
                 {
                     _progressFillWidth = value;
                     OnPropertyChangedWithValue(value, "ProgressFillWidth");

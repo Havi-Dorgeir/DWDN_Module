@@ -2202,3 +2202,39 @@ if (this._isInWeaponCameraMode)
 - `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок, 0 предупреждений.
 - `MechanicsTester.exe --cli`: 28/28 тестов пройдено (100% pass).
 - `sync_all.ps1`: Все бинарники, скрипты, XML и GUI prefabs синхронизированы в Dedicated Server (`DaewdenM` и `DWDN_TRY`).
+
+
+---
+
+### Глава 71: Устранение краша при удержании [F] на сцепке артиллерии (Fix Gauntlet ProgressFillWidth Type Mismatch Crash)
+
+#### 1. Симптом и первопричина
+- **Симптом**: При попытке отцепить или прицепить артиллерийскую платформу (удержание клавиши `[F]`) игра мгновенно падала на рабочий стол без стандартного окна отчета об ошибке.
+- **Бортовой журнал (`rgl_log_32856.txt`)**:
+  ```text
+  [04:38:20.680] Exception occurred inside invoke: set_ProgressFillWidth
+  Target type: DWDN_Script.Client.UI.DWDN_ArtilleryHitchVM
+  Argument count: 1
+  Argument type is System.Single
+  Inner message: Object of type 'System.Single' cannot be converted to type 'System.Int32'. 
+  Crash occurred. Asking for dump.
+  ```
+- **Первопричина**:
+  Свойство `Widget.SuggestedWidth` в TaleWorlds GauntletUI имеет тип `System.Single` (`float`).
+  В `DWDN_ArtilleryHitchVM.cs` свойство `ProgressFillWidth` было ошибочно объявлено с типом `int` (`System.Int32`).
+  При первом же кадре нажатия `[F]` сеттер `Progress` обновлял ширину, а механизм привязки данных Gauntlet пытался вызвать `set_ProgressFillWidth((Single)value)`. Рефлексия .NET выбрасывала фатальный `ArgumentException`, краша движок.
+  Также проверка прав взаимодействия жестко требовала класс `mp_Artillerist` или создателя, блокируя союзных игроков других классов (например, `mp_Ratay`).
+
+#### 2. Внесенные исправления
+1. **[DWDN_ArtilleryHitchVM.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Client/UI/DWDN_ArtilleryHitchVM.cs)**:
+   - Поле `_progressFillWidth` и свойство `ProgressFillWidth` переведены из `int` в `float` (`System.Single`), устраняя несоответствие типов при рефлексивном связывании с `Widget.SuggestedWidth`.
+   - В сеттере `Progress` внедрено безопасное ограничение диапазона:
+     `ProgressFillWidth = System.Math.Max(0f, System.Math.Min(320f, value * 320f));`
+2. **[DWDN_ArtilleryHitchView.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Client/UI/DWDN_ArtilleryHitchView.cs)** & **[DWDN_FieldArtilleryBehavior.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/DWDN_FieldArtilleryBehavior.cs)**:
+   - Смягчена проверка доступа: теперь сцепкой/отцепкой могут управлять союзники по команде (`agent.Team == null || agent.Team.Side == engine.TeamSide`) и игроки в одиночных/кастомных миссиях.
+
+#### 3. Верификация
+- `dotnet build DWDN_Script.csproj` (Client Release): 0 ошибок.
+- `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
+- `MechanicsTester.exe --cli`: 28 из 28 тестов пройдены успешно (100% pass).
+- `sync_all.ps1`: Все бинарники, скрипты и GUI синхронизированы в серверные каталоги `DaewdenM` и `DWDN_TRY`.

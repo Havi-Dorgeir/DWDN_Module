@@ -869,12 +869,13 @@ namespace DWDN_Script
                 var engine = _activeEngines.FirstOrDefault(e => e.Id == message.EngineId);
                 if (engine == null || engine.IsDestroyed) return false;
 
-                // 1. Проверка прав: создатель орудия или класс артиллериста
+                // 1. Проверка прав: создатель орудия, класс артиллериста или союзник
                 bool isOwner = !string.IsNullOrEmpty(engine.OwnerPlayerId) &&
                                (engine.OwnerPlayerId == (peer.VirtualPlayer?.Id.ToString() ?? "") ||
                                 engine.OwnerPlayerId == peer.UserName);
                 bool isArtillerist = agent.Character?.StringId?.IndexOf("artillerist", StringComparison.OrdinalIgnoreCase) >= 0;
-                if (!isOwner && !isArtillerist) return false;
+                bool isFriendly = !GameNetwork.IsMultiplayer || agent.Team == null || agent.Team.Side == engine.TeamSide;
+                if (!isOwner && !isArtillerist && !isFriendly) return false;
 
                 // 2. Проверка дистанции бойца до дышла
                 float dist = agent.Position.Distance(engine.HitchPosition);
