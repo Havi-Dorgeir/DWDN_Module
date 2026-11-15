@@ -2409,3 +2409,33 @@ if (this._isInWeaponCameraMode)
 - `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
 - `MechanicsTester.exe --cli`: 30 из 30 тестов пройдены успешно (100% pass).
 - `sync_all.ps1`: Модули `DaewdenM` и `DWDN_TRY` синхронизированы.
+
+
+---
+
+### Глава 77: Ликвидация краша 0xc0000005: Искоренение FrameLocked у четвероногих и переход на нативный лимит покоя
+
+#### 1. Симптоматика и вскрытая варп-скверна (C++ Access Violation)
+- **Симптом**: При входе на сервер / спавне происходил мгновенный вылет клиента на рабочий стол с кодом исключения `0xc0000005` (Access Violation).
+- **Первопричина**:
+  1. **Нативная несовместимость `FrameLocked` с лошадьми**: В нативном коде C++ движка (`TaleWorlds.MountAndBlade.Native.dll`) методы целевого фрейма (`SetTargetPositionAndDirection`, `ClearTargetFrame`) жестко рассчитывают на гуманоидный скелет и компоненты контроллера человека (`HumanAgentController`). У четвероногих монстров/лошадей (`AgentFlag.Mountable`) эти структуры в памяти отсутствуют. Вызов `MBAPI.IMBAgent.SetTargetPositionAndDirection` приводил к разыменованию невалидного адреса памяти в нативном коде (краш `0xc0000005`).
+  2. **Сетевой краш клиента**: Метод `SetTargetPositionAndDirectionSynched` рассылал пакет `SetAgentTargetPositionAndDirection`. На клиенте в `MissionNetworkComponent.HandleServerEventSetAgentTargetPositionAndDirection` производился вызов `Mission.MissionNetworkHelper.GetAgentFromIndex(index).SetTargetPositionAndDirectionSynched(...)` без проверки на `null` и с багом нативного движка (где `_lastSynchedTargetPosition` не инициализировался, сбрасывая позицию в 0).
+
+#### 2. Проведенные исправления в DWDN_FieldArtilleryBehavior.cs
+1. **Полное удаление опасных нативных вызовов фрейма**:
+   - Полностью вырезаны все вызовы `SetTargetPositionAndDirection`, `SetTargetPositionAndDirectionSynched`, `ClearTargetFrame` и проверки `MovementLockedState` из всех методов (`UpdateVisualAndPhysicsState`, `SpawnEngine`, `HandleServerSyncDescendants`, `DeployEngineToCombat`, `OnMissionTick`).
+2. **Фиксация коня проверенными свойствами животных**:
+   - При спавне и при отсутствии всадника (`RiderAgent == null`):
+     * `horseAgent.SetMaximumSpeedLimit(0.0001f, false)` — аппаратный лимит покоя (скорость заблокирована на уровне 0.0001 м/с);
+     * `horseAgent.MovementInputVector = Vec2.Zero` и `horseAgent.DisableScriptedMovement()`;
+     * `horseAgent.StopRetreating()` и `horseAgent.SetAlarmState(Agent.AIStateFlag.None)` — отключение инстинкта паники.
+3. **Разрыв петли выталкивания Havok в `OnMissionTick`**:
+   - Когда `RiderAgent == null`, цикл движения орудия немедленно завершается (`continue;`), исключая любое продвижение орудия на коне и Havok-выталкивание коллизией сзади.
+   - При посадке артиллериста в седло (`RiderAgent != null`) восстанавливается скорость шага `2.2f` и безопасная дистанция сцепки `4.0f`.
+   - При распряжке в боевое положение (`DeployEngineToCombat`) лимит скорости коня сбрасывается на `-1f` (полная свобода передвижения).
+
+#### 3. Верификация
+- `dotnet build DWDN_Script.csproj` (Client Release): 0 ошибок.
+- `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
+- `MechanicsTester.exe --cli`: 30 из 30 тестов пройдены успешно (100% pass).
+- `sync_all.ps1`: Модули `DaewdenM` и `DWDN_TRY` обновлены.

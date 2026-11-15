@@ -92,16 +92,15 @@ namespace DWDN_Script
                         if (combat)
                         {
                             // Освобождаем ограничение скорости у коня при распряжке
-                            try { HorseAgent.ClearTargetFrame(); } catch { }
                             try { HorseAgent.DisableScriptedMovement(); } catch { }
+                            HorseAgent.MovementInputVector = Vec2.Zero;
                             HorseAgent.SetMaximumSpeedLimit(-1f, false);
                         }
                         else
                         {
-                            // На марше: если есть всадник — шаг (2.2 м/с), если нет — удерживаем точку во FrameLocked
+                            // На марше: если есть всадник — шаг (2.2 м/с), если нет — удерживаем в покое
                             if (HorseAgent.RiderAgent != null)
                             {
-                                try { HorseAgent.ClearTargetFrame(); } catch { }
                                 try { HorseAgent.DisableScriptedMovement(); } catch { }
                                 HorseAgent.SetMaximumSpeedLimit(2.2f, false);
                             }
@@ -109,18 +108,9 @@ namespace DWDN_Script
                             {
                                 try { HorseAgent.StopRetreating(); } catch { }
                                 try { HorseAgent.SetAlarmState(Agent.AIStateFlag.None); } catch { }
+                                try { HorseAgent.DisableScriptedMovement(); } catch { }
+                                HorseAgent.MovementInputVector = Vec2.Zero;
                                 HorseAgent.SetMaximumSpeedLimit(0.0001f, false);
-                                try
-                                {
-                                    Vec2 p = HorseAgent.Position.AsVec2;
-                                    Vec3 d = HorseAgent.Frame.rotation.f;
-                                    HorseAgent.SetTargetPositionAndDirection(p, d);
-                                    if (GameNetwork.IsServer)
-                                    {
-                                        HorseAgent.SetTargetPositionAndDirectionSynched(ref p, ref d);
-                                    }
-                                }
-                                catch { }
                             }
                         }
                         HorseAgent.UpdateAgentProperties();
@@ -666,18 +656,9 @@ namespace DWDN_Script
                         // При спавне конь стоит строго на месте в упряжи, пока на него не сядет артиллерист
                         try { horseAgent.StopRetreating(); } catch { }
                         try { horseAgent.SetAlarmState(Agent.AIStateFlag.None); } catch { }
+                        try { horseAgent.DisableScriptedMovement(); } catch { }
+                        horseAgent.MovementInputVector = Vec2.Zero;
                         horseAgent.SetMaximumSpeedLimit(0.0001f, false);
-                        try
-                        {
-                            Vec2 p = horseAgent.Position.AsVec2;
-                            Vec3 d = new Vec3(horseHeading.x, horseHeading.y, 0f);
-                            horseAgent.SetTargetPositionAndDirection(p, d);
-                            if (GameNetwork.IsServer)
-                            {
-                                horseAgent.SetTargetPositionAndDirectionSynched(ref p, ref d);
-                            }
-                        }
-                        catch { }
                         horseAgent.UpdateAgentProperties();
                     }
                 }
@@ -851,7 +832,6 @@ namespace DWDN_Script
                         {
                             if (horseAgent.RiderAgent != null)
                             {
-                                try { horseAgent.ClearTargetFrame(); } catch { }
                                 try { horseAgent.DisableScriptedMovement(); } catch { }
                                 horseAgent.SetMaximumSpeedLimit(2.2f, false);
                             }
@@ -859,14 +839,9 @@ namespace DWDN_Script
                             {
                                 try { horseAgent.StopRetreating(); } catch { }
                                 try { horseAgent.SetAlarmState(Agent.AIStateFlag.None); } catch { }
+                                try { horseAgent.DisableScriptedMovement(); } catch { }
+                                horseAgent.MovementInputVector = Vec2.Zero;
                                 horseAgent.SetMaximumSpeedLimit(0.0001f, false);
-                                try
-                                {
-                                    Vec2 p = horseAgent.Position.AsVec2;
-                                    Vec3 d = horseAgent.Frame.rotation.f;
-                                    horseAgent.SetTargetPositionAndDirection(p, d);
-                                }
-                                catch { }
                             }
                             horseAgent.UpdateAgentProperties();
                         }
@@ -1042,8 +1017,8 @@ namespace DWDN_Script
             {
                 if (engine.HorseAgent != null && engine.HorseAgent.IsActive())
                 {
-                    try { engine.HorseAgent.ClearTargetFrame(); } catch { }
                     try { engine.HorseAgent.DisableScriptedMovement(); } catch { }
+                    engine.HorseAgent.MovementInputVector = Vec2.Zero;
                     engine.HorseAgent.SetMaximumSpeedLimit(-1f, false);
                     engine.HorseAgent.UpdateAgentProperties();
                 }
@@ -1157,8 +1132,8 @@ namespace DWDN_Script
                         {
                             try
                             {
-                                try { engine.HorseAgent.ClearTargetFrame(); } catch { }
                                 try { engine.HorseAgent.DisableScriptedMovement(); } catch { }
+                                engine.HorseAgent.MovementInputVector = Vec2.Zero;
                                 engine.HorseAgent.SetMaximumSpeedLimit(-1f, false);
                                 engine.HorseAgent.UpdateAgentProperties();
                             }
@@ -1176,26 +1151,17 @@ namespace DWDN_Script
                             if (engine.HorseAgent != null && engine.HorseAgent.IsActive())
                             {
                                 // Контроль поведения запряженного коня:
-                                // Без всадника — стоит смирно на месте во FrameLocked и повозку не двигаем
+                                // Без всадника — стоит смирно на месте и повозку не двигаем
                                 // Со всадником — управляемо движется шагом (до 2.2 м/с), орудие следует сзади
                                 if (engine.HorseAgent.RiderAgent == null)
                                 {
-                                    if (engine.HorseAgent.MovementLockedState == AgentMovementLockedState.None)
+                                    if (engine.HorseAgent.GetCurrentSpeedLimit() > 0.001f)
                                     {
                                         try { engine.HorseAgent.StopRetreating(); } catch { }
                                         try { engine.HorseAgent.SetAlarmState(Agent.AIStateFlag.None); } catch { }
+                                        try { engine.HorseAgent.DisableScriptedMovement(); } catch { }
+                                        engine.HorseAgent.MovementInputVector = Vec2.Zero;
                                         engine.HorseAgent.SetMaximumSpeedLimit(0.0001f, false);
-                                        try
-                                        {
-                                            Vec2 p = engine.HorseAgent.Position.AsVec2;
-                                            Vec3 d = engine.HorseAgent.Frame.rotation.f;
-                                            engine.HorseAgent.SetTargetPositionAndDirection(p, d);
-                                            if (GameNetwork.IsServer)
-                                            {
-                                                engine.HorseAgent.SetTargetPositionAndDirectionSynched(ref p, ref d);
-                                            }
-                                        }
-                                        catch { }
                                         engine.HorseAgent.UpdateAgentProperties();
                                     }
                                     // КРИТИЧЕСКИ ВАЖНО: без всадника тележка/орудие не двигаются, чтобы исключить Havok-выталкивание коня вперед
@@ -1203,9 +1169,8 @@ namespace DWDN_Script
                                 }
                                 else
                                 {
-                                    if (engine.HorseAgent.MovementLockedState != AgentMovementLockedState.None)
+                                    if (engine.HorseAgent.GetCurrentSpeedLimit() < 1.0f)
                                     {
-                                        try { engine.HorseAgent.ClearTargetFrame(); } catch { }
                                         try { engine.HorseAgent.DisableScriptedMovement(); } catch { }
                                         engine.HorseAgent.SetMaximumSpeedLimit(2.2f, false);
                                         engine.HorseAgent.UpdateAgentProperties();
