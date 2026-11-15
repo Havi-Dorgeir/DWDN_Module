@@ -135,16 +135,15 @@ namespace DWDN_Script.Client.UI
                 return;
             }
 
-            // 3. Проверка прав: создатель орудия, класс артиллериста или союзник по команде
+            // 3. Проверка прав: создатель орудия или класс артиллериста
             bool isOwner = !string.IsNullOrEmpty(closestEngine.OwnerPlayerId) &&
                            (closestEngine.OwnerPlayerId == (GameNetwork.MyPeer?.VirtualPlayer?.Id.ToString() ?? "") ||
                             closestEngine.OwnerPlayerId == GameNetwork.MyPeer?.UserName);
             bool isArtillerist = mainAgent.Character?.StringId?.IndexOf("artillerist", StringComparison.OrdinalIgnoreCase) >= 0;
-            bool isFriendly = !GameNetwork.IsMultiplayer || mainAgent.Team == null || mainAgent.Team.Side == closestEngine.TeamSide;
 
-            if (!isOwner && !isArtillerist && !isFriendly)
+            if (!isOwner && !isArtillerist)
             {
-                _viewModel.PromptText = "Управлять сцепкой могут только союзники или артиллеристы";
+                _viewModel.PromptText = "Управлять сцепкой может только артиллерийский расчет";
                 _viewModel.CanInteract = false;
                 _viewModel.IsPromptVisible = true;
                 _holdTimer = 0f;

@@ -2231,7 +2231,7 @@ if (this._isInWeaponCameraMode)
    - В сеттере `Progress` внедрено безопасное ограничение диапазона:
      `ProgressFillWidth = System.Math.Max(0f, System.Math.Min(320f, value * 320f));`
 2. **[DWDN_ArtilleryHitchView.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Client/UI/DWDN_ArtilleryHitchView.cs)** & **[DWDN_FieldArtilleryBehavior.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/DWDN_FieldArtilleryBehavior.cs)**:
-   - Смягчена проверка доступа: теперь сцепкой/отцепкой могут управлять союзники по команде (`agent.Team == null || agent.Team.Side == engine.TeamSide`) и игроки в одиночных/кастомных миссиях.
+   - Соблюден строгий догмат геймдизайна: управлять сцепкой/отцепкой артиллерийского лафета разрешено исключительно артиллеристам (`mp_Artillerist`) и создателю орудия (`isOwner`). Для всей остальной союзной пехоты и кавалерии выводится статус блокировки "Управлять сцепкой может только артиллерийский расчет", предотвращая угон и срыв боевых позиций. При этом в упряжь разрешено запрягать любых коней (включая захваченных вражеских).
 
 #### 3. Верификация
 - `dotnet build DWDN_Script.csproj` (Client Release): 0 ошибок.
