@@ -98,10 +98,44 @@ namespace DWDN_Script.Client.UI
                 return;
             }
 
+            // Защита: если боец активно управляет осадным орудием (наводчик/заряжающий) — полностью отключаем HUD сцепки
+            if (mainAgent.CurrentlyUsedGameObject != null || closestEngine.SiegeWeapon?.PilotAgent == mainAgent)
+            {
+                ResetInteraction();
+                return;
+            }
+
             Vec3 hitchPos = closestEngine.HitchPosition;
 
-            // 1. 3D World-to-Screen проекция маркера дышла на экран
+            // Геометрическое разделение сторон:
+            // Дышло (HitchPosition) находится спереди орудия (+Frame.rotation.f).
+            // Позиция наводчика и экипажа находится сзади орудия (-Frame.rotation.f).
+            // Надпись и маркер должны отображаться ТОЛЬКО со стороны сцепки (спереди от орудия).
+            Vec2 engineFwd = closestEngine.Frame.rotation.f.AsVec2.Normalized();
+            if (engineFwd.LengthSquared < 0.01f) engineFwd = new Vec2(0f, 1f);
+
+            Vec2 toPlayer = (mainAgent.Position.AsVec2 - hitchPos.AsVec2);
+            float forwardOffset = Vec2.DotProduct(toPlayer, engineFwd);
+
+            // Если боец находится позади дышла (внутри лафета или на позиции наводчика) — скрываем сцепку
+            if (forwardOffset < -0.35f)
+            {
+                ResetInteraction();
+                return;
+            }
+
             var cam = MissionScreen?.CombatCamera;
+            Vec3 camPos = cam != null ? cam.Position : mainAgent.GetEyeGlobalPosition();
+            Vec3 toHitch = (hitchPos - camPos).NormalizedCopy();
+
+            // Вектор взгляда на дышло не должен быть направлен сзади наперед (со стороны наводчика в сторону выстрела)
+            if (Vec2.DotProduct(toHitch.AsVec2.Normalized(), engineFwd) > 0.35f)
+            {
+                ResetInteraction();
+                return;
+            }
+
+            // 1. 3D World-to-Screen проекция маркера дышла на экран
             if (cam != null)
             {
                 Vec3 vp = cam.WorldPointToViewPortPoint(ref hitchPos);
@@ -124,16 +158,15 @@ namespace DWDN_Script.Client.UI
                 _viewModel.IsMarkerVisible = false;
             }
 
-            // 2. Проверка дистанции (до 2.5м) и направления взгляда
-            if (closestDist > 2.5f)
+            // 2. Проверка дистанции (до 1.85м пешком, до 3.5м верхом) и направления прицела
+            float maxInteractDist = (mainAgent.MountAgent != null) ? 3.5f : 1.85f;
+            if (closestDist > maxInteractDist)
             {
                 ResetPromptOnly();
                 return;
             }
 
-            Vec3 camPos = cam != null ? cam.Position : mainAgent.GetEyeGlobalPosition();
             Vec3 camDir = cam != null ? cam.Direction : mainAgent.LookDirection;
-            Vec3 toHitch = (hitchPos - camPos).NormalizedCopy();
             float dot = Vec3.DotProduct(camDir, toHitch);
 
             if (dot < 0.88f) // ~28 градусов комфортный угол прицела
