@@ -289,8 +289,7 @@
 				<equipment slot="Leg" id="Item.rundal_leg" />
 				<equipment slot="Gloves" id="Item.rundal_gloves_second" />
 				<equipment slot="Item0" id="Item.baldur_warpick" />
-				<equipment slot="Item1" id="Item.dwdn_banner1" />
-				<equipment slot="Item2" id="Item.rundal_shield" />
+				<equipment slot="Item1" id="Item.rundal_shield" />
 			</EquipmentRoster>
 		</Equipments>
 		<Resistances dismount="90" />
@@ -789,8 +788,7 @@
 				<equipment slot="Leg" id="Item.rundal_leg" />
 				<equipment slot="Gloves" id="Item.rundal_gloves_second" />
 				<equipment slot="Item0" id="Item.baldur_warpick" />
-				<equipment slot="Item1" id="Item.dwdn_banner1" />
-				<equipment slot="Item2" id="Item.rundal_shield" />
+				<equipment slot="Item1" id="Item.rundal_shield" />
 			</EquipmentRoster>
 		</Equipments>
 		<Resistances dismount="90" />

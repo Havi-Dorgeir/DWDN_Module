@@ -147,8 +147,8 @@ namespace DWDN_MechanicsTester.Suites
                 Assert.IsTrue(content.Contains("\"rundal_leg\""), "Хорунжий обязан иметь поножи Рюндаля rundal_leg");
                 Assert.IsTrue(content.Contains("\"rundal_gloves_second\""), "Хорунжий обязан иметь перчатки Рюндаля rundal_gloves_second");
                 Assert.IsTrue(content.Contains("\"baldur_warpick\""), "Хорунжий обязан иметь клевец baldur_warpick в слоте 0");
-                Assert.IsTrue(content.Contains("\"dwdn_banner1\""), "Хорунжий обязан иметь знамя dwdn_banner1 в слоте 1");
-                Assert.IsTrue(content.Contains("\"rundal_shield\""), "Хорунжий обязан иметь щит rundal_shield в слоте 2");
+                Assert.IsTrue(content.Contains("\"rundal_shield\""), "Хорунжий обязан иметь щит rundal_shield в слоте 1");
+                Assert.IsFalse(content.Contains("khorunzhiy.AllowedWeaponsSlot1.AddRange(new[] { \"dwdn_banner1\" })"), "Хорунжий НЕ должен иметь знамени в слоте 1");
             });
 
             RunTest(suite, "Test_All_Module_Classes_And_Items_Integrity", () =>
@@ -211,6 +211,10 @@ namespace DWDN_MechanicsTester.Suites
                 var troopNode = charDoc.SelectSingleNode("//NPCCharacter[@id='mp_Khorunzhiy_troop']");
                 Assert.IsNotNull(heroNode, "mp_Khorunzhiy_hero должен существовать в mpcharacters.xml");
                 Assert.IsNotNull(troopNode, "mp_Khorunzhiy_troop должен существовать в mpcharacters.xml");
+                var heroBanner = heroNode?.SelectSingleNode(".//equipment[@id='Item.dwdn_banner1']");
+                Assert.IsTrue(heroBanner == null, "mp_Khorunzhiy_hero НЕ должен иметь знамени в mpcharacters.xml");
+                var troopBanner = troopNode?.SelectSingleNode(".//equipment[@id='Item.dwdn_banner1']");
+                Assert.IsTrue(troopBanner == null, "mp_Khorunzhiy_troop НЕ должен иметь знамени в mpcharacters.xml");
             });
 
             sw.Stop();

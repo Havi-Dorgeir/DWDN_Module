@@ -92,23 +92,28 @@ namespace DWDN_Script
                         if (combat)
                         {
                             // Освобождаем ограничение скорости у коня при распряжке
+                            try { HorseAgent.DisableScriptedMovement(); } catch { }
                             HorseAgent.SetMaximumSpeedLimit(-1f, false);
-                            try { HorseAgent.SetIsAIPaused(false); } catch { }
                         }
                         else
                         {
-                            // На марше: если есть всадник — шаг (2.2 м/с), если нет — стоит смирно на месте (0.0001 м/с)
+                            // На марше: если есть всадник — шаг (2.2 м/с), если нет — удерживаем точку без паники и блуждания
                             if (HorseAgent.RiderAgent != null)
                             {
+                                try { HorseAgent.DisableScriptedMovement(); } catch { }
                                 HorseAgent.SetMaximumSpeedLimit(2.2f, false);
-                                try { HorseAgent.SetIsAIPaused(false); } catch { }
                             }
                             else
                             {
+                                try { HorseAgent.StopRetreating(); } catch { }
+                                try { HorseAgent.SetAlarmState(Agent.AIStateFlag.None); } catch { }
                                 HorseAgent.SetMaximumSpeedLimit(0.0001f, false);
-                                try { HorseAgent.SetIsAIPaused(true); } catch { }
-                                try { HorseAgent.DisableScriptedMovement(); } catch { }
-                                HorseAgent.MovementInputVector = Vec2.Zero;
+                                try
+                                {
+                                    var wp = new WorldPosition(Mission.Current?.Scene, HorseAgent.Position);
+                                    HorseAgent.SetScriptedPosition(ref wp, false, Agent.AIScriptedFrameFlags.DoNotRun);
+                                }
+                                catch { }
                             }
                         }
                         HorseAgent.UpdateAgentProperties();
@@ -652,10 +657,15 @@ namespace DWDN_Script
                     if (horseAgent != null)
                     {
                         // При спавне конь стоит строго на месте в упряжи, пока на него не сядет артиллерист
+                        try { horseAgent.StopRetreating(); } catch { }
+                        try { horseAgent.SetAlarmState(Agent.AIStateFlag.None); } catch { }
                         horseAgent.SetMaximumSpeedLimit(0.0001f, false);
-                        try { horseAgent.SetIsAIPaused(true); } catch { }
-                        try { horseAgent.DisableScriptedMovement(); } catch { }
-                        horseAgent.MovementInputVector = Vec2.Zero;
+                        try
+                        {
+                            var wp = new WorldPosition(mission.Scene, horsePos);
+                            horseAgent.SetScriptedPositionAndDirection(ref wp, horseHeading.RotationInRadians, false, Agent.AIScriptedFrameFlags.DoNotRun);
+                        }
+                        catch { }
                         horseAgent.UpdateAgentProperties();
                     }
                 }
@@ -829,15 +839,20 @@ namespace DWDN_Script
                         {
                             if (horseAgent.RiderAgent != null)
                             {
+                                try { horseAgent.DisableScriptedMovement(); } catch { }
                                 horseAgent.SetMaximumSpeedLimit(2.2f, false);
-                                try { horseAgent.SetIsAIPaused(false); } catch { }
                             }
                             else
                             {
+                                try { horseAgent.StopRetreating(); } catch { }
+                                try { horseAgent.SetAlarmState(Agent.AIStateFlag.None); } catch { }
                                 horseAgent.SetMaximumSpeedLimit(0.0001f, false);
-                                try { horseAgent.SetIsAIPaused(true); } catch { }
-                                try { horseAgent.DisableScriptedMovement(); } catch { }
-                                horseAgent.MovementInputVector = Vec2.Zero;
+                                try
+                                {
+                                    var wp = new WorldPosition(Mission.Current?.Scene, horseAgent.Position);
+                                    horseAgent.SetScriptedPosition(ref wp, false, Agent.AIScriptedFrameFlags.DoNotRun);
+                                }
+                                catch { }
                             }
                             horseAgent.UpdateAgentProperties();
                         }
@@ -1098,8 +1113,8 @@ namespace DWDN_Script
                         {
                             try
                             {
+                                try { engine.HorseAgent.DisableScriptedMovement(); } catch { }
                                 engine.HorseAgent.SetMaximumSpeedLimit(-1f, false);
-                                try { engine.HorseAgent.SetIsAIPaused(false); } catch { }
                                 engine.HorseAgent.UpdateAgentProperties();
                             }
                             catch { }
@@ -1121,8 +1136,8 @@ namespace DWDN_Script
                         {
                             try
                             {
+                                try { engine.HorseAgent.DisableScriptedMovement(); } catch { }
                                 engine.HorseAgent.SetMaximumSpeedLimit(-1f, false);
-                                try { engine.HorseAgent.SetIsAIPaused(false); } catch { }
                                 engine.HorseAgent.UpdateAgentProperties();
                             }
                             catch { }
@@ -1145,10 +1160,15 @@ namespace DWDN_Script
                                 {
                                     if (engine.HorseAgent.GetCurrentSpeedLimit() > 0.01f)
                                     {
+                                        try { engine.HorseAgent.StopRetreating(); } catch { }
+                                        try { engine.HorseAgent.SetAlarmState(Agent.AIStateFlag.None); } catch { }
                                         engine.HorseAgent.SetMaximumSpeedLimit(0.0001f, false);
-                                        try { engine.HorseAgent.SetIsAIPaused(true); } catch { }
-                                        try { engine.HorseAgent.DisableScriptedMovement(); } catch { }
-                                        engine.HorseAgent.MovementInputVector = Vec2.Zero;
+                                        try
+                                        {
+                                            var wp = new WorldPosition(Mission.Current?.Scene, engine.HorseAgent.Position);
+                                            engine.HorseAgent.SetScriptedPosition(ref wp, false, Agent.AIScriptedFrameFlags.DoNotRun);
+                                        }
+                                        catch { }
                                         engine.HorseAgent.UpdateAgentProperties();
                                     }
                                 }
@@ -1156,8 +1176,8 @@ namespace DWDN_Script
                                 {
                                     if (engine.HorseAgent.GetCurrentSpeedLimit() < 1.0f)
                                     {
+                                        try { engine.HorseAgent.DisableScriptedMovement(); } catch { }
                                         engine.HorseAgent.SetMaximumSpeedLimit(2.2f, false);
-                                        try { engine.HorseAgent.SetIsAIPaused(false); } catch { }
                                         engine.HorseAgent.UpdateAgentProperties();
                                     }
                                 }

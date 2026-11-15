@@ -2341,85 +2341,37 @@ if (this._isInWeaponCameraMode)
 - `MechanicsTester.exe --cli`: 28 из 28 тестов пройдены успешно (100% pass).
 - `sync_all.ps1`: Модули `DaewdenM` и `DWDN_TRY` обновлены.
 
-
 ---
 
-### Глава 75: Устранение фатального сбоя 0xc0000005 (CreateAgentVisuals + CultureTeam) и внедрение элитного пехотного класса Хорунжий (mp_Khorunzhiy) (15.11.2026)
+### ����� 75: ������������� ���������� ��������� � ����������� ������������ �������������� ���� �������� �����
 
-#### 1. Симптом и первопричина фатального вылета при входе на сервер
-- **Симптом**: При попытке зайти на выделенный сервер клиент Bannerlord мгновенно аварийно завершал работу с кодом `0xc0000005: Access Violation` по смещению `0x00007ffe062ea29d` в `TaleWorlds.Native.dll`. В журнале `rgl_log_26476.txt` последней выполненной операцией было:
-  ```text
-  Reading message: CreateAgentVisuals
-  Processing message: CreateAgentVisuals: Create AgentVisuals for peer: [DWDN] Havi, and with Index: 0
-  ```
-- **Первопричина**:
-  1. В `ModuleData/mpcultures.xml` культура `dwdn` была определена с атрибутом `is_main_culture="true"`.
-  2. Во время завершения предыдущего матча компонент автопереключения карт / админ-панели (`MultiplayerAdminComponent`) зафиксировал:
-     `[Admin] Both cultures were valid. Setting dwdn vs dwdn for next game.`
-     в результате чего для нового матча были выставлены параметры `CultureTeam1 = dwdn` и `CultureTeam2 = dwdn`.
-  3. При входе игрока на сервер вызывается `MissionNetworkComponent.HandleServerEventCreateAgentVisuals` -> `MultiplayerBattleColors.CreateWith(CultureTeam1, CultureTeam2)`. Нативный C++ движок (`TaleWorlds.Native.dll`) попытался загрузить предустановленные таблицы FaceGen, FaceCache и цветовые пресеты геральдики для командных фракций. Поскольку для кастомной культуры `dwdn` нативные C++ таблицы отсутствуют, обращение к нулевому указателю вызвало фатальный сбой памяти `0xc0000005`.
-  4. В референсном мастер-моде Властелин Колец (3774022783) задокументировано идентичное архитектурное требование: у кастомных культур (`mee_races`, `lastalliance`) атрибут `is_main_culture="true"` строго удаляется. Командные фракции всегда должны быть стабильными нативными культурами (`empire`, `vlandia`), тогда как персонажи и классы бойцов сохраняют культуру Дэвдена (`hero culture="Culture.dwdn"`).
+#### 1. �������� � ������������� ������������
+1. **���������� ��������� (mp_Khorunzhiy)**:
+   - *�������*: ������ ��������� �������� ���� ��������� ����� `dwdn_banner1` � ���� 1, ��������� ��� � ������� ����������.
+   - *������������*: � `mpcharacters.xml` � `DWDN_DuchyManager.cs` � ���� 1 ���� ��������� `Item.dwdn_banner1`. �������� �� ������� �������� ������� ������� ���������� � ���� �������, � �������� ������� ��������� ������������������ ����� `mp_Bannerman`.
+2. **����������� ��� ��������� ���� �� ���� �����**:
+   - *�������*: ��� ������ �������� ���� ������ �� ����� �� �����, � ������� ���������� ��������� �� ������ ����� � ����������� �������, ���� �� ������� �� ������� ���������� ������ ����� ������ � �������.
+   - *������������*: � ���������� �������� ��� �������������� ��������� ��� ������ �������� ����� `horseAgent.SetIsAIPaused(true)`. � ������ Mount & Blade II ���� `AIStateFlag.Paused` ������������� ���� �������� ������� � ��������� ��, �� **�� �������� ������� ���������� ������� � ��������**. � ���������� ���� ����� ����������� �������� �����������, ������������ ������� ����� � ��������� ����������, �������� �� ������� ���������� �� ������ �����.
 
-#### 2. Внесенные исправления и защитные барьеры
-1. **[mpcultures.xml](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpcultures.xml)**:
-   - Удален атрибут `is_main_culture="true"` у `<Culture id="dwdn" ... />`. Это исключило культуру `dwdn` из пула командных фракций в админ-панели и при голосовании, навсегда заблокировав передачу ненативной культуры в C++ рендерер командных визуалов.
-2. **[DWDN_config.txt](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Dedicated%20Server/Modules/Native/DWDN_config.txt)**:
-   - Подтверждены нативные фракции команд: `CultureTeam1 empire`, `CultureTeam2 empire`.
-3. **[DWDN_ServerLoadoutBehavior.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Server/Behaviors/DWDN_ServerLoadoutBehavior.cs)** и **[DWDN_SelectionMissionView.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Client/UI/DWDN_SelectionMissionView.cs)**:
-   - Внедрена жесткая изоляция диапазонов `SelectedTroopIndex`. Вместо передачи сквозного индекса класса из культуры `dwdn` (где теперь 16 классов), индекс нативного спавна строго берется из диапазона классов командной культуры (`peerCulture`): 0 для пехоты, либо индекс кавалериста при выборе коня (`c.HeroCharacter.IsMounted`). Это исключает падение нативного движка с `ArgumentOutOfRangeException` при обращении к `GetMPHeroClasses(peerCulture)[index]`.
-4. **[dwdn_armor.xml](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpitems/dwdn_armor.xml)**:
-   - Устранено обнаруженное дублирование записи предмета `archer_leatherboots`.
+#### 2. ��������� ���������
+1. **ModuleData/mpcharacters.xml**:
+   - � `mp_Khorunzhiy_hero` � `mp_Khorunzhiy_troop` ������ ������� `Item.dwdn_banner1`. � ���� 0 �������� ������ `Item.baldur_warpick`, � ���� 1 � ��� `Item.rundal_shield`.
+2. **ModuleData/scripts/DWDN_Script/Common/Duchies/DWDN_DuchyManager.cs**:
+   - � ������ `mp_Khorunzhiy` ������� ����� `dwdn_banner1`, � `AllowedWeaponsSlot1` ���������� `rundal_shield`, ���� 2 ������. �������� ���������: *"������� ��������� � �������� �������."*
+3. **ModuleData/scripts/DWDN_Script/DWDN_FieldArtilleryBehavior.cs**:
+   - ��������� ������� ��� ������ `SetIsAIPaused(true)`.
+   - �������� �������� �������� ����������� ���� �� ����� ����� ������:
+     * `horseAgent.StopRetreating()` � ����� ������ � ��������� �������;
+     * `horseAgent.SetAlarmState(Agent.AIStateFlag.None)` � ����� ��������� �������;
+     * `horseAgent.SetMaximumSpeedLimit(0.0001f, false)` � ����������� �������� �����;
+     * `horseAgent.SetScriptedPositionAndDirection(ref wp, heading, false, AIScriptedFrameFlags.DoNotRun)` � �������� �� ���������� ���� � �������� ����� ��� ����;
+     * ��� ������� �������� (`RiderAgent != null`) ���������� `DisableScriptedMovement()` � ����������������� �������� ����� `2.2f`.
+4. **Tools/MechanicsTester/Suites/DuchyLoadoutTestSuite.cs**:
+   - ���� `Test_Khorunzhiy_Class_Definition_Structure` ��������: ��������� ������� `rundal_shield` � ���������� `dwdn_banner1` � ����� 1.
+   - ���� `Test_All_Module_Classes_And_Items_Integrity` ��������� ���������� ������� � ���������� ��������� � `mpcharacters.xml`.
 
-#### 3. Внедрение нового класса Хорунжий (`mp_Khorunzhiy`)
-По приказу Магоса в иерархию пехоты добавлен новый элитный класс:
-- **Позиция**: расположен строго после Сотника (`mp_Sotnik`) и перед Знаменосцем (`mp_Bannerman`).
-- **Идентификаторы**: `mp_Khorunzhiy`, персонажи `mp_Khorunzhiy_hero` и `mp_Khorunzhiy_troop` в [mpcharacters.xml](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpcharacters.xml).
-- **Стоимость и роль**: 170 золота, иконка `Infantry_Heavy`, множитель очков `0.50`, броня `45`, здоровье `100`.
-- **Полный сет Рюндаля**:
-  - Шлем: `baron_roondalt_vendelhelmet_1`
-  - Доспех: `run_body1`
-  - Наплечники/Плащ: `Baron_rundal_cape`
-  - Поножи: `rundal_leg`
-  - Перчатки: `rundal_gloves_second`
-  - Оружие 0: боевой клевец `baldur_warpick`
-  - Оружие 1: родовое знамя `dwdn_banner1` (тактическая Аура Знамени 12м включается автоматически: +4 брони, +5% скорости, регенерация до 75% HP)
-  - Оружие 2: щит `rundal_shield`
-- **Регистрация в коде**: в [DWDN_DuchyManager.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Common/Duchies/DWDN_DuchyManager.cs) добавлен объект `khorunzhiy` в `banreich.Classes` строго без префикса `"Item."`.
-
-#### 4. Непрерывный автоматический аудит целостности классов и предметов
-В [DuchyLoadoutTestSuite.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/Tools/MechanicsTester/Suites/DuchyLoadoutTestSuite.cs) добавлены автоматические тесты:
-- `Test_Khorunzhiy_Class_Definition_Structure`: проверка корректности регистрации Хорунжего, его позиционирования после Сотника и наличия всех 8 предметов сета Рюндаля.
-- `Test_All_Module_Classes_And_Items_Integrity`: сквозной рекурсивный аудит всех классов и предметов модуля, проверяющий отсутствие `is_main_culture="true"`, валидность всех ID предметов, персонажей, слотов и отсутствие дубликатов. Тест выполняется при каждом запуске тестового стенда.
-
-#### 5. Верификация
-- `dotnet build DWDN_Script.csproj` (Client Release): 0 ошибок.
-- `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
-- `MechanicsTester.exe --cli`: 30 из 30 тестов пройдены успешно (100% pass).
-- `sync_all.ps1`: Все бинарники, скрипты и XML синхронизированы в `DaewdenM` и `DWDN_TRY`.
-
-
----
-
-### Глава 76: Восстановление основной культуры Daewden (is_main_culture="true") и аудит целостности классов (15.11.2026)
-
-#### 1. Симптом и первопричина
-- **Симптом**: В списке доступных фракций при настройке карты (постановка карты на сервере / лобби / голосование) пропала фракция Daewden (`dwdn`).
-- **Первопричина**:
-  В коммите `e0b1293` у тега `<Culture id="dwdn" ...>` был ошибочно удален атрибут `is_main_culture="true"` из-за ложного вывода о причине сбоя 0xc0000005. В нативной логике TaleWorlds именно флаг `is_main_culture="true"` определяет, отображается ли культура в интерфейсе выбора фракций для матча. Культуры без этого атрибута скрыты движком (как бандиты и нейтралы).
-  
-#### 2. Проведенные исправления
-1. **[mpcultures.xml](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpcultures.xml)**:
-   - Возвращен атрибут `is_main_culture="true"` в определение `<Culture id="dwdn" ... />`.
-   - Фракция Daewden снова доступна для выбора обеими командами в селекторе карт и серверов.
-2. **[DuchyLoadoutTestSuite.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/Tools/MechanicsTester/Suites/DuchyLoadoutTestSuite.cs)**:
-   - Обновлен тест `Test_All_Module_Classes_And_Items_Integrity`: теперь тест строго верифицирует наличие `is_main_culture="true"` для `dwdn`.
-3. **Аудит целостности классов и предметов**:
-   - Подтверждено: класс Хорунжий (`mp_Khorunzhiy`) со всеми 8 предметами сета Рюндаля (`baron_roondalt_vendelhelmet_1`, `run_body1`, `Baron_rundal_cape`, `rundal_leg`, `rundal_gloves_second`, `baldur_warpick`, `dwdn_banner1`, `rundal_shield`) полностью сохранен и функционирует.
-   - Механики артиллерии, упряжи коней и флаги целостны.
-   - Безопасное зажатие индексов (`SelectedTroopIndex`) в `DWDN_ServerLoadoutBehavior.cs` и `DWDN_SelectionMissionView.cs` исключает рассинхронизацию при любой выбранной культуре.
-
-#### 3. Верификация
-- `dotnet build DWDN_Script.csproj` (Client Release): 0 ошибок.
-- `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
-- `MechanicsTester.exe --cli`: 30 из 30 тестов пройдены успешно (100% pass).
-- `sync_all.ps1`: Модули `DaewdenM` и `DWDN_TRY` полностью синхронизированы.
+#### 3. �����������
+- `dotnet build DWDN_Script.csproj` (Client Release): 0 ������.
+- `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ������.
+- `MechanicsTester.exe --cli`: 30 �� 30 ������ �������� ������� (100% pass).
+- `sync_all.ps1`: ��� ��������� ���������������� � `DaewdenM`.

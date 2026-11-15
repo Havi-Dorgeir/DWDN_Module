@@ -132,11 +132,11 @@ namespace DWDN_Script.Common.Duchies
             sotnik.DefaultLoadout = sotnik.CreateDefaultLoadout(banreich.Id);
             banreich.Classes.Add(sotnik);
 
-            // 6.1 Хорунжий (Элитный пеший знаменосец в доспехах Рюндаля)
+            // 6.1 Хорунжий (Элитный пехотинец в доспехах Рюндаля)
             var khorunzhiy = new DWDN_ClassDefinition(
                 "mp_Khorunzhiy",
                 "Хорунжий",
-                "Элитный пехотинец и защитник знамени в доспехах Рюндаля.",
+                "Элитный пехотинец в доспехах Рюндаля.",
                 "mp_Khorunzhiy_hero"
             );
             khorunzhiy.AllowedHelmets.AddRange(new[] { "baron_roondalt_vendelhelmet_1", "" });
@@ -145,8 +145,7 @@ namespace DWDN_Script.Common.Duchies
             khorunzhiy.AllowedLegs.AddRange(new[] { "rundal_leg" });
             khorunzhiy.AllowedGloves.AddRange(new[] { "rundal_gloves_second", "" });
             khorunzhiy.AllowedWeaponsSlot0.AddRange(new[] { "baldur_warpick" });
-            khorunzhiy.AllowedWeaponsSlot1.AddRange(new[] { "dwdn_banner1" });
-            khorunzhiy.AllowedWeaponsSlot2.AddRange(new[] { "rundal_shield", "" });
+            khorunzhiy.AllowedWeaponsSlot1.AddRange(new[] { "rundal_shield", "" });
             khorunzhiy.DefaultLoadout = khorunzhiy.CreateDefaultLoadout(banreich.Id);
             banreich.Classes.Add(khorunzhiy);
 
