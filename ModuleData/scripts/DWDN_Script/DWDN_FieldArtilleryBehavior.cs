@@ -93,11 +93,23 @@ namespace DWDN_Script
                         {
                             // Освобождаем ограничение скорости у коня при распряжке
                             HorseAgent.SetMaximumSpeedLimit(-1f, false);
+                            try { HorseAgent.SetIsAIPaused(false); } catch { }
                         }
                         else
                         {
-                            // На марше конь движется строго шагом
-                            HorseAgent.SetMaximumSpeedLimit(2.2f, false);
+                            // На марше: если есть всадник — шаг (2.2 м/с), если нет — стоит смирно на месте (0.0001 м/с)
+                            if (HorseAgent.RiderAgent != null)
+                            {
+                                HorseAgent.SetMaximumSpeedLimit(2.2f, false);
+                                try { HorseAgent.SetIsAIPaused(false); } catch { }
+                            }
+                            else
+                            {
+                                HorseAgent.SetMaximumSpeedLimit(0.0001f, false);
+                                try { HorseAgent.SetIsAIPaused(true); } catch { }
+                                try { HorseAgent.DisableScriptedMovement(); } catch { }
+                                HorseAgent.MovementInputVector = Vec2.Zero;
+                            }
                         }
                         HorseAgent.UpdateAgentProperties();
                     }
@@ -639,8 +651,11 @@ namespace DWDN_Script
 
                     if (horseAgent != null)
                     {
-                        // ЖЕСТКИЙ ЗАПРЕТ БЕГА И ГАЛОПА: ТОЛЬКО ШАГ
-                        horseAgent.SetMaximumSpeedLimit(2.2f, false);
+                        // При спавне конь стоит строго на месте в упряжи, пока на него не сядет артиллерист
+                        horseAgent.SetMaximumSpeedLimit(0.0001f, false);
+                        try { horseAgent.SetIsAIPaused(true); } catch { }
+                        try { horseAgent.DisableScriptedMovement(); } catch { }
+                        horseAgent.MovementInputVector = Vec2.Zero;
                         horseAgent.UpdateAgentProperties();
                     }
                 }
@@ -812,7 +827,18 @@ namespace DWDN_Script
                     {
                         try
                         {
-                            horseAgent.SetMaximumSpeedLimit(2.2f, false);
+                            if (horseAgent.RiderAgent != null)
+                            {
+                                horseAgent.SetMaximumSpeedLimit(2.2f, false);
+                                try { horseAgent.SetIsAIPaused(false); } catch { }
+                            }
+                            else
+                            {
+                                horseAgent.SetMaximumSpeedLimit(0.0001f, false);
+                                try { horseAgent.SetIsAIPaused(true); } catch { }
+                                try { horseAgent.DisableScriptedMovement(); } catch { }
+                                horseAgent.MovementInputVector = Vec2.Zero;
+                            }
                             horseAgent.UpdateAgentProperties();
                         }
                         catch { }
@@ -1073,6 +1099,7 @@ namespace DWDN_Script
                             try
                             {
                                 engine.HorseAgent.SetMaximumSpeedLimit(-1f, false);
+                                try { engine.HorseAgent.SetIsAIPaused(false); } catch { }
                                 engine.HorseAgent.UpdateAgentProperties();
                             }
                             catch { }
@@ -1095,6 +1122,7 @@ namespace DWDN_Script
                             try
                             {
                                 engine.HorseAgent.SetMaximumSpeedLimit(-1f, false);
+                                try { engine.HorseAgent.SetIsAIPaused(false); } catch { }
                                 engine.HorseAgent.UpdateAgentProperties();
                             }
                             catch { }
@@ -1110,6 +1138,29 @@ namespace DWDN_Script
                         {
                             if (engine.HorseAgent != null && engine.HorseAgent.IsActive())
                             {
+                                // Контроль поведения запряженного коня:
+                                // Без всадника — стоит смирно на месте и не блуждает
+                                // Со всадником — управляемо движется шагом (до 2.2 м/с)
+                                if (engine.HorseAgent.RiderAgent == null)
+                                {
+                                    if (engine.HorseAgent.GetCurrentSpeedLimit() > 0.01f)
+                                    {
+                                        engine.HorseAgent.SetMaximumSpeedLimit(0.0001f, false);
+                                        try { engine.HorseAgent.SetIsAIPaused(true); } catch { }
+                                        try { engine.HorseAgent.DisableScriptedMovement(); } catch { }
+                                        engine.HorseAgent.MovementInputVector = Vec2.Zero;
+                                        engine.HorseAgent.UpdateAgentProperties();
+                                    }
+                                }
+                                else
+                                {
+                                    if (engine.HorseAgent.GetCurrentSpeedLimit() < 1.0f)
+                                    {
+                                        engine.HorseAgent.SetMaximumSpeedLimit(2.2f, false);
+                                        try { engine.HorseAgent.SetIsAIPaused(false); } catch { }
+                                        engine.HorseAgent.UpdateAgentProperties();
+                                    }
+                                }
                                 // Обновляем позицию тележки/орудия за лошадью
                                 Vec3 horsePos = engine.HorseAgent.Position;
                                 Vec2 horseFwd = engine.HorseAgent.Frame.rotation.f.AsVec2.Normalized();
