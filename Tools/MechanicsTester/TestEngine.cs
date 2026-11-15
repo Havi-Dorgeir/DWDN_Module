@@ -11,6 +11,50 @@ namespace DWDN_MechanicsTester
         public string ServerBinDir { get; set; } = @"E:\SteamLibrary\steamapps\common\Mount & Blade II Dedicated Server\bin\Win64_Shipping_Server";
         public string DwdnTryDir { get; set; } = @"E:\SteamLibrary\steamapps\common\Mount & Blade II Bannerlord\Modules\DWDN_TRY";
 
+        public TestEngine()
+        {
+            ResolveUniversalPaths();
+        }
+
+        public void ResolveUniversalPaths()
+        {
+            try
+            {
+                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                DirectoryInfo? dir = new DirectoryInfo(baseDir);
+                string? foundModDir = null;
+                string? foundCommon = null;
+
+                while (dir != null)
+                {
+                    if (dir.Name.Equals("DWDN_TRY", StringComparison.OrdinalIgnoreCase) && File.Exists(Path.Combine(dir.FullName, "SubModule.xml")))
+                    {
+                        foundModDir = dir.FullName;
+                    }
+                    if (dir.Name.Equals("common", StringComparison.OrdinalIgnoreCase))
+                    {
+                        foundCommon = dir.FullName;
+                    }
+                    dir = dir.Parent;
+                }
+
+                if (!string.IsNullOrEmpty(foundModDir))
+                {
+                    DwdnTryDir = foundModDir;
+                }
+
+                if (!string.IsNullOrEmpty(foundCommon))
+                {
+                    string clientBin = Path.Combine(foundCommon, "Mount & Blade II Bannerlord", "bin", "Win64_Shipping_Client");
+                    if (Directory.Exists(clientBin)) ClientBinDir = clientBin;
+
+                    string serverBin = Path.Combine(foundCommon, "Mount & Blade II Dedicated Server", "bin", "Win64_Shipping_Server");
+                    if (Directory.Exists(serverBin)) ServerBinDir = serverBin;
+                }
+            }
+            catch { }
+        }
+
         public string DuchyManagerPath => Path.Combine(DwdnTryDir, @"ModuleData\scripts\DWDN_Script\Common\Duchies\DWDN_DuchyManager.cs");
         public string ModClientDll => Path.Combine(DwdnTryDir, @"bin\Win64_Shipping_Client\DWDN_Script.dll");
         public string ModServerDll => Path.Combine(DwdnTryDir, @"bin\Win64_Shipping_Server\DWDN_Script.Server.dll");

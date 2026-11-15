@@ -508,6 +508,11 @@ namespace DWDN_Script
                 // Находим встроенную кучу снарядов projectile_pile
                 GameEntity ammoPile = FindChildByNameRecursive(root, "projectile_pile");
 
+                // Подавление Dynamic Navmesh ДО вызова CallScriptCallbacks / OnInit:
+                // Предотвращает попытку нативного движка импортировать 'ballista_a_dnm' и пересчитывать
+                // навигационную сетку на каждом тике перемещения орудия (приводившую к аллокации 17 ГБ и крашу).
+                SuppressDynamicNavmeshRecursive(root);
+
                 // Запускаем CallScriptCallbacks ровно один раз для полной инициализации компонентов движком
                 root.CallScriptCallbacks(true);
 
@@ -536,6 +541,10 @@ namespace DWDN_Script
                 for (int i = 0; i < allObjects.Count; i++)
                 {
                     var mo = allObjects[i];
+                    if (_navMeshPrefabNameField != null)
+                    {
+                        try { _navMeshPrefabNameField.SetValue(mo, ""); } catch { }
+                    }
 
                     if (mo is StandingPoint sp)
                     {
@@ -727,6 +736,9 @@ namespace DWDN_Script
 
                 GameEntity ammoPile = FindChildByNameRecursive(root, "projectile_pile");
 
+                // Подавление Dynamic Navmesh ДО вызова CallScriptCallbacks / OnInit на клиенте
+                SuppressDynamicNavmeshRecursive(root);
+
                 try
                 {
                     root.CallScriptCallbacks(true);
@@ -753,6 +765,10 @@ namespace DWDN_Script
                 for (int i = 0; i < allObjects.Count; i++)
                 {
                     var mo = allObjects[i];
+                    if (_navMeshPrefabNameField != null)
+                    {
+                        try { _navMeshPrefabNameField.SetValue(mo, ""); } catch { }
+                    }
 
                     if (mo is StandingPoint sp)
                     {
@@ -1239,6 +1255,37 @@ namespace DWDN_Script
         // =========================================================================
 
         public static EngineTypeSpec GetSpecForWeaponItem(string id) => GetSpecForType(id);
+
+        private static readonly FieldInfo _navMeshPrefabNameField = typeof(MissionObject).GetField("NavMeshPrefabName", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+
+        /// <summary>
+        /// Подавляет Dynamic Navmesh префабы (например, ballista_a_dnm у баллисты)
+        /// предотвращая катастрофическую аллокацию памяти (17 ГБ) на сервере и клиенте при движении орудия.
+        /// </summary>
+        private static void SuppressDynamicNavmeshRecursive(GameEntity entity)
+        {
+            if (entity == null) return;
+            try
+            {
+                foreach (var mo in entity.GetScriptComponents<MissionObject>())
+                {
+                    if (mo != null && _navMeshPrefabNameField != null)
+                    {
+                        try
+                        {
+                            _navMeshPrefabNameField.SetValue(mo, "");
+                        }
+                        catch { }
+                    }
+                }
+
+                foreach (var child in entity.GetChildren())
+                {
+                    SuppressDynamicNavmeshRecursive(child);
+                }
+            }
+            catch { }
+        }
 
         private static void CollectMissionObjectsRecursive(GameEntity entity, List<MissionObject> result)
         {

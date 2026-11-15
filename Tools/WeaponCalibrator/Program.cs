@@ -139,13 +139,26 @@ public class WeaponSimulationResult
 
 public static class Program
 {
+    private static string FindModRoot(string fallback)
+    {
+        if (Directory.Exists(fallback)) return fallback;
+        DirectoryInfo dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+        while (dir != null)
+        {
+            if (dir.Name.Equals("DWDN_TRY", StringComparison.OrdinalIgnoreCase) && File.Exists(Path.Combine(dir.FullName, "SubModule.xml")))
+                return dir.FullName;
+            dir = dir.Parent;
+        }
+        return fallback;
+    }
+
     [STAThread]
     static void Main(string[] args)
     {
         CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
         CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
 
-        string modPath = @"E:\SteamLibrary\steamapps\common\Mount & Blade II Bannerlord\Modules\DWDN_TRY";
+        string modPath = FindModRoot(@"E:\SteamLibrary\steamapps\common\Mount & Blade II Bannerlord\Modules\DWDN_TRY");
         string outputDir = @"d:\banAImod\WeaponCalibrator\output";
         Directory.CreateDirectory(outputDir);
 

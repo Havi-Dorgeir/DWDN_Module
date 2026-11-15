@@ -2085,3 +2085,70 @@ if (this._isInWeaponCameraMode)
 - `dotnet build DWDN_Script.Server.csproj` (Release): 0 ошибок.
 - `MechanicsTester.exe --cli`: 28 из 28 тестов пройдены успешно (100% pass).
 - `sync_all.ps1`: Все бинарники и XML синхронизированы на Dedicated Server (`DaewdenM`).
+
+
+---
+
+### Глава 68: Очищение Знаменосца и Короля Альберика Девальда — Восстановление сетевого атрибута перчаток (multiplayer_item), нормализация подвеса знамени и возвращение пеших анимаций покоя кавалерии
+
+#### 1. Симптоматика и локализация скрапкода
+- **Симптом**: При выборе в меню экипировки или материализации на поле боя Знаменосца (`mp_Bannerman`) и Короля Альберика Девальда (`mp_ALberic_Devald_hero`) происходил критический сбой игры (вылет клиента с аварийной остановкой процесса).
+- **Глубинные первопричины сбоя**:
+  1. **Отсутствие сетевой печати `multiplayer_item="true"` на перчатках (`dwdn_armor.xml`)**:
+     В `dwdn_armor.xml` строки 302–350 содержали 10 кастомных перчаток (`arch_banreich_leatherglove`, `plate_gauntlet`, `plate_round_gauntlet`, `gothic_gloves`, `king_plate_gauntlet`, `crossbowman_mailgoves`, `rundal_gloves_second`, `bergen_gloves`, `Baron_Finard_gauntlet`, `mail__armeds_mitten`). Все они были объявлены без атрибута `multiplayer_item="true"`. В сетевых сессиях TaleWorlds `MBObjectManager` загружает в мультиплеерный пул только предметы с `multiplayer_item="true"`. Из-за этого при экипировке `plate_round_gauntlet` у Знаменосца и `king_plate_gauntlet` у Короля `MBObjectManager.GetObject<ItemObject>` возвращал `null`, приводя к разрушению структуры `EquipmentElement` и падению нативного движка рендеринга персонажа.
+  2. **Искажение скелетного подвеса знамени (`dwdn_banners.xml`)**:
+     В `dwdn_banners.xml` предмет `dwdn_banner1` имел кобуру `item_holsters="throwing_stone_2"` и культуру `Culture.dwdn`. При уборке знамени в кобуру (переключение на меч/топор) движок пытался привязать 1.5-метровое полотнище к набедренному подсумку для камней (`throwing_stone_2`), вызывая ошибку скелетной трансформации.
+  3. **Отсутствие пеших анимаций покоя у кавалерии (`mpclassdivisions.xml`)**:
+     У Короля (`mp_ALberic_Devald_hero`), баронов и рыцарей были прописаны исключительно `hero_mount_idle_anim` и `troop_mount_idle_anim`. На пьедестале кастомного селектора (где конь по архитектуре скрывается, а боец осматривается пешим) и при выборе спешенного боя движок искал `hero_idle_anim` и `troop_idle_anim` и падал по незаданному указателю.
+
+#### 2. Внесенные исправления
+1. **[dwdn_armor.xml](file:///e:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpitems/dwdn_armor.xml)**:
+   - Всем 10 парам перчаток (включая `plate_round_gauntlet` Знаменосца и `king_plate_gauntlet` Короля) возвращен священный атрибут `multiplayer_item="true"`.
+2. **[dwdn_banners.xml](file:///e:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpitems/dwdn_banners.xml)**:
+   - Для знамени `dwdn_banner1` установлен каноничный поясной подвес `item_holsters="abdomen_left"`, а культура нормализована до `culture="Culture.neutral_culture"`.
+3. **[mpclassdivisions.xml](file:///e:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpclassdivisions.xml)**:
+   - Для `mp_ALberic_Devald_hero`, `mp_Finnard_Valerian`, `mp_Bergen_Klaus`, `mp_Knight` и `mp_DWDN_Cav` внедрены пешие анимации покоя: `hero_idle_anim="act_sturgia_mp_huskarl_idle"` и `troop_idle_anim="act_idle_unarmed_1"`.
+
+#### 3. Верификация и синхронизация
+- `dotnet build DWDN_Script.csproj` (Release): 0 ошибок (сборка успешна).
+- `dotnet build DWDN_Script.Server.csproj` (Release): 0 ошибок (сборка успешна).
+- `MechanicsTester.exe --cli`: 28 из 28 тестов пройдены успешно (100% pass).
+- `sync_all.ps1`: Все бинарники и XML зеркалированы на Dedicated Server (`DaewdenM`).
+
+
+---
+
+### Глава 69: Устранение краша сервера при спавне Баллисты (Dynamic Navmesh 17GB leak) и универсализация путей без привязки к диску E:
+
+#### 1. Диагностика и первопричины
+1. **Катастрофическая аллокация памяти при спавне Баллисты (`rgl_log_45272.txt`)**:
+   - Журнал Dedicated Server зафиксировал мгновенный краш процесса:
+     `Application crashed because it could not get new memory from the operating system. Requested memory size is 17112760320 bytes` (17.1 ГБ!).
+   - Сравнение с префабом работающего Онагра (`mangonel_a`) против Баллисты (`ballista_a`):
+     * В `props_siege_mangonels.xml` у `mangonel_a`: `<variable name="NavMeshPrefabName" value=""/>` (пустая строка).
+     * В `props_siege_ballistas.xml` у `ballista_a`: `<variable name="NavMeshPrefabName" value="ballista_a_dnm"/>`.
+   - Анализ IL-байткода `MissionObject.OnInit()` и `AttachDynamicNavmeshToEntity()`:
+     Если `NavMeshPrefabName` не пуст, нативный движок вызывает `Scene.ImportNavigationMeshPrefab` и пытается вырезать динамический навмеш вокруг орудия через `AttachNavigationMeshFaces`. На сетевых боевых картах (`scn_arena` и др.) данный навмеш не имеет смежных полигонов.
+     Когда орудие буксируется тягловым конем, в `OnMissionTick` каждые 33 мс вызывается `engine.RootEntity.SetFrame(ref weaponF)`. Нативный геометрический вычислитель Dynamic NavMesh входит в бесконечный цикл деления пространства полигонов и запрашивает у операционной системы 17.1 ГБ, вызывая мгновенный Out-Of-Memory краш сервера.
+2. **Жесткие абсолютные ссылки на диск `E:\`**:
+   - `SubModule.cs`: fallback `BasePath.Name ?? @"e:\SteamLibrary\..."` падал при работе на других дисках.
+   - `sync_all.ps1`: пути `$masterDir`, `$serverDir` и `$serverBinDir` были захардкожены на диск `E:\`.
+   - `TestEngine.cs` и утилиты `Tools/` (`DuchyLoadoutStudio`, `ModValidator`, `WeaponCalibrator`) содержали жесткие пути к `E:\SteamLibrary`.
+
+#### 2. Внесенные исправления
+1. **[DWDN_FieldArtilleryBehavior.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/DWDN_FieldArtilleryBehavior.cs)**:
+   - Внедрена процедура `SuppressDynamicNavmeshRecursive(GameEntity entity)`, которая через кэшированное поле `_navMeshPrefabNameField` обнуляет `NavMeshPrefabName = ""` у всех `MissionObject` на баллисте и ее дочерних объектах **до** вызова `root.CallScriptCallbacks(true)`.
+   - Применено в серверном методе `SpawnEngine` и в клиентском зеркале `HandleServerSyncDescendants`.
+   - Благодаря этому `MissionObject.OnInit()` видит пустую строку и полностью пропускает `AttachDynamicNavmeshToEntity()`, устраняя вызов `ImportNavigationMeshPrefab` и утечку 17 ГБ. Баллиста теперь ведет себя абсолютно симметрично и стабильно, как и проверенный Онагр.
+2. **[SubModule.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/SubModule.cs)**:
+   - Внедрен универсальный метод `GetGameBasePath()`, считывающий `BasePath.Name` либо динамически вычисляющий директорию от `AppDomain.CurrentDomain.BaseDirectory` (поднимаясь от `bin/Win64_Shipping_Client` или `bin/Win64_Shipping_Server`), работающий на любых дисках и ОС.
+3. **[sync_all.ps1](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/sync_all.ps1)**:
+   - Переведен на автоопределение `$PSScriptRoot` с динамическим поиском каталога `steamapps/common` и папки `Mount & Blade II Dedicated Server` на том же накопителе, где запущен скрипт.
+4. **[TestEngine.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/Tools/MechanicsTester/TestEngine.cs) и утилиты `Tools/`**:
+   - Внедрен метод `ResolveUniversalPaths()`, динамически определяющий пути к модулю и бинарникам движка.
+
+#### 3. Верификация и синхронизация
+- `dotnet build DWDN_Script.csproj` (Client Release): 0 ошибок.
+- `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
+- `MechanicsTester.exe --cli`: 28 из 28 тестов успешно пройдены (100% pass).
+- `sync_all.ps1`: успешно развернул клиентские и серверные сборки, скрипты и XML в каталог выделенного сервера `DaewdenM` и `DWDN_TRY`.

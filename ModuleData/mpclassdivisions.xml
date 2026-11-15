@@ -278,7 +278,7 @@
 	</MPClassDivision>
 	<!-- Cav -->
 	<!-- Cav -->
-	<MPClassDivision id="mp_DWDN_Cav" hero="mp_DWDN_Cav_hero" troop="mp_DWDN_Cav_troop" hero_mount_idle_anim="act_vlandia_mp_vanguard_mount_idle" troop_mount_idle_anim="act_horse_idle_1" multiplier="0.42" cost="160" icon="Cavalry_Heavy" melee_ai="60" ranged_ai="40" armor="32" movement_speed="0.71" combat_movement_speed="0.63" acceleration="3.0" hitpoints="100">
+	<MPClassDivision id="mp_DWDN_Cav" hero="mp_DWDN_Cav_hero" troop="mp_DWDN_Cav_troop" hero_mount_idle_anim="act_vlandia_mp_vanguard_mount_idle" troop_mount_idle_anim="act_horse_idle_1" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.42" cost="160" icon="Cavalry_Heavy" melee_ai="60" ranged_ai="40" armor="32" movement_speed="0.71" combat_movement_speed="0.63" acceleration="3.0" hitpoints="100">
 		<Perks>
 			<!-- Слот 1: Баффы -->
 			<Perk game_mode="All" name="Cuirassier" description="+10 Armor" icon="PerkArmorUpgrade" perk_list="1">
@@ -303,7 +303,7 @@
 		</Perks>
 	</MPClassDivision>
 	<!-- Knight -->
-	<MPClassDivision id="mp_Knight" hero="mp_Knight_hero" troop="mp_Knight_troop" hero_mount_idle_anim="act_vlandia_mp_vanguard_mount_idle" troop_mount_idle_anim="act_horse_idle_1" multiplier="0.30" cost="200" icon="Cavalry_Heavy" melee_ai="70" ranged_ai="40" armor="38" movement_speed="0.70" combat_movement_speed="0.60" acceleration="3.2" hitpoints="100">
+	<MPClassDivision id="mp_Knight" hero="mp_Knight_hero" troop="mp_Knight_troop" hero_mount_idle_anim="act_vlandia_mp_vanguard_mount_idle" troop_mount_idle_anim="act_horse_idle_1" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.30" cost="200" icon="Cavalry_Heavy" melee_ai="70" ranged_ai="40" armor="38" movement_speed="0.70" combat_movement_speed="0.60" acceleration="3.2" hitpoints="100">
 		<Perks>
 			<!-- Слот 1: Конный / Пеший бой -->
 			<Perk game_mode="All" name="Warhorse" description="Spawns with an armored warhorse" icon="PerkCharger" perk_list="1">
@@ -329,7 +329,7 @@
 		</Perks>
 	</MPClassDivision>
 	<!-- Barons -->
-	<MPClassDivision id="mp_Bergen_Klaus" hero="mp_Bergen_Klaus_hero" troop="mp_Bergen_Klaus_troop" hero_mount_idle_anim="act_vlandia_mp_vanguard_mount_idle" troop_mount_idle_anim="act_horse_idle_1" multiplier="0.30" cost="200" icon="Cavalry_Heavy" melee_ai="70" ranged_ai="50" armor="38" movement_speed="0.71" combat_movement_speed="0.63" acceleration="3.0" hitpoints="100">
+	<MPClassDivision id="mp_Bergen_Klaus" hero="mp_Bergen_Klaus_hero" troop="mp_Bergen_Klaus_troop" hero_mount_idle_anim="act_vlandia_mp_vanguard_mount_idle" troop_mount_idle_anim="act_horse_idle_1" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.30" cost="200" icon="Cavalry_Heavy" melee_ai="70" ranged_ai="50" armor="38" movement_speed="0.71" combat_movement_speed="0.63" acceleration="3.0" hitpoints="100">
 		<Perks>
 			<Perk game_mode="All" name="Light Armor" description="+5 Armor" icon="PerkArmorPadding" perk_list="1">
 				<OnSpawnEffect type="ArmorOnSpawn" value="5" />
@@ -339,7 +339,7 @@
 			</Perk>
 		</Perks>
 	</MPClassDivision>
-	<MPClassDivision id="mp_Finnard_Valerian" hero="mp_Finnard_Valerian_hero" troop="mp_Finnard_Valerian_troop" hero_mount_idle_anim="act_vlandia_mp_vanguard_mount_idle" troop_mount_idle_anim="act_horse_idle_1" multiplier="0.30" cost="200" icon="Cavalry_Heavy" melee_ai="70" ranged_ai="50" armor="38" movement_speed="0.71" combat_movement_speed="0.63" acceleration="3.0" hitpoints="100">
+	<MPClassDivision id="mp_Finnard_Valerian" hero="mp_Finnard_Valerian_hero" troop="mp_Finnard_Valerian_troop" hero_mount_idle_anim="act_vlandia_mp_vanguard_mount_idle" troop_mount_idle_anim="act_horse_idle_1" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.30" cost="200" icon="Cavalry_Heavy" melee_ai="70" ranged_ai="50" armor="38" movement_speed="0.71" combat_movement_speed="0.63" acceleration="3.0" hitpoints="100">
 		<Perks>
 			<Perk game_mode="All" name="Light Armor" description="+5 Armor" icon="PerkArmorPadding" perk_list="1">
 				<OnSpawnEffect type="ArmorOnSpawn" value="5" />
@@ -350,7 +350,7 @@
 		</Perks>
 	</MPClassDivision>
 	<!-- ALberic Devald-->
-	<MPClassDivision id="mp_ALberic_Devald_hero" hero="mp_ALberic_Devald_hero" troop="mp_ALberic_Devald_troop" hero_mount_idle_anim="act_vlandia_mp_vanguard_mount_idle" troop_mount_idle_anim="act_horse_idle_1" multiplier="0.30" cost="200" icon="Cavalry_Heavy" melee_ai="75" ranged_ai="50" armor="40" movement_speed="0.73" combat_movement_speed="0.65" acceleration="2.8" hitpoints="100">
+	<MPClassDivision id="mp_ALberic_Devald_hero" hero="mp_ALberic_Devald_hero" troop="mp_ALberic_Devald_troop" hero_mount_idle_anim="act_vlandia_mp_vanguard_mount_idle" troop_mount_idle_anim="act_horse_idle_1" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.30" cost="200" icon="Cavalry_Heavy" melee_ai="75" ranged_ai="50" armor="40" movement_speed="0.73" combat_movement_speed="0.65" acceleration="2.8" hitpoints="100">
 		<Perks>
 			<Perk game_mode="All" name="Light Armor" description="+5 Armor" icon="PerkArmorPadding" perk_list="1">
 				<OnSpawnEffect type="ArmorOnSpawn" value="5" />

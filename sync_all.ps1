@@ -4,11 +4,39 @@ Write-Host "==================================================" -ForegroundColor
 Write-Host " [DWDN] Sacred Sync Ritual: DWDN_TRY -> DaewdenM (Dedicated Server)" -ForegroundColor Cyan
 Write-Host "==================================================" -ForegroundColor Cyan
 
-# 0. Directories
-$masterDir     = "E:\SteamLibrary\steamapps\common\Mount & Blade II Bannerlord\Modules\DWDN_TRY"
-$serverDir     = "E:\SteamLibrary\steamapps\common\Mount & Blade II Dedicated Server\Modules\DaewdenM"
-$serverDir2    = "E:\SteamLibrary\steamapps\common\Mount & Blade II Dedicated Server\Modules\DWDN_TRY"
-$serverBinDir  = "E:\SteamLibrary\steamapps\common\Mount & Blade II Dedicated Server\bin\Win64_Shipping_Server"
+# 0. Universal Directory Discovery
+$masterDir = $PSScriptRoot
+if (-not (Test-Path "$masterDir\SubModule.xml")) {
+    $masterDir = "E:\SteamLibrary\steamapps\common\Mount & Blade II Bannerlord\Modules\DWDN_TRY"
+}
+
+# Auto-detect Steam common directory dynamically from masterDir
+$steamCommon = $null
+$curr = Get-Item $masterDir -ErrorAction SilentlyContinue
+while ($curr -ne $null -and $curr.Parent -ne $null) {
+    if ($curr.Name -eq "common") {
+        $steamCommon = $curr.FullName
+        break
+    }
+    $curr = $curr.Parent
+}
+
+if (-not $steamCommon -or -not (Test-Path $steamCommon)) {
+    $drive = (Get-Item $masterDir).Root.Name
+    $cand = Join-Path $drive "SteamLibrary\steamapps\common"
+    if (Test-Path $cand) {
+        $steamCommon = $cand
+    } else {
+        foreach ($c in @("E:\SteamLibrary\steamapps\common", "D:\SteamLibrary\steamapps\common", "C:\Program Files (x86)\Steam\steamapps\common", "C:\SteamLibrary\steamapps\common")) {
+            if (Test-Path $c) { $steamCommon = $c; break }
+        }
+    }
+}
+
+$serverRoot = Join-Path $steamCommon "Mount & Blade II Dedicated Server"
+$serverDir     = Join-Path $serverRoot "Modules\DaewdenM"
+$serverDir2    = Join-Path $serverRoot "Modules\DWDN_TRY"
+$serverBinDir  = Join-Path $serverRoot "bin\Win64_Shipping_Server"
 $banAiDir      = "d:\banAImod\DWDN_TRY"
 
 $masterClientDll = "$masterDir\bin\Win64_Shipping_Client\DWDN_Script.dll"

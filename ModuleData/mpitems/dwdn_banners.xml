@@ -8,11 +8,11 @@
 		body_name="bo_mace_a"
 		recalculate_body="false"
 		mesh="dwdn_banner1"
-		culture="Culture.dwdn"
+		culture="Culture.neutral_culture"
 		value="4"
 		weight="2.1"
 		Type="Banner"
-		item_holsters="throwing_stone_2">
+		item_holsters="abdomen_left">
 		<ItemComponent>
 			<Banner
 				banner_level="1"

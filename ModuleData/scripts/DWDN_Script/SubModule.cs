@@ -33,6 +33,30 @@ namespace DWDN_Script
 
         private static bool _assemblyResolverRegistered = false;
 
+        public static string GetGameBasePath()
+        {
+            if (!string.IsNullOrEmpty(BasePath.Name)) return BasePath.Name;
+            try
+            {
+                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                DirectoryInfo dir = new DirectoryInfo(baseDir);
+                if (dir.Name.Equals("Win64_Shipping_Client", StringComparison.OrdinalIgnoreCase) ||
+                    dir.Name.Equals("Win64_Shipping_Server", StringComparison.OrdinalIgnoreCase))
+                {
+                    return dir.Parent?.Parent?.FullName ?? baseDir;
+                }
+                if (dir.Name.Equals("bin", StringComparison.OrdinalIgnoreCase))
+                {
+                    return dir.Parent?.FullName ?? baseDir;
+                }
+                return baseDir;
+            }
+            catch
+            {
+                return BasePath.Name ?? "";
+            }
+        }
+
         private static void RegisterAssemblyResolver()
         {
             if (_assemblyResolverRegistered) return;
@@ -43,7 +67,7 @@ namespace DWDN_Script
                 try
                 {
                     string shortName = new AssemblyName(args.Name).Name;
-                    string basePath = BasePath.Name ?? @"e:\SteamLibrary\steamapps\common\Mount & Blade II Bannerlord";
+                    string basePath = GetGameBasePath();
 
                     // 1. Check game client bin
                     string binDir = Path.Combine(basePath, "bin", "Win64_Shipping_Client");

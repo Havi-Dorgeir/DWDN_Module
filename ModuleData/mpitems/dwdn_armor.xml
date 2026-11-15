@@ -299,52 +299,52 @@
 		<Flags UseTeamColor="false" />
 	</Item>
 	<!--DWDN ARMOR GlOVES-->
-	<Item id="arch_banreich_leatherglove" name="{=0}Heavy Leather Gloves" mesh="arch_banreich_leatherglove" culture="Culture.dwdn" weight="0.5" difficulty="0" appearance="3" Type="HandArmor">
+	<Item multiplayer_item="true" id="arch_banreich_leatherglove" name="{=0}Heavy Leather Gloves" mesh="arch_banreich_leatherglove" culture="Culture.dwdn" weight="0.5" difficulty="0" appearance="3" Type="HandArmor">
 		<ItemComponent>
 			<Armor arm_armor="6" covers_hands="true" modifier_group="plate" material_type="Plate" />
 		</ItemComponent>
 	</Item>
-	<Item id="plate_gauntlet" name="{=0}Heavy Leather Gloves" mesh="plate_gauntlet" culture="Culture.dwdn" weight="1.6" difficulty="0" appearance="3" Type="HandArmor">
+	<Item multiplayer_item="true" id="plate_gauntlet" name="{=0}Heavy Leather Gloves" mesh="plate_gauntlet" culture="Culture.dwdn" weight="1.6" difficulty="0" appearance="3" Type="HandArmor">
 		<ItemComponent>
 			<Armor arm_armor="18" covers_hands="true" modifier_group="plate" material_type="Plate" />
 		</ItemComponent>
 	</Item>
-	<Item id="plate_round_gauntlet" name="{=0}Heavy Leather Gloves" mesh="plate_round_gauntlet" culture="Culture.dwdn" weight="1.6" difficulty="0" appearance="3" Type="HandArmor">
+	<Item multiplayer_item="true" id="plate_round_gauntlet" name="{=0}Heavy Leather Gloves" mesh="plate_round_gauntlet" culture="Culture.dwdn" weight="1.6" difficulty="0" appearance="3" Type="HandArmor">
 		<ItemComponent>
 			<Armor arm_armor="18" covers_hands="true" modifier_group="plate" material_type="Plate" />
 		</ItemComponent>
 	</Item>
-	<Item id="gothic_gloves" name="{=0}Heavy Leather Gloves" mesh="gothic_gloves" culture="Culture.dwdn" weight="1.6" difficulty="0" appearance="3" Type="HandArmor">
+	<Item multiplayer_item="true" id="gothic_gloves" name="{=0}Heavy Leather Gloves" mesh="gothic_gloves" culture="Culture.dwdn" weight="1.6" difficulty="0" appearance="3" Type="HandArmor">
 		<ItemComponent>
 			<Armor arm_armor="18" covers_hands="true" modifier_group="plate" material_type="Plate" />
 		</ItemComponent>
 	</Item>
-	<Item id="king_plate_gauntlet" name="{=0}Heavy Leather Gloves" mesh="gothic_gloves" culture="Culture.dwdn" weight="1.6" difficulty="0" appearance="3" Type="HandArmor">
+	<Item multiplayer_item="true" id="king_plate_gauntlet" name="{=0}Heavy Leather Gloves" mesh="gothic_gloves" culture="Culture.dwdn" weight="1.6" difficulty="0" appearance="3" Type="HandArmor">
 		<ItemComponent>
 			<Armor arm_armor="18" covers_hands="true" modifier_group="plate" material_type="Plate" />
 		</ItemComponent>
 	</Item>
-	<Item id="crossbowman_mailgoves" name="{=0}Heavy Leather Gloves" mesh="crossbowman_mailgoves" culture="Culture.dwdn" weight="1.2" difficulty="0" appearance="3" Type="HandArmor">
+	<Item multiplayer_item="true" id="crossbowman_mailgoves" name="{=0}Heavy Leather Gloves" mesh="crossbowman_mailgoves" culture="Culture.dwdn" weight="1.2" difficulty="0" appearance="3" Type="HandArmor">
 		<ItemComponent>
 			<Armor arm_armor="12" covers_hands="true" modifier_group="plate" material_type="Plate" />
 		</ItemComponent>
 	</Item>
-	<Item id="rundal_gloves_second" name="{=0}Heavy Leather Gloves" mesh="rundal_gloves_second" culture="Culture.dwdn" weight="1.6" difficulty="0" appearance="3" Type="HandArmor">
+	<Item multiplayer_item="true" id="rundal_gloves_second" name="{=0}Heavy Leather Gloves" mesh="rundal_gloves_second" culture="Culture.dwdn" weight="1.6" difficulty="0" appearance="3" Type="HandArmor">
 		<ItemComponent>
 			<Armor arm_armor="18" covers_hands="true" modifier_group="plate" material_type="Plate" />
 		</ItemComponent>
 	</Item>
-	<Item id="bergen_gloves" name="{=0}Heavy Leather Gloves" mesh="bergen_gloves" culture="Culture.dwdn" weight="1.7" difficulty="0" appearance="3" Type="HandArmor">
+	<Item multiplayer_item="true" id="bergen_gloves" name="{=0}Heavy Leather Gloves" mesh="bergen_gloves" culture="Culture.dwdn" weight="1.7" difficulty="0" appearance="3" Type="HandArmor">
 		<ItemComponent>
 			<Armor arm_armor="19" covers_hands="true" modifier_group="plate" material_type="Plate" />
 		</ItemComponent>
 	</Item>
-	<Item id="Baron_Finard_gauntlet" name="{=0}Heavy Leather Gloves" mesh="Baron_Finard_gothicgauntlet_1" culture="Culture.dwdn" weight="1.8" difficulty="0" appearance="3" Type="HandArmor">
+	<Item multiplayer_item="true" id="Baron_Finard_gauntlet" name="{=0}Heavy Leather Gloves" mesh="Baron_Finard_gothicgauntlet_1" culture="Culture.dwdn" weight="1.8" difficulty="0" appearance="3" Type="HandArmor">
 		<ItemComponent>
 			<Armor arm_armor="20" covers_hands="true" modifier_group="plate" material_type="Plate" />
 		</ItemComponent>
 	</Item>
-	<Item id="mail__armeds_mitten" name="{=0}Heavy Leather Gloves" mesh="mail__armeds_mitten" culture="Culture.dwdn" weight="1.6" difficulty="0" appearance="3" Type="HandArmor">
+	<Item multiplayer_item="true" id="mail__armeds_mitten" name="{=0}Heavy Leather Gloves" mesh="mail__armeds_mitten" culture="Culture.dwdn" weight="1.6" difficulty="0" appearance="3" Type="HandArmor">
 		<ItemComponent>
 			<Armor arm_armor="18" covers_hands="true" modifier_group="plate" material_type="Plate" />
 		</ItemComponent>

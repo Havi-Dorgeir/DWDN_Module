@@ -70,8 +70,34 @@ namespace ModValidator
 
         private ValidationIssue? _selectedIssue;
 
+        private void ResolvePaths()
+        {
+            if (!Directory.Exists(_modRoot))
+            {
+                DirectoryInfo dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+                while (dir != null)
+                {
+                    if (dir.Name.Equals("DWDN_TRY", StringComparison.OrdinalIgnoreCase) && File.Exists(Path.Combine(dir.FullName, "SubModule.xml")))
+                    {
+                        _modRoot = dir.FullName;
+                        break;
+                    }
+                    dir = dir.Parent;
+                }
+            }
+            if (!Directory.Exists(_gameModulesRoot))
+            {
+                DirectoryInfo modDir = new DirectoryInfo(_modRoot);
+                if (modDir.Parent != null)
+                {
+                    _gameModulesRoot = modDir.Parent.FullName;
+                }
+            }
+        }
+
         public ValidatorForm()
         {
+            ResolvePaths();
             this.Text = "DWDN Pre-Flight Mod Validator v1.0 — Мгновенный предпусковой валидатор и авто-исправитель мода";
             this.Size = new Size(1660, 960);
             this.MinimumSize = new Size(1340, 820);

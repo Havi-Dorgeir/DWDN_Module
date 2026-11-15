@@ -132,8 +132,35 @@ namespace DuchyLoadoutStudio
             (SlotCategory.Mount,     "10. Кони", Color.FromArgb(96, 165, 250))
         };
 
+        private void ResolvePaths()
+        {
+            if (!Directory.Exists(_modRoot))
+            {
+                DirectoryInfo dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+                while (dir != null)
+                {
+                    if (dir.Name.Equals("DWDN_TRY", StringComparison.OrdinalIgnoreCase) && File.Exists(Path.Combine(dir.FullName, "SubModule.xml")))
+                    {
+                        _modRoot = dir.FullName;
+                        break;
+                    }
+                    dir = dir.Parent;
+                }
+            }
+            if (!Directory.Exists(_nativeRoot))
+            {
+                DirectoryInfo modDir = new DirectoryInfo(_modRoot);
+                if (modDir.Parent != null)
+                {
+                    string native = Path.Combine(modDir.Parent.FullName, "Native");
+                    if (Directory.Exists(native)) _nativeRoot = native;
+                }
+            }
+        }
+
         public StudioForm()
         {
+            ResolvePaths();
             this.Text = "DWDN Duchy & Class Loadout Studio v1.0 — Визуальный конструктор герцогств, классов и 3D-манекена";
             this.Size = new Size(1680, 990);
             this.MinimumSize = new Size(1380, 860);
