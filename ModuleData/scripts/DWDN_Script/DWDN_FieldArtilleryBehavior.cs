@@ -808,6 +808,15 @@ namespace DWDN_Script
                 if (message.HorseAgentIndex >= 0)
                 {
                     horseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.Index == message.HorseAgentIndex);
+                    if (horseAgent != null && horseAgent.IsActive())
+                    {
+                        try
+                        {
+                            horseAgent.SetMaximumSpeedLimit(2.2f, false);
+                            horseAgent.UpdateAgentProperties();
+                        }
+                        catch { }
+                    }
                 }
 
                 EngineInstance instance = new EngineInstance
@@ -883,28 +892,39 @@ namespace DWDN_Script
                 // 3. Выполнение сцепки или отцепки
                 if (message.Attach)
                 {
+                    if (engine.IsHitched) return false;
+
                     Agent horseAgent = null;
                     if (message.HorseAgentIndex >= 0)
                     {
                         horseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.Index == message.HorseAgentIndex);
                     }
-                    if (horseAgent == null || !horseAgent.IsMount || !horseAgent.IsActive() || (horseAgent.RiderAgent != null && horseAgent.RiderAgent != agent))
+                    if (horseAgent == null || !horseAgent.IsMount || !horseAgent.IsActive() || (horseAgent.RiderAgent != null && horseAgent.RiderAgent != agent) || IsHorseHitched(horseAgent))
                     {
                         horseAgent = null;
                         // Fallback: ищем ближайшего свободного коня (включая трофейных коней врага!)
                         float closestDistSq = 4.0f * 4.0f;
-                        foreach (var a in Mission.Current.Agents)
+                        try
                         {
-                            if (a.IsMount && a.IsActive() && (a.RiderAgent == null || a.RiderAgent == agent))
+                            var agents = Mission.Current?.Agents;
+                            if (agents != null)
                             {
-                                float dSq = a.Position.DistanceSquared(engine.HitchPosition);
-                                if (dSq <= closestDistSq)
+                                for (int i = 0; i < agents.Count; i++)
                                 {
-                                    closestDistSq = dSq;
-                                    horseAgent = a;
+                                    var a = agents[i];
+                                    if (a != null && a.IsMount && a.IsActive() && (a.RiderAgent == null || a.RiderAgent == agent) && !IsHorseHitched(a))
+                                    {
+                                        float dSq = a.Position.DistanceSquared(engine.HitchPosition);
+                                        if (dSq <= closestDistSq)
+                                        {
+                                            closestDistSq = dSq;
+                                            horseAgent = a;
+                                        }
+                                    }
                                 }
                             }
                         }
+                        catch { }
                     }
 
                     if (horseAgent == null) return false;
@@ -914,10 +934,26 @@ namespace DWDN_Script
                 }
                 else
                 {
+                    if (engine.IsCombatState) return false;
                     DeployEngineToCombat(engine);
                     return true;
                 }
             }
+        }
+
+        public static bool IsHorseHitched(Agent horse)
+        {
+            if (horse == null) return false;
+            lock (_lockObject)
+            {
+                for (int i = 0; i < _activeEngines.Count; i++)
+                {
+                    var e = _activeEngines[i];
+                    if (!e.IsDestroyed && e.HorseAgent == horse)
+                        return true;
+                }
+            }
+            return false;
         }
 
         public static void HitchEngineToHorse(EngineInstance engine, Agent horseAgent)
@@ -979,13 +1015,14 @@ namespace DWDN_Script
                 {
                     engine.HorseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.Index == message.HorseAgentIndex);
                 }
-                else if (message.IsCombatState)
-                {
-                    engine.HorseAgent = null;
-                }
 
                 engine.SavedAmmo = message.RemainingAmmo;
                 engine.SetCombatState(message.IsCombatState);
+
+                if (message.IsCombatState)
+                {
+                    engine.HorseAgent = null;
+                }
 
                 if (message.Frame.origin.LengthSquared > 0.01f)
                 {
@@ -1031,11 +1068,21 @@ namespace DWDN_Script
                         {
                             _playerLastEngineDestroyed[engine.OwnerPlayerId] = engine.DestroyedTime;
                         }
+                        if (engine.HorseAgent != null && engine.HorseAgent.IsActive())
+                        {
+                            try
+                            {
+                                engine.HorseAgent.SetMaximumSpeedLimit(-1f, false);
+                                engine.HorseAgent.UpdateAgentProperties();
+                            }
+                            catch { }
+                        }
+                        engine.HorseAgent = null;
                         continue;
                     }
 
                     // Защита от катапультирования в небеса / провала под текстуры
-                    if (engine.Frame.origin.z > 100f || engine.Frame.origin.z < -50f)
+                    if (engine.Frame.origin.z > 1500f || engine.Frame.origin.z < -200f || float.IsNaN(engine.Frame.origin.z))
                     {
                         engine.IsDestroyed = true;
                         engine.DestroyedTime = Mission.Current?.CurrentTime ?? 0f;
@@ -1043,6 +1090,16 @@ namespace DWDN_Script
                         {
                             _playerLastEngineDestroyed[engine.OwnerPlayerId] = engine.DestroyedTime;
                         }
+                        if (engine.HorseAgent != null && engine.HorseAgent.IsActive())
+                        {
+                            try
+                            {
+                                engine.HorseAgent.SetMaximumSpeedLimit(-1f, false);
+                                engine.HorseAgent.UpdateAgentProperties();
+                            }
+                            catch { }
+                        }
+                        engine.HorseAgent = null;
                         continue;
                     }
 
@@ -1061,6 +1118,26 @@ namespace DWDN_Script
                                 float hitchDistance = 3.6f;
                                 Vec3 targetPos = horsePos - new Vec3(horseFwd.x * hitchDistance, horseFwd.y * hitchDistance, 0f);
                                 targetPos.z = horsePos.z;
+                                try
+                                {
+                                    if (Mission.Current?.Scene != null)
+                                    {
+                                        float gz = targetPos.z;
+                                        if (Mission.Current.Scene.ContainsTerrain)
+                                        {
+                                            gz = Mission.Current.Scene.GetTerrainHeight(targetPos.AsVec2);
+                                        }
+                                        else
+                                        {
+                                            Mission.Current.Scene.GetHeightAtPoint(targetPos.AsVec2, BodyFlags.CommonCollisionExcludeFlags, ref gz);
+                                        }
+                                        if (Math.Abs(gz - horsePos.z) < 3.5f)
+                                        {
+                                            targetPos.z = gz;
+                                        }
+                                    }
+                                }
+                                catch { }
 
                                 Vec2 toHorse = (horsePos.AsVec2 - targetPos.AsVec2).Normalized();
                                 if (toHorse.LengthSquared < 0.01f) toHorse = horseFwd;
@@ -1092,8 +1169,8 @@ namespace DWDN_Script
                             }
                             else if (engine.HorseAgent != null && !engine.HorseAgent.IsActive())
                             {
-                                // Если тягловый конь погиб на марше, автоматически переводим орудие в боевой режим
-                                engine.SetCombatState(true);
+                                // Если тягловый конь погиб на марше, автоматически развертываем орудие и оповещаем сеть
+                                DeployEngineToCombat(engine);
                             }
                         }
                         catch { }
@@ -1283,6 +1360,10 @@ namespace DWDN_Script
                                 if (existingEngine.RootEntity != null)
                                 {
                                     existingEngine.RootEntity.FadeOut(0.5f, false);
+                                }
+                                if (existingEngine.CartEntity != null)
+                                {
+                                    existingEngine.CartEntity.FadeOut(0.5f, false);
                                 }
                             }
                             catch { }
@@ -1480,7 +1561,7 @@ namespace DWDN_Script
                     if (engine.IsCombatState)
                     {
                         GameNetwork.BeginModuleEventAsServer(peer);
-                        GameNetwork.WriteMessage(new SetArtilleryCombatStateMessage(engine.Id, true, engine.Frame));
+                        GameNetwork.WriteMessage(new SetArtilleryCombatStateMessage(engine.Id, true, engine.Frame, -1, engine.SavedAmmo));
                         GameNetwork.EndModuleEventAsServer();
                     }
                 }

@@ -64,28 +64,32 @@ namespace DWDN_Script.Client.UI
             }
             _lastHealth = mainAgent.Health;
 
-            var activeEngines = DWDN_FieldArtilleryBehavior.ActiveEngines;
-            if (activeEngines == null || activeEngines.Count == 0)
-            {
-                ResetInteraction();
-                return;
-            }
-
             // Находим ближайшее орудие по его дышлу (HitchPosition)
             DWDN_FieldArtilleryBehavior.EngineInstance closestEngine = null;
             float closestDist = 3.6f;
 
-            for (int i = 0; i < activeEngines.Count; i++)
+            try
             {
-                var eng = activeEngines[i];
-                if (eng.IsDestroyed) continue;
-
-                float d = mainAgent.Position.Distance(eng.HitchPosition);
-                if (d < closestDist)
+                var activeEngines = DWDN_FieldArtilleryBehavior.ActiveEngines;
+                if (activeEngines != null)
                 {
-                    closestDist = d;
-                    closestEngine = eng;
+                    for (int i = 0; i < activeEngines.Count; i++)
+                    {
+                        var eng = activeEngines[i];
+                        if (eng == null || eng.IsDestroyed) continue;
+
+                        float d = mainAgent.Position.Distance(eng.HitchPosition);
+                        if (d < closestDist)
+                        {
+                            closestDist = d;
+                            closestEngine = eng;
+                        }
+                    }
                 }
+            }
+            catch
+            {
+                closestEngine = null;
             }
 
             if (closestEngine == null)
@@ -166,7 +170,7 @@ namespace DWDN_Script.Client.UI
             else
             {
                 // Поиск подходящего коня (включая трофейных коней врага!)
-                if (mainAgent.MountAgent != null && mainAgent.MountAgent.IsActive())
+                if (mainAgent.MountAgent != null && mainAgent.MountAgent.IsActive() && !DWDN_FieldArtilleryBehavior.IsHorseHitched(mainAgent.MountAgent))
                 {
                     if (mainAgent.MountAgent.Position.Distance(hitchPos) <= 4.0f)
                     {
@@ -174,22 +178,28 @@ namespace DWDN_Script.Client.UI
                     }
                 }
 
-                if (targetHorse == null)
+                if (targetHorse == null && Mission.Agents != null)
                 {
                     float closestHorseDistSq = 3.5f * 3.5f;
-                    foreach (var a in Mission.Agents)
+                    try
                     {
-                        // Разрешены любые активные кони (свои, нейтральные, вражеские), не занятые чужим всадником
-                        if (a.IsMount && a.IsActive() && (a.RiderAgent == null || a.RiderAgent == mainAgent))
+                        var agents = Mission.Agents;
+                        for (int i = 0; i < agents.Count; i++)
                         {
-                            float dSq = a.Position.DistanceSquared(hitchPos);
-                            if (dSq <= closestHorseDistSq)
+                            var a = agents[i];
+                            // Разрешены любые активные кони (свои, нейтральные, вражеские), не занятые чужим всадником и не впряженные в другое орудие
+                            if (a != null && a.IsMount && a.IsActive() && (a.RiderAgent == null || a.RiderAgent == mainAgent) && !DWDN_FieldArtilleryBehavior.IsHorseHitched(a))
                             {
-                                closestHorseDistSq = dSq;
-                                targetHorse = a;
+                                float dSq = a.Position.DistanceSquared(hitchPos);
+                                if (dSq <= closestHorseDistSq)
+                                {
+                                    closestHorseDistSq = dSq;
+                                    targetHorse = a;
+                                }
                             }
                         }
                     }
+                    catch { }
                 }
 
                 if (targetHorse != null)

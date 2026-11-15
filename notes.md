@@ -2238,3 +2238,46 @@ if (this._isInWeaponCameraMode)
 - `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
 - `MechanicsTester.exe --cli`: 28 из 28 тестов пройдены успешно (100% pass).
 - `sync_all.ps1`: Все бинарники, скрипты и GUI синхронизированы в серверные каталоги `DaewdenM` и `DWDN_TRY`.
+
+
+---
+
+### Глава 72: Глубинный аудит и нейтрализация скрытых краевых аномалий полевой артиллерии
+
+#### 1. Выявленные латентные уязвимости и скрапкод
+В ходе многопроходного сакрального сканирования кода взаимодействия и физики упряжи полевой артиллерии обнаружены 8 скрытых уязвимостей, которые неизбежно привели бы к геймплейным сбоям и десинхронизациям:
+1. **Ловушка скорости коня на клиенте при распряжке (`Client Horse Speed Limit Trap`)**:
+   В `HandleServerCombatState` поле `engine.HorseAgent = null` очищалось *до* вызова `engine.SetCombatState(message.IsCombatState)`. Внутри `SetCombatState` проверка `HorseAgent != null` возвращала `false`, из-за чего вызов `HorseAgent.SetMaximumSpeedLimit(-1f, false)` на клиенте пропускался, оставляя отцепленного коня навсегда заблокированным в режиме шага (2.2 м/с).
+2. **Уязвимость двойной впряжки коня (`Double Hitching / Stealing Horse`)**:
+   Ни клиент, ни сервер не проверяли, запряжен ли конь в другое орудие в данный момент (`IsHorseHitched`). Два артиллериста могли запрячь одного и того же коня в две разные пушки, что приводило к совмещению двух тяжелых лафетов в одной точке и взрыву физического движка Havok.
+3. **Ложное уничтожение орудий на высокогорных картах (`Mountain Altitude Destruction Trap`)**:
+   В `OnMissionTick` проверка на катапультирование в небеса содержала жесткий порог `engine.Frame.origin.z > 100f`. На любых горных картах, возвышенностях или высоких замковых стенах с высотой рельефа > 100 метров орудия мгновенно уничтожались сразу после спавна.
+4. **Зависание ограничения скорости коня при гибели орудия (`Trapped Speed on Destruction`)**:
+   При уничтожении орудия вражеским огнем (`Destructable.IsDestroyed`) или выбросе за пределы карты конь не освобождался от ограничения скорости.
+5. **Осиротевшая тележка баллисты при респавне игрока (`Ghost Cart on Respawn`)**:
+   При гибели и повторном входе артиллериста очищался только `RootEntity`, а `CartEntity` оставалась висеть на поле боя пустым ящиком.
+6. **Отрыв от рельефа при буксировке орудия по склонам (`Slope Ground Snapping`)**:
+   При движении по холмам и оврагам высота орудия рассчитывалась как `targetPos.z = horsePos.z`, из-за чего на спусках орудие парило в воздухе, а на подъемах зарывалось в грунт.
+7. **Потоконебезопасный перебор агентов на сервере (`Unsafe Foreach On Mission.Current.Agents`)**:
+   Итератор `foreach` при обработке сетевого запроса сцепки мог вызвать `InvalidOperationException` при спавне или смерти агентов во время тика.
+8. **Инициализация ограничения скорости коня для поздних игроков (JIP)**:
+   При подключении игрока к уже идущей битве с запряженным орудием клиент локально не выставлял шаговое ограничение тягловому коню до первого сетевого обновления.
+
+#### 2. Проведенные обряды очищения кода
+1. **[DWDN_FieldArtilleryBehavior.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/DWDN_FieldArtilleryBehavior.cs)**:
+   - Добавлен сакральный метод `IsHorseHitched(Agent horse)` с блокировкой `_lockObject`.
+   - В `HandleClientToggleHitchRequest` внедрены проверки `if (engine.IsHitched) return false;`, `!IsHorseHitched(horseAgent)` и безопасный индексированный обход `Mission.Current.Agents`.
+   - В `HandleServerCombatState` вызов `engine.SetCombatState(message.IsCombatState)` перемещен перед сбросом `engine.HorseAgent = null`, гарантируя снятие скоростного ограничения на клиенте.
+   - Порог высотной аннигиляции расширен до `> 1500f || < -200f || float.IsNaN(z)`.
+   - При гибели орудия тягловый конь гарантированно освобождается (`SetMaximumSpeedLimit(-1f)`).
+   - При спавне/респавне орудия `existingEngine.CartEntity?.FadeOut(0.5f, false)` устраняет фантомные тележки.
+   - В тике буксировки внедрен опрос высоты рельефа сцены (`GetTerrainHeight` / `GetHeightAtPoint`).
+   - В `HandleServerSyncDescendants` для JIP-игроков добавлен вызов `horseAgent.SetMaximumSpeedLimit(2.2f, false)`.
+2. **[DWDN_ArtilleryHitchView.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Client/UI/DWDN_ArtilleryHitchView.cs)**:
+   - Внедрена фильтрация `!DWDN_FieldArtilleryBehavior.IsHorseHitched(a)` как для верхового коня игрока, так и для свободных и трофейных коней поблизости.
+
+#### 3. Результаты машинных испытаний
+- `dotnet build DWDN_Script.csproj` (Client Release): 0 ошибок.
+- `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
+- `MechanicsTester.exe --cli`: 28 из 28 тестов пройдены успешно (100% pass).
+- `sync_all.ps1`: Все бинарники, скрипты и GUI синхронизированы в модули `DaewdenM` и `DWDN_TRY`.
