@@ -104,13 +104,11 @@ namespace DWDN_Script.Client.UI
             bool hasAmmo = false;
             bool hasRanged = false;
             bool hasFirearm = false;
-            bool hasSiege = false;
 
             foreach (var id in itemIds)
             {
                 if (string.IsNullOrEmpty(id)) continue;
                 string lower = id.ToLowerInvariant();
-                if (lower.Contains("mangonel") || lower.Contains("ballista") || lower.Contains("onager") || lower.Contains("order")) hasSiege = true;
                 if (lower.Contains("shield")) hasShield = true;
                 if (lower.Contains("bullet") || lower.Contains("bolt") || lower.Contains("arrow")) hasAmmo = true;
                 if (lower.Contains("cannon") || lower.Contains("bombard") || lower.Contains("gun")) hasFirearm = true;
@@ -128,7 +126,6 @@ namespace DWDN_Script.Client.UI
                 }
             }
 
-            if (hasSiege) return "Осадное орудие";
             if (hasFirearm) return "Огнестрел";
             if (hasShield) return "Щит";
             if (hasPike) return "Пика";

@@ -410,20 +410,7 @@ namespace DWDN_Script.Client.UI
                 case DWDN_SlotCategory.Gloves: _currentSelection.GlovesId = itemId; break;
                 case DWDN_SlotCategory.Legs: _currentSelection.LegsId = itemId; break;
                 case DWDN_SlotCategory.Weapon0: _currentSelection.Weapon0Id = itemId; break;
-                case DWDN_SlotCategory.Weapon1:
-                    _currentSelection.Weapon1Id = itemId;
-                    if (string.Equals(_currentSelection.ClassId, "mp_Artillerist", StringComparison.OrdinalIgnoreCase))
-                    {
-                        if (itemId == "dwdn_order_mangonel" || itemId == "dwdn_order_ballista")
-                        {
-                            _currentSelection.HorseId = "sumpter_horse";
-                        }
-                        else
-                        {
-                            _currentSelection.HorseId = "";
-                        }
-                    }
-                    break;
+                case DWDN_SlotCategory.Weapon1: _currentSelection.Weapon1Id = itemId; break;
                 case DWDN_SlotCategory.Weapon2: _currentSelection.Weapon2Id = itemId; break;
                 case DWDN_SlotCategory.Weapon3: _currentSelection.Weapon3Id = itemId; break;
                 case DWDN_SlotCategory.Horse: _currentSelection.HorseId = itemId; break;
