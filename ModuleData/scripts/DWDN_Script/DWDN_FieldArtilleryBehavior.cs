@@ -92,26 +92,12 @@ namespace DWDN_Script
                         if (combat)
                         {
                             // Освобождаем ограничение скорости у коня при распряжке
-                            try { HorseAgent.DisableScriptedMovement(); } catch { }
-                            HorseAgent.MovementInputVector = Vec2.Zero;
                             HorseAgent.SetMaximumSpeedLimit(-1f, false);
                         }
                         else
                         {
-                            // На марше: если есть всадник — шаг (2.2 м/с), если нет — удерживаем в покое
-                            if (HorseAgent.RiderAgent != null)
-                            {
-                                try { HorseAgent.DisableScriptedMovement(); } catch { }
-                                HorseAgent.SetMaximumSpeedLimit(2.2f, false);
-                            }
-                            else
-                            {
-                                try { HorseAgent.StopRetreating(); } catch { }
-                                try { HorseAgent.SetAlarmState(Agent.AIStateFlag.None); } catch { }
-                                try { HorseAgent.DisableScriptedMovement(); } catch { }
-                                HorseAgent.MovementInputVector = Vec2.Zero;
-                                HorseAgent.SetMaximumSpeedLimit(0.0001f, false);
-                            }
+                            // На марше конь движется строго шагом
+                            HorseAgent.SetMaximumSpeedLimit(2.2f, false);
                         }
                         HorseAgent.UpdateAgentProperties();
                     }
@@ -466,7 +452,7 @@ namespace DWDN_Script
         // СПАВН ОРУДИЙ НА СЕРВЕРЕ (ЛОШАДЬ + ТЕЛЕЖКА + ОРУДИЕ)
         // =========================================================================
 
-        public static EngineInstance SpawnEngine(Mission mission, EngineTypeSpec spec, BattleSideEnum teamSide, Vec3 position, Vec2 heading, string ownerPlayerId)
+        public static EngineInstance SpawnEngine(Mission mission, EngineTypeSpec spec, BattleSideEnum teamSide, Vec3 position, Vec2 heading, string ownerPlayerId, Agent existingHorse = null)
         {
             if (mission?.Scene == null || spec == null) return null;
 
@@ -605,66 +591,69 @@ namespace DWDN_Script
                     catch { }
                 }
 
-                // 3. СПАВН ТЯГЛОВОЙ ЛОШАДИ ВПЕРЕДИ ОРУДИЯ
-                Vec3 horsePos = position + new Vec3(heading.x * 4.0f, heading.y * 4.0f, 0f);
-                float hZ = horsePos.z;
-                try
+                // 3. СПАВН ТЯГЛОВОЙ ЛОШАДИ ВПЕРЕДИ ОРУДИЯ (если не передана существующая)
+                Agent horseAgent = existingHorse;
+                if (horseAgent == null)
                 {
-                    if (mission.Scene.ContainsTerrain)
+                    Vec3 horsePos = position + new Vec3(heading.x * 4.0f, heading.y * 4.0f, 0f);
+                    float hZ = horsePos.z;
+                    try
                     {
-                        float tZ = mission.Scene.GetTerrainHeight(horsePos.AsVec2);
-                        if (Math.Abs(tZ - horsePos.z) < 3.0f)
+                        if (mission.Scene.ContainsTerrain)
                         {
-                            hZ = tZ;
+                            float tZ = mission.Scene.GetTerrainHeight(horsePos.AsVec2);
+                            if (Math.Abs(tZ - horsePos.z) < 3.0f)
+                            {
+                                hZ = tZ;
+                            }
+                            else
+                            {
+                                mission.Scene.GetHeightAtPoint(horsePos.AsVec2, BodyFlags.CommonCollisionExcludeFlags, ref hZ);
+                            }
                         }
                         else
                         {
                             mission.Scene.GetHeightAtPoint(horsePos.AsVec2, BodyFlags.CommonCollisionExcludeFlags, ref hZ);
                         }
                     }
-                    else
+                    catch
                     {
                         mission.Scene.GetHeightAtPoint(horsePos.AsVec2, BodyFlags.CommonCollisionExcludeFlags, ref hZ);
                     }
-                }
-                catch
-                {
-                    mission.Scene.GetHeightAtPoint(horsePos.AsVec2, BodyFlags.CommonCollisionExcludeFlags, ref hZ);
-                }
-                horsePos.z = hZ;
+                    horsePos.z = hZ;
 
-                Vec2 horseHeading = heading;
-                ItemObject horseItem = MBObjectManager.Instance?.GetObject<ItemObject>("mp_vlandia_horse")
-                                    ?? MBObjectManager.Instance?.GetObject<ItemObject>("sumpter_horse")
-                                    ?? MBObjectManager.Instance?.GetObject<ItemObject>("mule");
-                ItemObject harnessItem = MBObjectManager.Instance?.GetObject<ItemObject>("mp_vlandia_horse_harness")
-                                      ?? MBObjectManager.Instance?.GetObject<ItemObject>("saddle_horse");
+                    Vec2 horseHeading = heading;
+                    ItemObject horseItem = MBObjectManager.Instance?.GetObject<ItemObject>("mp_vlandia_horse")
+                                        ?? MBObjectManager.Instance?.GetObject<ItemObject>("sumpter_horse")
+                                        ?? MBObjectManager.Instance?.GetObject<ItemObject>("mule");
+                    ItemObject harnessItem = MBObjectManager.Instance?.GetObject<ItemObject>("mp_vlandia_horse_harness")
+                                          ?? MBObjectManager.Instance?.GetObject<ItemObject>("saddle_horse");
 
-                Agent horseAgent = null;
-                try
-                {
-                    horseAgent = mission.SpawnMonster(
-                        new ItemRosterElement(horseItem, 1),
-                        new ItemRosterElement(harnessItem, 1),
-                        horsePos,
-                        horseHeading,
-                        (int)teamSide
-                    );
-
-                    if (horseAgent != null)
+                    try
                     {
-                        // При спавне конь стоит строго на месте в упряжи, пока на него не сядет артиллерист
-                        try { horseAgent.StopRetreating(); } catch { }
-                        try { horseAgent.SetAlarmState(Agent.AIStateFlag.None); } catch { }
-                        try { horseAgent.DisableScriptedMovement(); } catch { }
-                        horseAgent.MovementInputVector = Vec2.Zero;
-                        horseAgent.SetMaximumSpeedLimit(0.0001f, false);
-                        horseAgent.UpdateAgentProperties();
+                        horseAgent = mission.SpawnMonster(
+                            new ItemRosterElement(horseItem, 1),
+                            new ItemRosterElement(harnessItem, 1),
+                            horsePos,
+                            horseHeading,
+                            (int)teamSide
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Print($"[DWDN Artillery] Horse spawn exception: {ex.Message}");
                     }
                 }
-                catch (Exception ex)
+
+                if (horseAgent != null)
                 {
-                    Debug.Print($"[DWDN Artillery] Horse spawn exception: {ex.Message}");
+                    try
+                    {
+                        // На марше конь движется строго шагом
+                        horseAgent.SetMaximumSpeedLimit(2.2f, false);
+                        horseAgent.UpdateAgentProperties();
+                    }
+                    catch { }
                 }
 
                 MissionObject rootMissionObject = allObjects.FirstOrDefault();
@@ -830,19 +819,7 @@ namespace DWDN_Script
                     {
                         try
                         {
-                            if (horseAgent.RiderAgent != null)
-                            {
-                                try { horseAgent.DisableScriptedMovement(); } catch { }
-                                horseAgent.SetMaximumSpeedLimit(2.2f, false);
-                            }
-                            else
-                            {
-                                try { horseAgent.StopRetreating(); } catch { }
-                                try { horseAgent.SetAlarmState(Agent.AIStateFlag.None); } catch { }
-                                try { horseAgent.DisableScriptedMovement(); } catch { }
-                                horseAgent.MovementInputVector = Vec2.Zero;
-                                horseAgent.SetMaximumSpeedLimit(0.0001f, false);
-                            }
+                            horseAgent.SetMaximumSpeedLimit(2.2f, false);
                             horseAgent.UpdateAgentProperties();
                         }
                         catch { }
@@ -1017,10 +994,12 @@ namespace DWDN_Script
             {
                 if (engine.HorseAgent != null && engine.HorseAgent.IsActive())
                 {
-                    try { engine.HorseAgent.DisableScriptedMovement(); } catch { }
-                    engine.HorseAgent.MovementInputVector = Vec2.Zero;
-                    engine.HorseAgent.SetMaximumSpeedLimit(-1f, false);
-                    engine.HorseAgent.UpdateAgentProperties();
+                    try
+                    {
+                        engine.HorseAgent.SetMaximumSpeedLimit(-1f, false);
+                        engine.HorseAgent.UpdateAgentProperties();
+                    }
+                    catch { }
                 }
                 engine.SetCombatState(true);
                 engine.HorseAgent = null;
@@ -1109,7 +1088,6 @@ namespace DWDN_Script
                         {
                             try
                             {
-                                try { engine.HorseAgent.DisableScriptedMovement(); } catch { }
                                 engine.HorseAgent.SetMaximumSpeedLimit(-1f, false);
                                 engine.HorseAgent.UpdateAgentProperties();
                             }
@@ -1132,8 +1110,6 @@ namespace DWDN_Script
                         {
                             try
                             {
-                                try { engine.HorseAgent.DisableScriptedMovement(); } catch { }
-                                engine.HorseAgent.MovementInputVector = Vec2.Zero;
                                 engine.HorseAgent.SetMaximumSpeedLimit(-1f, false);
                                 engine.HorseAgent.UpdateAgentProperties();
                             }
@@ -1150,38 +1126,12 @@ namespace DWDN_Script
                         {
                             if (engine.HorseAgent != null && engine.HorseAgent.IsActive())
                             {
-                                // Контроль поведения запряженного коня:
-                                // Без всадника — стоит смирно на месте и повозку не двигаем
-                                // Со всадником — управляемо движется шагом (до 2.2 м/с), орудие следует сзади
-                                if (engine.HorseAgent.RiderAgent == null)
-                                {
-                                    if (engine.HorseAgent.GetCurrentSpeedLimit() > 0.001f)
-                                    {
-                                        try { engine.HorseAgent.StopRetreating(); } catch { }
-                                        try { engine.HorseAgent.SetAlarmState(Agent.AIStateFlag.None); } catch { }
-                                        try { engine.HorseAgent.DisableScriptedMovement(); } catch { }
-                                        engine.HorseAgent.MovementInputVector = Vec2.Zero;
-                                        engine.HorseAgent.SetMaximumSpeedLimit(0.0001f, false);
-                                        engine.HorseAgent.UpdateAgentProperties();
-                                    }
-                                    // КРИТИЧЕСКИ ВАЖНО: без всадника тележка/орудие не двигаются, чтобы исключить Havok-выталкивание коня вперед
-                                    continue;
-                                }
-                                else
-                                {
-                                    if (engine.HorseAgent.GetCurrentSpeedLimit() < 1.0f)
-                                    {
-                                        try { engine.HorseAgent.DisableScriptedMovement(); } catch { }
-                                        engine.HorseAgent.SetMaximumSpeedLimit(2.2f, false);
-                                        engine.HorseAgent.UpdateAgentProperties();
-                                    }
-                                }
-                                // Обновляем позицию тележки/орудия за лошадью только при наличии всадника
+                                // Обновляем позицию тележки/орудия за лошадью
                                 Vec3 horsePos = engine.HorseAgent.Position;
                                 Vec2 horseFwd = engine.HorseAgent.Frame.rotation.f.AsVec2.Normalized();
                                 if (horseFwd.LengthSquared < 0.01f) horseFwd = new Vec2(0f, 1f);
 
-                                float hitchDistance = 4.0f;
+                                float hitchDistance = 3.8f;
                                 Vec3 targetPos = horsePos - new Vec3(horseFwd.x * hitchDistance, horseFwd.y * hitchDistance, 0f);
                                 targetPos.z = horsePos.z;
                                 try
@@ -1279,6 +1229,7 @@ namespace DWDN_Script
 
             bool wantsBallista = false;
             bool hasArtilleryBlueprint = false;
+            bool explicitNoArtillery = false;
 
             // 1. Проверяем кастомный лодаут DWDN (выбор оружия в интерфейсе кастомизации)
             try
@@ -1286,20 +1237,27 @@ namespace DWDN_Script
                 var selection = DWDN_Script.Server.Behaviors.DWDN_ServerLoadoutBehavior.GetSelectionForAgent(agent);
                 if (selection != null)
                 {
-                    string[] candidates = new[] { selection.Weapon1Id, selection.Weapon0Id, selection.Weapon2Id, selection.Weapon3Id };
-                    foreach (var c in candidates)
+                    if (string.Equals(selection.ClassId, "mp_Artillerist", StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty(selection.Weapon1Id))
                     {
-                        if (!string.IsNullOrEmpty(c))
+                        explicitNoArtillery = true;
+                    }
+                    else
+                    {
+                        string[] candidates = new[] { selection.Weapon1Id, selection.Weapon0Id, selection.Weapon2Id, selection.Weapon3Id };
+                        foreach (var c in candidates)
                         {
-                            if (c.IndexOf("ballista", StringComparison.OrdinalIgnoreCase) >= 0)
+                            if (!string.IsNullOrEmpty(c))
                             {
-                                wantsBallista = true;
-                                hasArtilleryBlueprint = true;
-                                break;
-                            }
-                            if (c.IndexOf("mangonel", StringComparison.OrdinalIgnoreCase) >= 0 || c.IndexOf("onager", StringComparison.OrdinalIgnoreCase) >= 0)
-                            {
-                                hasArtilleryBlueprint = true;
+                                if (c.IndexOf("ballista", StringComparison.OrdinalIgnoreCase) >= 0)
+                                {
+                                    wantsBallista = true;
+                                    hasArtilleryBlueprint = true;
+                                    break;
+                                }
+                                if (c.IndexOf("mangonel", StringComparison.OrdinalIgnoreCase) >= 0 || c.IndexOf("onager", StringComparison.OrdinalIgnoreCase) >= 0)
+                                {
+                                    hasArtilleryBlueprint = true;
+                                }
                             }
                         }
                     }
@@ -1307,27 +1265,33 @@ namespace DWDN_Script
             }
             catch { }
 
-            // 2. Проверяем физические предметы экипировки (dwdn_order_ballista / dwdn_order_mangonel)
-            for (EquipmentIndex i = EquipmentIndex.WeaponItemBeginSlot; i < EquipmentIndex.ExtraWeaponSlot; i++)
+            // 2. Если игрок явно выбрал пеший бой без орудия в лодауте, спавн не производим
+            if (explicitNoArtillery) return;
+
+            // 3. Проверяем физические предметы экипировки (dwdn_order_ballista / dwdn_order_mangonel)
+            if (!hasArtilleryBlueprint)
             {
-                var item = agent.Equipment[i].Item;
-                if (item != null)
+                for (EquipmentIndex i = EquipmentIndex.WeaponItemBeginSlot; i < EquipmentIndex.ExtraWeaponSlot; i++)
                 {
-                    if (item.StringId.IndexOf("ballista", StringComparison.OrdinalIgnoreCase) >= 0)
+                    var item = agent.Equipment[i].Item;
+                    if (item != null)
                     {
-                        wantsBallista = true;
-                        hasArtilleryBlueprint = true;
-                        break;
-                    }
-                    if (item.StringId.IndexOf("mangonel", StringComparison.OrdinalIgnoreCase) >= 0 || item.StringId.IndexOf("onager", StringComparison.OrdinalIgnoreCase) >= 0)
-                    {
-                        hasArtilleryBlueprint = true;
+                        if (item.StringId.IndexOf("ballista", StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            wantsBallista = true;
+                            hasArtilleryBlueprint = true;
+                            break;
+                        }
+                        if (item.StringId.IndexOf("mangonel", StringComparison.OrdinalIgnoreCase) >= 0 || item.StringId.IndexOf("onager", StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            hasArtilleryBlueprint = true;
+                        }
                     }
                 }
             }
 
-            // 3. Проверяем нативные перки дивизиона
-            if (agent.MissionPeer != null)
+            // 4. Проверяем нативные перки дивизиона
+            if (!hasArtilleryBlueprint && agent.MissionPeer != null)
             {
                 try
                 {
@@ -1352,7 +1316,7 @@ namespace DWDN_Script
                         }
                     }
 
-                    if (isArtillerist && !wantsBallista)
+                    if (isArtillerist && !wantsBallista && !hasArtilleryBlueprint)
                     {
                         int pIdx = agent.MissionPeer.GetSelectedPerkIndexWithPerkListIndex(agent.MissionPeer.SelectedTroopIndex, 1);
                         if (pIdx == 1)
@@ -1369,8 +1333,8 @@ namespace DWDN_Script
                 catch { }
             }
 
-            // Если не артиллерист и нет чертежей — спавнить ничего не нужно
-            if (!isArtillerist && !hasArtilleryBlueprint) return;
+            // Если чертежей нет — артиллерист спавнится пешим без орудия
+            if (!hasArtilleryBlueprint) return;
 
             EngineTypeSpec chosenSpec = wantsBallista ? GetSpecForType("ballista") : GetSpecForType("mangonel");
             if (chosenSpec == null) return;
@@ -1457,8 +1421,42 @@ namespace DWDN_Script
             Vec2 forward = agent.LookDirection.AsVec2.Normalized();
             if (forward.LengthSquared < 0.01f) forward = new Vec2(0f, 1f);
 
-            Vec3 spawnPos = agent.Position + new Vec3(forward.x * 4.5f, forward.y * 4.5f, 0f);
-            var engine = SpawnEngine(Mission.Current, chosenSpec, side, spawnPos, forward, playerId);
+            Agent horse = agent.MountAgent;
+            if (horse == null)
+            {
+                ItemObject horseItem = MBObjectManager.Instance?.GetObject<ItemObject>("sumpter_horse")
+                                    ?? MBObjectManager.Instance?.GetObject<ItemObject>("mp_vlandia_horse")
+                                    ?? MBObjectManager.Instance?.GetObject<ItemObject>("mule");
+                ItemObject harnessItem = MBObjectManager.Instance?.GetObject<ItemObject>("mp_vlandia_horse_harness")
+                                      ?? MBObjectManager.Instance?.GetObject<ItemObject>("saddle_horse");
+                Vec3 horsePos = agent.Position;
+                Vec2 horseHeading = forward;
+                horse = Mission.Current.SpawnMonster(
+                    new ItemRosterElement(horseItem, 1),
+                    new ItemRosterElement(harnessItem, 1),
+                    horsePos,
+                    horseHeading,
+                    (int)side
+                );
+                if (horse != null)
+                {
+                    try { agent.Mount(horse); } catch { }
+                }
+            }
+
+            Vec3 spawnPos;
+            if (horse != null)
+            {
+                Vec2 horseFwd = horse.Frame.rotation.f.AsVec2.Normalized();
+                if (horseFwd.LengthSquared < 0.01f) horseFwd = forward;
+                spawnPos = horse.Position - new Vec3(horseFwd.x * 3.8f, horseFwd.y * 3.8f, 0f);
+            }
+            else
+            {
+                spawnPos = agent.Position - new Vec3(forward.x * 3.8f, forward.y * 3.8f, 0f);
+            }
+
+            var engine = SpawnEngine(Mission.Current, chosenSpec, side, spawnPos, forward, playerId, horse);
 
             if (engine != null)
             {
@@ -1470,7 +1468,7 @@ namespace DWDN_Script
                 if (agent.IsPlayerControlled)
                 {
                     InformationManager.DisplayMessage(new InformationMessage(
-                        $"[DWDN Артиллерия] Ваш {chosenSpec.Name} запряжен и готов к движению! Садитесь на лошадь верхом. На позиции нажмите [F], чтобы отцепить коня.",
+                        $"[DWDN Артиллерия] Ваш {chosenSpec.Name} запряжен и готов к движению! На позиции нажмите [F], чтобы отцепить коня.",
                         Colors.Green
                     ));
                 }

@@ -110,6 +110,18 @@ namespace DWDN_Script.Server.Behaviors
                     var cls = duchy?.GetClass(selection.ClassId);
                     if (cls != null)
                     {
+                        if (string.Equals(selection.ClassId, "mp_Artillerist", StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (selection.Weapon1Id == "dwdn_order_mangonel" || selection.Weapon1Id == "dwdn_order_ballista")
+                            {
+                                selection.HorseId = "sumpter_horse";
+                            }
+                            else
+                            {
+                                selection.HorseId = "";
+                            }
+                        }
+
                         // Безопасный нативный индекс для спавна и синхронизации с культурой команды игрока
                         BasicCultureObject peerCulture = missionPeer.Culture;
                         if (peerCulture == null && missionPeer.Team != null)

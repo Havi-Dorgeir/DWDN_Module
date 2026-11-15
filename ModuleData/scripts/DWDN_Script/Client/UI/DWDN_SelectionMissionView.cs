@@ -421,6 +421,19 @@ namespace DWDN_Script.Client.UI
         private void OnSelectionChanged(DWDN_LoadoutSelection selection, bool isClassChange)
         {
             if (selection == null) return;
+
+            if (string.Equals(selection.ClassId, "mp_Artillerist", StringComparison.OrdinalIgnoreCase))
+            {
+                if (selection.Weapon1Id == "dwdn_order_mangonel" || selection.Weapon1Id == "dwdn_order_ballista")
+                {
+                    selection.HorseId = "sumpter_horse";
+                }
+                else
+                {
+                    selection.HorseId = "";
+                }
+            }
+
             _currentSelection = selection;
 
             SyncNativeTroopIndex(_currentSelection);
