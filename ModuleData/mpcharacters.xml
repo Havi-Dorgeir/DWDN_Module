@@ -266,6 +266,35 @@
 		</Equipments>
 		<Resistances dismount="90" />
 	</NPCCharacter>
+	<!-- Khorunzhiy -->
+	<NPCCharacter id="mp_Khorunzhiy_hero" default_group="Infantry" level="25" name="{=hoinf1}Khorunzhiy" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="40" />
+			<skill id="OneHanded" value="130" />
+			<skill id="TwoHanded" value="110" />
+			<skill id="Polearm" value="120" />
+			<skill id="Crossbow" value="25" />
+			<skill id="Bow" value="25" />
+			<skill id="Throwing" value="60" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Head" id="Item.baron_roondalt_vendelhelmet_1" />
+				<equipment slot="Body" id="Item.run_body1" />
+				<equipment slot="Cape" id="Item.Baron_rundal_cape" />
+				<equipment slot="Leg" id="Item.rundal_leg" />
+				<equipment slot="Gloves" id="Item.rundal_gloves_second" />
+				<equipment slot="Item0" id="Item.baldur_warpick" />
+				<equipment slot="Item1" id="Item.dwdn_banner1" />
+				<equipment slot="Item2" id="Item.rundal_shield" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
 	<!-- Knight -->
 	<NPCCharacter id="mp_Knight_hero" default_group="Cavalry" level="25" name="{=hoinf1}Knight" occupation="Soldier" culture="Culture.dwdn">
 		<face>
@@ -733,6 +762,35 @@
 				<equipment slot="Item0" id="Item.mp_battania_noble_sword" />
 				<equipment slot="Item1" id="Item.zbroyniy_shield_silver1" />
 				<equipment slot="Item2" id="Item.mp_western_long_spear" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
+	<!-- Khorunzhiy -->
+	<NPCCharacter id="mp_Khorunzhiy_troop" default_group="Infantry" level="25" name="{=hoinf1}Khorunzhiy" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="40" />
+			<skill id="OneHanded" value="130" />
+			<skill id="TwoHanded" value="110" />
+			<skill id="Polearm" value="120" />
+			<skill id="Crossbow" value="25" />
+			<skill id="Bow" value="25" />
+			<skill id="Throwing" value="60" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Head" id="Item.baron_roondalt_vendelhelmet_1" />
+				<equipment slot="Body" id="Item.run_body1" />
+				<equipment slot="Cape" id="Item.Baron_rundal_cape" />
+				<equipment slot="Leg" id="Item.rundal_leg" />
+				<equipment slot="Gloves" id="Item.rundal_gloves_second" />
+				<equipment slot="Item0" id="Item.baldur_warpick" />
+				<equipment slot="Item1" id="Item.dwdn_banner1" />
+				<equipment slot="Item2" id="Item.rundal_shield" />
 			</EquipmentRoster>
 		</Equipments>
 		<Resistances dismount="90" />

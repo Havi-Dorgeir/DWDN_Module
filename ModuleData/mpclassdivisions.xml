@@ -159,6 +159,27 @@
 			</Perk>
 		</Perks>
 	</MPClassDivision>
+	<!-- Khorunzhiy (Хорунжий) -->
+	<MPClassDivision id="mp_Khorunzhiy" hero="mp_Khorunzhiy_hero" troop="mp_Khorunzhiy_troop" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.50" cost="170" icon="Infantry_Heavy" melee_ai="70" ranged_ai="45" armor="45" movement_speed="0.75" combat_movement_speed="0.80" acceleration="2.6" hitpoints="100">
+		<Perks>
+			<!-- Слот 1: Баффы -->
+			<Perk game_mode="All" name="Heavy Plating" description="+12 Armor" icon="PerkToughness" perk_list="1">
+				<OnSpawnEffect type="ArmorOnSpawn" value="12" />
+			</Perk>
+			<Perk game_mode="All" name="Athletics" description="+5% Movement Speed" icon="PerkFleetFooted" perk_list="1">
+				<Effect type="DrivenProperty" driven_property="MaxSpeedMultiplier" value="0.05" />
+			</Perk>
+			<!-- Слот 2: Оружие / Знамя -->
+			<Perk game_mode="All" name="Baldur Warpick" description="Baldur Warpick and clan banner" icon="PerkMaces" perk_list="2">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item0" item="baldur_warpick" />
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item1" item="dwdn_banner1" />
+			</Perk>
+			<!-- Слот 3: Щит -->
+			<Perk game_mode="All" name="Rundal Shield" description="Rundal shield" icon="PerkShield" perk_list="3">
+				<OnSpawnEffect type="AlternativeEquipmentOnSpawn" slot="Item2" item="rundal_shield" />
+			</Perk>
+		</Perks>
+	</MPClassDivision>
 	<!-- Bannerman -->
 	<MPClassDivision id="mp_Bannerman" hero="mp_Bannerman_hero" troop="mp_Bannerman_troop" hero_idle_anim="act_sturgia_mp_huskarl_idle" troop_idle_anim="act_idle_unarmed_1" multiplier="0.60" cost="140" icon="Infantry_Heavy" melee_ai="55" ranged_ai="40" armor="35" movement_speed="0.77" combat_movement_speed="0.84" acceleration="2.4" hitpoints="100">
 		<Perks>

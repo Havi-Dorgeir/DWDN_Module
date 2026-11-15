@@ -110,40 +110,39 @@ namespace DWDN_Script.Server.Behaviors
                     var cls = duchy?.GetClass(selection.ClassId);
                     if (cls != null)
                     {
-                        var allHeroClasses = MultiplayerClassDivisions.GetMPHeroClasses();
-                        if (allHeroClasses != null)
+                        // Безопасный нативный индекс для спавна и синхронизации с культурой команды игрока
+                        BasicCultureObject peerCulture = missionPeer.Culture;
+                        if (peerCulture == null && missionPeer.Team != null)
                         {
-                            foreach (var hc in allHeroClasses)
+                            string cultStr = missionPeer.Team.Side == BattleSideEnum.Attacker
+                                ? MultiplayerOptions.OptionType.CultureTeam1.GetStrValue()
+                                : MultiplayerOptions.OptionType.CultureTeam2.GetStrValue();
+                            peerCulture = MBObjectManager.Instance?.GetObject<BasicCultureObject>(cultStr);
+                        }
+                        if (peerCulture != null)
+                        {
+                            var peerClasses = MultiplayerClassDivisions.GetMPHeroClasses(peerCulture);
+                            if (peerClasses != null)
                             {
-                                if (hc == null) continue;
-                                if (string.Equals(hc.StringId, cls.Id, StringComparison.OrdinalIgnoreCase) ||
-                                    string.Equals(hc.StringId, cls.TroopId, StringComparison.OrdinalIgnoreCase) ||
-                                    (hc.HeroCharacter != null && string.Equals(hc.HeroCharacter.StringId, cls.TroopId, StringComparison.OrdinalIgnoreCase)) ||
-                                    (hc.TroopCharacter != null && string.Equals(hc.TroopCharacter.StringId, cls.TroopId, StringComparison.OrdinalIgnoreCase)))
+                                var classList = System.Linq.Enumerable.ToList(peerClasses);
+                                if (classList.Count > 0)
                                 {
-                                    if (hc.Culture != null)
+                                    int safeNativeIdx = 0;
+                                    if (!string.IsNullOrEmpty(selection.HorseId))
                                     {
-                                        int idx = 0;
-                                        foreach (var cultClass in MultiplayerClassDivisions.GetMPHeroClasses(hc.Culture))
-                                        {
-                                            if (cultClass == hc)
-                                            {
-                                                int targetIdx = idx;
-                                                missionPeer.SelectedTroopIndex = targetIdx;
-                                                missionPeer.NextSelectedTroopIndex = targetIdx;
-                                                try
-                                                {
-                                                    GameNetwork.BeginBroadcastModuleEvent();
-                                                    GameNetwork.WriteMessage(new UpdateSelectedTroopIndex(peer, targetIdx));
-                                                    GameNetwork.EndBroadcastModuleEvent(GameNetwork.EventBroadcastFlags.ExcludeOtherTeamPlayers, peer);
-                                                }
-                                                catch {}
-                                                break;
-                                            }
-                                            idx++;
-                                        }
+                                        int cavIdx = classList.FindIndex(c => c != null && c.HeroCharacter != null && c.HeroCharacter.IsMounted);
+                                        if (cavIdx >= 0) safeNativeIdx = cavIdx;
                                     }
-                                    break;
+                                    safeNativeIdx = Math.Min(Math.Max(0, safeNativeIdx), classList.Count - 1);
+                                    missionPeer.SelectedTroopIndex = safeNativeIdx;
+                                    missionPeer.NextSelectedTroopIndex = safeNativeIdx;
+                                    try
+                                    {
+                                        GameNetwork.BeginBroadcastModuleEvent();
+                                        GameNetwork.WriteMessage(new UpdateSelectedTroopIndex(peer, safeNativeIdx));
+                                        GameNetwork.EndBroadcastModuleEvent(GameNetwork.EventBroadcastFlags.ExcludeOtherTeamPlayers, peer);
+                                    }
+                                    catch {}
                                 }
                             }
                         }

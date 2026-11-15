@@ -122,6 +122,97 @@ namespace DWDN_MechanicsTester.Suites
                 Assert.IsFalse(invalidItem, "Несуществующий предмет должен быть отвергнут");
             });
 
+            RunTest(suite, "Test_Khorunzhiy_Class_Definition_Structure", () =>
+            {
+                if (!File.Exists(duchyManagerPath)) return;
+                string content = File.ReadAllText(duchyManagerPath);
+
+                // 1. Проверяем наличие класса Хорунжего в коде
+                Assert.IsTrue(content.Contains("\"mp_Khorunzhiy\""), "Класс mp_Khorunzhiy должен быть объявлен в DWDN_DuchyManager.cs");
+                Assert.IsTrue(content.Contains("\"mp_Khorunzhiy_hero\""), "mp_Khorunzhiy обязан ссылаться на персонажа mp_Khorunzhiy_hero");
+
+                // 2. Проверяем позиционирование: Хорунжий должен идти сразу после Сотника (mp_Sotnik)
+                int sotnikIdx = content.IndexOf("\"mp_Sotnik\"");
+                int khorunzhiyIdx = content.IndexOf("\"mp_Khorunzhiy\"");
+                int bannermanIdx = content.IndexOf("\"mp_Bannerman\"");
+                Assert.IsTrue(sotnikIdx != -1, "mp_Sotnik должен быть найден");
+                Assert.IsTrue(khorunzhiyIdx != -1, "mp_Khorunzhiy должен быть найден");
+                Assert.IsTrue(bannermanIdx != -1, "mp_Bannerman должен быть найден");
+                Assert.IsTrue(khorunzhiyIdx > sotnikIdx && khorunzhiyIdx < bannermanIdx, "Хорунжий обязан находиться строго между Сотником и Знаменосцем в иерархии пехоты");
+
+                // 3. Проверяем полный сет Рюндаля
+                Assert.IsTrue(content.Contains("\"baron_roondalt_vendelhelmet_1\""), "Хорунжий обязан иметь шлем Рюндаля baron_roondalt_vendelhelmet_1");
+                Assert.IsTrue(content.Contains("\"run_body1\""), "Хорунжий обязан иметь доспех Рюндаля run_body1");
+                Assert.IsTrue(content.Contains("\"Baron_rundal_cape\""), "Хорунжий обязан иметь плащ Рюндаля Baron_rundal_cape");
+                Assert.IsTrue(content.Contains("\"rundal_leg\""), "Хорунжий обязан иметь поножи Рюндаля rundal_leg");
+                Assert.IsTrue(content.Contains("\"rundal_gloves_second\""), "Хорунжий обязан иметь перчатки Рюндаля rundal_gloves_second");
+                Assert.IsTrue(content.Contains("\"baldur_warpick\""), "Хорунжий обязан иметь клевец baldur_warpick в слоте 0");
+                Assert.IsTrue(content.Contains("\"dwdn_banner1\""), "Хорунжий обязан иметь знамя dwdn_banner1 в слоте 1");
+                Assert.IsTrue(content.Contains("\"rundal_shield\""), "Хорунжий обязан иметь щит rundal_shield в слоте 2");
+            });
+
+            RunTest(suite, "Test_All_Module_Classes_And_Items_Integrity", () =>
+            {
+                // Поиск корневой директории модуля DWDN_TRY по SubModule.xml
+                string dir = Path.GetDirectoryName(duchyManagerPath) ?? "";
+                while (!string.IsNullOrEmpty(dir) && !File.Exists(Path.Combine(dir, "SubModule.xml")))
+                {
+                    dir = Path.GetDirectoryName(dir) ?? "";
+                }
+                string moduleDataDir = Path.Combine(dir, "ModuleData");
+                Assert.IsTrue(Directory.Exists(moduleDataDir), $"Каталог ModuleData обязан существовать: {moduleDataDir}");
+
+                // 1. Проверка mpcultures.xml: культура dwdn НЕ должна иметь is_main_culture="true"
+                string culturesPath = Path.Combine(moduleDataDir, "mpcultures.xml");
+                if (File.Exists(culturesPath))
+                {
+                    string cultText = File.ReadAllText(culturesPath);
+                    Assert.IsFalse(cultText.Contains("is_main_culture=\"true\""), "Культура dwdn НЕ должна иметь is_main_culture=\"true\", иначе нативный C++ движок падает с 0xc0000005 в CreateAgentVisuals!");
+                }
+
+                // 2. Сбор всех предметов модуля и натива
+                var allItems = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (string xmlFile in Directory.GetFiles(moduleDataDir, "*.xml", SearchOption.AllDirectories))
+                {
+                    try
+                    {
+                        var doc = new System.Xml.XmlDocument();
+                        doc.Load(xmlFile);
+                        foreach (System.Xml.XmlNode n in doc.SelectNodes("//Item[@id]") ?? (System.Xml.XmlNodeList)null!)
+                        {
+                            if (n is System.Xml.XmlElement el) allItems.Add(el.GetAttribute("id"));
+                        }
+                        foreach (System.Xml.XmlNode n in doc.SelectNodes("//CraftedItem[@id]") ?? (System.Xml.XmlNodeList)null!)
+                        {
+                            if (n is System.Xml.XmlElement el) allItems.Add(el.GetAttribute("id"));
+                        }
+                    }
+                    catch {}
+                }
+
+                // 3. Проверка классов в mpclassdivisions.xml
+                string classDivPath = Path.Combine(moduleDataDir, "mpclassdivisions.xml");
+                Assert.IsTrue(File.Exists(classDivPath), "mpclassdivisions.xml обязан существовать");
+                var classDoc = new System.Xml.XmlDocument();
+                classDoc.Load(classDivPath);
+                var divisions = classDoc.SelectNodes("//MPClassDivision");
+                Assert.IsTrue(divisions != null && divisions.Count >= 16, $"Ожидается как минимум 16 классов в mpclassdivisions.xml (найдено: {divisions?.Count})");
+
+                // Проверяем наличие mp_Khorunzhiy в mpclassdivisions.xml
+                var khorunzhiyNode = classDoc.SelectSingleNode("//MPClassDivision[@id='mp_Khorunzhiy']");
+                Assert.IsNotNull(khorunzhiyNode, "mp_Khorunzhiy должен быть объявлен в mpclassdivisions.xml");
+
+                // 4. Проверка mpcharacters.xml
+                string charPath = Path.Combine(moduleDataDir, "mpcharacters.xml");
+                Assert.IsTrue(File.Exists(charPath), "mpcharacters.xml обязан существовать");
+                var charDoc = new System.Xml.XmlDocument();
+                charDoc.Load(charPath);
+                var heroNode = charDoc.SelectSingleNode("//NPCCharacter[@id='mp_Khorunzhiy_hero']");
+                var troopNode = charDoc.SelectSingleNode("//NPCCharacter[@id='mp_Khorunzhiy_troop']");
+                Assert.IsNotNull(heroNode, "mp_Khorunzhiy_hero должен существовать в mpcharacters.xml");
+                Assert.IsNotNull(troopNode, "mp_Khorunzhiy_troop должен существовать в mpcharacters.xml");
+            });
+
             sw.Stop();
             suite.DurationMs = sw.Elapsed.TotalMilliseconds;
             return suite;

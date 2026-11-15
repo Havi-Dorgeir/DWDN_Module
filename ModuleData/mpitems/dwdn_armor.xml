@@ -214,12 +214,6 @@
 		</ItemComponent>
 		<Flags UseTeamColor="false" />
 	</Item>
-	<Item multiplayer_item="true" id="archer_leatherboots" name="Bannreich Archer Pants" mesh="archer_leatherboots" culture="Culture.dwdn" weight="1.0" Type="LegArmor">
-		<ItemComponent>
-			<Armor leg_armor="6" covers_legs="true" modifier_group="cloth_unarmoured" material_type="Cloth" />
-		</ItemComponent>
-		<Flags UseTeamColor="false" />
-	</Item>
 	<Item multiplayer_item="true" id="pikemen_dwdn_plate_leg" name="Bannreich Pikeman Plate Legs" mesh="pikemen_dwdn_plate_leg" culture="Culture.dwdn" weight="2.8" Type="LegArmor">
 		<ItemComponent>
 			<Armor leg_armor="18" covers_legs="true" modifier_group="cloth_unarmoured" material_type="Plate" />
