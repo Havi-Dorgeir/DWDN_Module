@@ -92,14 +92,16 @@ namespace DWDN_Script
                         if (combat)
                         {
                             // Освобождаем ограничение скорости у коня при распряжке
+                            try { HorseAgent.ClearTargetFrame(); } catch { }
                             try { HorseAgent.DisableScriptedMovement(); } catch { }
                             HorseAgent.SetMaximumSpeedLimit(-1f, false);
                         }
                         else
                         {
-                            // На марше: если есть всадник — шаг (2.2 м/с), если нет — удерживаем точку без паники и блуждания
+                            // На марше: если есть всадник — шаг (2.2 м/с), если нет — удерживаем точку во FrameLocked
                             if (HorseAgent.RiderAgent != null)
                             {
+                                try { HorseAgent.ClearTargetFrame(); } catch { }
                                 try { HorseAgent.DisableScriptedMovement(); } catch { }
                                 HorseAgent.SetMaximumSpeedLimit(2.2f, false);
                             }
@@ -110,8 +112,13 @@ namespace DWDN_Script
                                 HorseAgent.SetMaximumSpeedLimit(0.0001f, false);
                                 try
                                 {
-                                    var wp = new WorldPosition(Mission.Current?.Scene, HorseAgent.Position);
-                                    HorseAgent.SetScriptedPosition(ref wp, false, Agent.AIScriptedFrameFlags.DoNotRun);
+                                    Vec2 p = HorseAgent.Position.AsVec2;
+                                    Vec3 d = HorseAgent.Frame.rotation.f;
+                                    HorseAgent.SetTargetPositionAndDirection(p, d);
+                                    if (GameNetwork.IsServer)
+                                    {
+                                        HorseAgent.SetTargetPositionAndDirectionSynched(ref p, ref d);
+                                    }
                                 }
                                 catch { }
                             }
@@ -609,7 +616,7 @@ namespace DWDN_Script
                 }
 
                 // 3. СПАВН ТЯГЛОВОЙ ЛОШАДИ ВПЕРЕДИ ОРУДИЯ
-                Vec3 horsePos = position + new Vec3(heading.x * 3.8f, heading.y * 3.8f, 0f);
+                Vec3 horsePos = position + new Vec3(heading.x * 4.0f, heading.y * 4.0f, 0f);
                 float hZ = horsePos.z;
                 try
                 {
@@ -662,8 +669,13 @@ namespace DWDN_Script
                         horseAgent.SetMaximumSpeedLimit(0.0001f, false);
                         try
                         {
-                            var wp = new WorldPosition(mission.Scene, horsePos);
-                            horseAgent.SetScriptedPositionAndDirection(ref wp, horseHeading.RotationInRadians, false, Agent.AIScriptedFrameFlags.DoNotRun);
+                            Vec2 p = horseAgent.Position.AsVec2;
+                            Vec3 d = new Vec3(horseHeading.x, horseHeading.y, 0f);
+                            horseAgent.SetTargetPositionAndDirection(p, d);
+                            if (GameNetwork.IsServer)
+                            {
+                                horseAgent.SetTargetPositionAndDirectionSynched(ref p, ref d);
+                            }
                         }
                         catch { }
                         horseAgent.UpdateAgentProperties();
@@ -839,6 +851,7 @@ namespace DWDN_Script
                         {
                             if (horseAgent.RiderAgent != null)
                             {
+                                try { horseAgent.ClearTargetFrame(); } catch { }
                                 try { horseAgent.DisableScriptedMovement(); } catch { }
                                 horseAgent.SetMaximumSpeedLimit(2.2f, false);
                             }
@@ -849,8 +862,9 @@ namespace DWDN_Script
                                 horseAgent.SetMaximumSpeedLimit(0.0001f, false);
                                 try
                                 {
-                                    var wp = new WorldPosition(Mission.Current?.Scene, horseAgent.Position);
-                                    horseAgent.SetScriptedPosition(ref wp, false, Agent.AIScriptedFrameFlags.DoNotRun);
+                                    Vec2 p = horseAgent.Position.AsVec2;
+                                    Vec3 d = horseAgent.Frame.rotation.f;
+                                    horseAgent.SetTargetPositionAndDirection(p, d);
                                 }
                                 catch { }
                             }
@@ -1026,6 +1040,13 @@ namespace DWDN_Script
 
             lock (_lockObject)
             {
+                if (engine.HorseAgent != null && engine.HorseAgent.IsActive())
+                {
+                    try { engine.HorseAgent.ClearTargetFrame(); } catch { }
+                    try { engine.HorseAgent.DisableScriptedMovement(); } catch { }
+                    engine.HorseAgent.SetMaximumSpeedLimit(-1f, false);
+                    engine.HorseAgent.UpdateAgentProperties();
+                }
                 engine.SetCombatState(true);
                 engine.HorseAgent = null;
 
@@ -1136,6 +1157,7 @@ namespace DWDN_Script
                         {
                             try
                             {
+                                try { engine.HorseAgent.ClearTargetFrame(); } catch { }
                                 try { engine.HorseAgent.DisableScriptedMovement(); } catch { }
                                 engine.HorseAgent.SetMaximumSpeedLimit(-1f, false);
                                 engine.HorseAgent.UpdateAgentProperties();
@@ -1154,39 +1176,47 @@ namespace DWDN_Script
                             if (engine.HorseAgent != null && engine.HorseAgent.IsActive())
                             {
                                 // Контроль поведения запряженного коня:
-                                // Без всадника — стоит смирно на месте и не блуждает
-                                // Со всадником — управляемо движется шагом (до 2.2 м/с)
+                                // Без всадника — стоит смирно на месте во FrameLocked и повозку не двигаем
+                                // Со всадником — управляемо движется шагом (до 2.2 м/с), орудие следует сзади
                                 if (engine.HorseAgent.RiderAgent == null)
                                 {
-                                    if (engine.HorseAgent.GetCurrentSpeedLimit() > 0.01f)
+                                    if (engine.HorseAgent.MovementLockedState == AgentMovementLockedState.None)
                                     {
                                         try { engine.HorseAgent.StopRetreating(); } catch { }
                                         try { engine.HorseAgent.SetAlarmState(Agent.AIStateFlag.None); } catch { }
                                         engine.HorseAgent.SetMaximumSpeedLimit(0.0001f, false);
                                         try
                                         {
-                                            var wp = new WorldPosition(Mission.Current?.Scene, engine.HorseAgent.Position);
-                                            engine.HorseAgent.SetScriptedPosition(ref wp, false, Agent.AIScriptedFrameFlags.DoNotRun);
+                                            Vec2 p = engine.HorseAgent.Position.AsVec2;
+                                            Vec3 d = engine.HorseAgent.Frame.rotation.f;
+                                            engine.HorseAgent.SetTargetPositionAndDirection(p, d);
+                                            if (GameNetwork.IsServer)
+                                            {
+                                                engine.HorseAgent.SetTargetPositionAndDirectionSynched(ref p, ref d);
+                                            }
                                         }
                                         catch { }
                                         engine.HorseAgent.UpdateAgentProperties();
                                     }
+                                    // КРИТИЧЕСКИ ВАЖНО: без всадника тележка/орудие не двигаются, чтобы исключить Havok-выталкивание коня вперед
+                                    continue;
                                 }
                                 else
                                 {
-                                    if (engine.HorseAgent.GetCurrentSpeedLimit() < 1.0f)
+                                    if (engine.HorseAgent.MovementLockedState != AgentMovementLockedState.None)
                                     {
+                                        try { engine.HorseAgent.ClearTargetFrame(); } catch { }
                                         try { engine.HorseAgent.DisableScriptedMovement(); } catch { }
                                         engine.HorseAgent.SetMaximumSpeedLimit(2.2f, false);
                                         engine.HorseAgent.UpdateAgentProperties();
                                     }
                                 }
-                                // Обновляем позицию тележки/орудия за лошадью
+                                // Обновляем позицию тележки/орудия за лошадью только при наличии всадника
                                 Vec3 horsePos = engine.HorseAgent.Position;
                                 Vec2 horseFwd = engine.HorseAgent.Frame.rotation.f.AsVec2.Normalized();
                                 if (horseFwd.LengthSquared < 0.01f) horseFwd = new Vec2(0f, 1f);
 
-                                float hitchDistance = 3.6f;
+                                float hitchDistance = 4.0f;
                                 Vec3 targetPos = horsePos - new Vec3(horseFwd.x * hitchDistance, horseFwd.y * hitchDistance, 0f);
                                 targetPos.z = horsePos.z;
                                 try
