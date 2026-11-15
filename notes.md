@@ -2396,3 +2396,30 @@ if (this._isInWeaponCameraMode)
 - `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
 - `MechanicsTester.exe --cli`: 30 из 30 тестов пройдены успешно (100% pass).
 - `sync_all.ps1`: Все бинарники, скрипты и XML синхронизированы в `DaewdenM` и `DWDN_TRY`.
+
+
+---
+
+### Глава 76: Восстановление основной культуры Daewden (is_main_culture="true") и аудит целостности классов (15.11.2026)
+
+#### 1. Симптом и первопричина
+- **Симптом**: В списке доступных фракций при настройке карты (постановка карты на сервере / лобби / голосование) пропала фракция Daewden (`dwdn`).
+- **Первопричина**:
+  В коммите `e0b1293` у тега `<Culture id="dwdn" ...>` был ошибочно удален атрибут `is_main_culture="true"` из-за ложного вывода о причине сбоя 0xc0000005. В нативной логике TaleWorlds именно флаг `is_main_culture="true"` определяет, отображается ли культура в интерфейсе выбора фракций для матча. Культуры без этого атрибута скрыты движком (как бандиты и нейтралы).
+  
+#### 2. Проведенные исправления
+1. **[mpcultures.xml](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpcultures.xml)**:
+   - Возвращен атрибут `is_main_culture="true"` в определение `<Culture id="dwdn" ... />`.
+   - Фракция Daewden снова доступна для выбора обеими командами в селекторе карт и серверов.
+2. **[DuchyLoadoutTestSuite.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/Tools/MechanicsTester/Suites/DuchyLoadoutTestSuite.cs)**:
+   - Обновлен тест `Test_All_Module_Classes_And_Items_Integrity`: теперь тест строго верифицирует наличие `is_main_culture="true"` для `dwdn`.
+3. **Аудит целостности классов и предметов**:
+   - Подтверждено: класс Хорунжий (`mp_Khorunzhiy`) со всеми 8 предметами сета Рюндаля (`baron_roondalt_vendelhelmet_1`, `run_body1`, `Baron_rundal_cape`, `rundal_leg`, `rundal_gloves_second`, `baldur_warpick`, `dwdn_banner1`, `rundal_shield`) полностью сохранен и функционирует.
+   - Механики артиллерии, упряжи коней и флаги целостны.
+   - Безопасное зажатие индексов (`SelectedTroopIndex`) в `DWDN_ServerLoadoutBehavior.cs` и `DWDN_SelectionMissionView.cs` исключает рассинхронизацию при любой выбранной культуре.
+
+#### 3. Верификация
+- `dotnet build DWDN_Script.csproj` (Client Release): 0 ошибок.
+- `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
+- `MechanicsTester.exe --cli`: 30 из 30 тестов пройдены успешно (100% pass).
+- `sync_all.ps1`: Модули `DaewdenM` и `DWDN_TRY` полностью синхронизированы.

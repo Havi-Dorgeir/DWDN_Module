@@ -162,12 +162,12 @@ namespace DWDN_MechanicsTester.Suites
                 string moduleDataDir = Path.Combine(dir, "ModuleData");
                 Assert.IsTrue(Directory.Exists(moduleDataDir), $"Каталог ModuleData обязан существовать: {moduleDataDir}");
 
-                // 1. Проверка mpcultures.xml: культура dwdn НЕ должна иметь is_main_culture="true"
+                // 1. Проверка mpcultures.xml: культура dwdn ОБЯЗАНА иметь is_main_culture="true" для выбора фракции на карте
                 string culturesPath = Path.Combine(moduleDataDir, "mpcultures.xml");
                 if (File.Exists(culturesPath))
                 {
                     string cultText = File.ReadAllText(culturesPath);
-                    Assert.IsFalse(cultText.Contains("is_main_culture=\"true\""), "Культура dwdn НЕ должна иметь is_main_culture=\"true\", иначе нативный C++ движок падает с 0xc0000005 в CreateAgentVisuals!");
+                    Assert.IsTrue(cultText.Contains("is_main_culture=\"true\""), "Культура dwdn ОБЯЗАНА иметь is_main_culture=\"true\", чтобы отображаться в списке фракций при настройке карты!");
                 }
 
                 // 2. Сбор всех предметов модуля и натива

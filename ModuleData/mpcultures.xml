@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <BasicCultures>
-	<!-- Daewden Culture. Deliberately NOT a main culture (is_main_culture="false"):
-	     keeping it as non-main prevents the native engine/lobby/admin panel from offering dwdn
-	     as CultureTeam1/CultureTeam2 (which crashes native C++ CreateAgentVisuals with 0xc0000005
-	     due to missing native FaceGen/FaceCache tables). Teams use native cultures (empire, vlandia, etc.)
-	     while troops and heroes retain Culture.dwdn. -->
 	<Culture
 	  id="dwdn"
 	  name="Daewden"
+	  is_main_culture="true"
 	  color="FF0B0C11"
 	  color2="FFF4CA14"
 	  cloth_alternative_color1="FF0B0C11"
