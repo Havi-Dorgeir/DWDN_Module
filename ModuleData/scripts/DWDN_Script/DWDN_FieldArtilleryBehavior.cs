@@ -76,7 +76,9 @@ namespace DWDN_Script
             public float DestroyTimer => DestroyedTime;
             public Agent PushingAgent => HorseAgent;
 
+            public int SavedAmmo = 25;
             public Vec3 Position => Frame.origin;
+            public Vec3 HitchPosition => Frame.origin + (Frame.rotation.f * 2.2f) + new Vec3(0f, 0f, 0.45f);
 
             public void SetCombatState(bool combat)
             {
@@ -85,10 +87,18 @@ namespace DWDN_Script
 
                 if (HorseAgent != null && HorseAgent.IsActive())
                 {
-                    // Освобождаем ограничение скорости у коня при отцепке
                     try
                     {
-                        HorseAgent.SetMaximumSpeedLimit(-1f, false);
+                        if (combat)
+                        {
+                            // Освобождаем ограничение скорости у коня при распряжке
+                            HorseAgent.SetMaximumSpeedLimit(-1f, false);
+                        }
+                        else
+                        {
+                            // На марше конь движется строго шагом
+                            HorseAgent.SetMaximumSpeedLimit(2.2f, false);
+                        }
                         HorseAgent.UpdateAgentProperties();
                     }
                     catch { }
@@ -116,6 +126,10 @@ namespace DWDN_Script
                     }
                     else
                     {
+                        if (SiegeWeapon != null)
+                        {
+                            SavedAmmo = SiegeWeapon.AmmoCount;
+                        }
                         SiegeWeapon?.Deactivate();
                         var stonePile = AmmoPileEntity?.GetFirstScriptOfType<UsableMachine>();
                         stonePile?.Deactivate();
@@ -197,8 +211,9 @@ namespace DWDN_Script
                     try
                     {
                         SetSiegeWeaponDefaultSide(SiegeWeapon, TeamSide);
-                        SiegeWeapon.StartingAmmoCount = 25;
-                        SiegeWeapon.SetAmmo(25);
+                        int ammoCount = SavedAmmo > 0 ? SavedAmmo : 25;
+                        SiegeWeapon.StartingAmmoCount = ammoCount;
+                        SiegeWeapon.SetAmmo(ammoCount);
                     }
                     catch { }
                 }
@@ -286,6 +301,7 @@ namespace DWDN_Script
             if (GameNetwork.IsServer)
             {
                 DWDN_NetworkHelper.RegisterClientMessageHandler<RequestDeployArtilleryMessage>(HandleClientDeployRequest);
+                DWDN_NetworkHelper.RegisterClientMessageHandler<RequestToggleArtilleryHitchMessage>(HandleClientToggleHitchRequest);
                 _networkHandlersRegistered = true;
                 Debug.Print("[DWDN Artillery] Server message handlers registered.");
             }
@@ -305,6 +321,7 @@ namespace DWDN_Script
             if (GameNetwork.IsServer)
             {
                 DWDN_NetworkHelper.UnregisterClientMessageHandler<RequestDeployArtilleryMessage>(HandleClientDeployRequest);
+                DWDN_NetworkHelper.UnregisterClientMessageHandler<RequestToggleArtilleryHitchMessage>(HandleClientToggleHitchRequest);
             }
             else if (GameNetwork.IsClient)
             {
@@ -819,7 +836,7 @@ namespace DWDN_Script
         }
 
         // =========================================================================
-        // ПЕРЕВОД В БОЕВОЕ ПОЛОЖЕНИЕ (ОТЦЕПКА КОНЯ)
+        // ПЕРЕВОД В БОЕВОЕ ПОЛОЖЕНИЕ И СЦЕПКА / ОТЦЕПКА
         // =========================================================================
 
         private static bool HandleClientDeployRequest(NetworkCommunicator peer, RequestDeployArtilleryMessage message)
@@ -833,12 +850,95 @@ namespace DWDN_Script
                 var engine = _activeEngines.FirstOrDefault(e => e.Id == message.EngineId);
                 if (engine == null || engine.IsDestroyed || !engine.IsHitched) return false;
 
-                // Проверяем дистанцию до сцепки
                 float distSq = agent.Position.DistanceSquared(engine.Position);
                 if (distSq > (InteractRadius + 2.0f) * (InteractRadius + 2.0f)) return false;
 
                 DeployEngineToCombat(engine);
                 return true;
+            }
+        }
+
+        private static bool HandleClientToggleHitchRequest(NetworkCommunicator peer, RequestToggleArtilleryHitchMessage message)
+        {
+            if (peer == null || message == null) return false;
+            Agent agent = peer.ControlledAgent;
+            if (agent == null || !agent.IsActive()) return false;
+
+            lock (_lockObject)
+            {
+                var engine = _activeEngines.FirstOrDefault(e => e.Id == message.EngineId);
+                if (engine == null || engine.IsDestroyed) return false;
+
+                // 1. Проверка прав: создатель орудия или класс артиллериста
+                bool isOwner = !string.IsNullOrEmpty(engine.OwnerPlayerId) &&
+                               (engine.OwnerPlayerId == (peer.VirtualPlayer?.Id.ToString() ?? "") ||
+                                engine.OwnerPlayerId == peer.UserName);
+                bool isArtillerist = agent.Character?.StringId?.IndexOf("artillerist", StringComparison.OrdinalIgnoreCase) >= 0;
+                if (!isOwner && !isArtillerist) return false;
+
+                // 2. Проверка дистанции бойца до дышла
+                float dist = agent.Position.Distance(engine.HitchPosition);
+                if (dist > 3.4f) return false;
+
+                // 3. Выполнение сцепки или отцепки
+                if (message.Attach)
+                {
+                    Agent horseAgent = null;
+                    if (message.HorseAgentIndex >= 0)
+                    {
+                        horseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.Index == message.HorseAgentIndex);
+                    }
+                    if (horseAgent == null || !horseAgent.IsMount || !horseAgent.IsActive())
+                    {
+                        // Fallback: ищем ближайшего свободного коня (включая трофейных коней врага!)
+                        float closestDistSq = 4.0f * 4.0f;
+                        foreach (var a in Mission.Current.Agents)
+                        {
+                            if (a.IsMount && a.IsActive() && (a.RiderAgent == null || a.RiderAgent == agent))
+                            {
+                                float dSq = a.Position.DistanceSquared(engine.HitchPosition);
+                                if (dSq <= closestDistSq)
+                                {
+                                    closestDistSq = dSq;
+                                    horseAgent = a;
+                                }
+                            }
+                        }
+                    }
+
+                    if (horseAgent == null) return false;
+
+                    HitchEngineToHorse(engine, horseAgent);
+                    return true;
+                }
+                else
+                {
+                    DeployEngineToCombat(engine);
+                    return true;
+                }
+            }
+        }
+
+        public static void HitchEngineToHorse(EngineInstance engine, Agent horseAgent)
+        {
+            if (engine == null || horseAgent == null || !horseAgent.IsActive()) return;
+
+            lock (_lockObject)
+            {
+                engine.HorseAgent = horseAgent;
+                engine.SetCombatState(false);
+
+                if (GameNetwork.IsServer)
+                {
+                    GameNetwork.BeginBroadcastModuleEvent();
+                    GameNetwork.WriteMessage(new SetArtilleryCombatStateMessage(engine.Id, false, engine.Frame, horseAgent.Index, engine.SavedAmmo));
+                    GameNetwork.EndBroadcastModuleEvent(GameNetwork.EventBroadcastFlags.AddToMissionRecord, null);
+                }
+
+                InformationManager.DisplayMessage(new InformationMessage(
+                    $"[DWDN Артиллерия] {engine.Spec.Name} запряжен в походную упряжь! Орудие переведено в походный режим.",
+                    Colors.Green
+                ));
             }
         }
 
@@ -853,7 +953,7 @@ namespace DWDN_Script
                 if (GameNetwork.IsServer)
                 {
                     GameNetwork.BeginBroadcastModuleEvent();
-                    GameNetwork.WriteMessage(new SetArtilleryCombatStateMessage(engine.Id, true, engine.Frame));
+                    GameNetwork.WriteMessage(new SetArtilleryCombatStateMessage(engine.Id, true, engine.Frame, -1, engine.SavedAmmo));
                     GameNetwork.EndBroadcastModuleEvent(GameNetwork.EventBroadcastFlags.AddToMissionRecord, null);
                 }
 
@@ -873,7 +973,18 @@ namespace DWDN_Script
                 var engine = _activeEngines.FirstOrDefault(e => e.Id == message.EngineId);
                 if (engine == null) return;
 
+                if (!message.IsCombatState && message.HorseAgentIndex >= 0)
+                {
+                    engine.HorseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.Index == message.HorseAgentIndex);
+                }
+                else if (message.IsCombatState)
+                {
+                    engine.HorseAgent = null;
+                }
+
+                engine.SavedAmmo = message.RemainingAmmo;
                 engine.SetCombatState(message.IsCombatState);
+
                 if (message.Frame.origin.LengthSquared > 0.01f)
                 {
                     engine.Frame = message.Frame;
@@ -882,10 +993,10 @@ namespace DWDN_Script
                     engine.CartEntity?.SetFrame(ref f);
                 }
 
-                InformationManager.DisplayMessage(new InformationMessage(
-                    $"[DWDN Артиллерия] {engine.Spec.Name} приведен в боевое положение!",
-                    Colors.Green
-                ));
+                string msg = message.IsCombatState
+                    ? $"[DWDN Артиллерия] {engine.Spec.Name} приведен в боевое положение!"
+                    : $"[DWDN Артиллерия] {engine.Spec.Name} запряжен в походное положение!";
+                InformationManager.DisplayMessage(new InformationMessage(msg, Colors.Green));
             }
         }
 
@@ -984,39 +1095,6 @@ namespace DWDN_Script
                             }
                         }
                         catch { }
-                    }
-
-                    // 3. ПОДСКАЗКА [F] ОТЦЕПИТЬ КОНЯ ДЛЯ ЛОКАЛЬНОГО ИГРОКА
-                    if (engine.IsHitched && !engine.IsCombatState)
-                    {
-                        Agent mainAgent = Agent.Main;
-                        if (mainAgent != null && mainAgent.IsActive() && !mainAgent.IsMount)
-                        {
-                            float distSq = mainAgent.Position.DistanceSquared(engine.Position);
-                            if (distSq <= InteractRadius * InteractRadius)
-                            {
-                                // Отображаем подсказку отцепки
-                                MBInformationManager.AddQuickInformation(
-                                    new TextObject("{=*}[F] Отцепить коня (Перевести в боевое положение)"),
-                                    0,
-                                    null
-                                );
-
-                                if (Input.IsKeyPressed(InputKey.F))
-                                {
-                                    if (GameNetwork.IsClient)
-                                    {
-                                        GameNetwork.BeginModuleEventAsClient();
-                                        GameNetwork.WriteMessage(new RequestDeployArtilleryMessage(engine.Id));
-                                        GameNetwork.EndModuleEventAsClient();
-                                    }
-                                    else if (GameNetwork.IsServer || !GameNetwork.IsMultiplayer)
-                                    {
-                                        DeployEngineToCombat(engine);
-                                    }
-                                }
-                            }
-                        }
                     }
                 }
             }

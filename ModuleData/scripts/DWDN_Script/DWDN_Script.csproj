@@ -177,6 +177,8 @@
     <Compile Include="Client\UI\DWDN_EquipmentSlotVM.cs" />
     <Compile Include="Client\UI\DWDN_ItemOptionVM.cs" />
     <Compile Include="Client\UI\DWDN_ClassSelectionVM.cs" />
+    <Compile Include="Client\UI\DWDN_ArtilleryHitchVM.cs" />
+    <Compile Include="Client\UI\DWDN_ArtilleryHitchView.cs" />
     <Compile Include="Client\UI\Admin\DWDN_AdminPanelVM.cs" />
     <Compile Include="Client\UI\Admin\DWDN_AdminMissionView.cs" />
   </ItemGroup>

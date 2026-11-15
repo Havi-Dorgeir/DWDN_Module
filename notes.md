@@ -2152,3 +2152,53 @@ if (this._isInWeaponCameraMode)
 - `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
 - `MechanicsTester.exe --cli`: 28 из 28 тестов успешно пройдены (100% pass).
 - `sync_all.ps1`: успешно развернул клиентские и серверные сборки, скрипты и XML в каталог выделенного сервера `DaewdenM` и `DWDN_TRY`.
+
+
+---
+
+### Глава 70: Полная переработка UI и двусторонней сцепки артиллерии (Responsive Artillery Interaction UI & Limber Mechanics)
+
+#### 1. Контекст и проблематика
+- **Симптомы**:
+  1. Всплывающее сверху текстовое окно `MBInformationManager.AddQuickInformation` вызывало постоянный спам при каждом тике в слепом радиусе 3.5 метров.
+  2. Игроку было непонятно, где именно точка сцепки, куда нужно наводиться прицелом и сколько времени удерживать [F].
+  3. Невозможность повторно прицепить орудие к коню после распряжки (отсутствие двусторонней сцепки).
+  4. При упаковке орудия в походное положение не сохранялся остаток боекомплекта орудия.
+
+#### 2. Архитектурные решения
+1. **Математическая виртуальная точка сцепки (без навешивания мешей на модель)**:
+   - В соответствии с решением Создателя, физические коллайдеры или дочерние меши на 3D-модели не навешиваются.
+   - Точка сцепки на дышле рассчитывается динамически в пространстве матрицы орудия:
+     `HitchPosition = Frame.origin + (Frame.rotation.f * 2.2f) + new Vec3(0f, 0f, 0.45f);`
+2. **3D World-to-Screen проекция и отзывчивый Gauntlet UI**:
+   - `GUI/Prefabs/DWDN_ArtilleryHitchHUD.xml`:
+     * 3D-маяк (`Hitch3DMarker`), проецируемый на дышло через `CombatCamera.WorldPointToViewPortPoint`, показывающий точное местоположение замка сцепки.
+     * Прицельный HUD (`CrosshairPromptPanel`) прямо под перекрестием со статусной строкой и плавной полосой прогресса удержания (`ProgressFillWidth`).
+   - `DWDN_ArtilleryHitchVM.cs`: ViewModel со свойствами `IsPromptVisible`, `PromptText`, `Progress`, `ProgressFillWidth`, `IsMarkerVisible`, `MarkerX`, `MarkerY`, `CanInteract`.
+   - `DWDN_ArtilleryHitchView.cs`: Клиентский `MissionView` (Gauntlet layer 16), отслеживающий угол взгляда (конус ~28 градусов, `dot >= 0.88f`), дистанцию (<= 2.5м) и 2-секундное удержание [F].
+3. **Тактическое удержание и прерывание уроном**:
+   - Время удержания [F] составляет 2.0 секунды.
+   - Получение любого урона (`Health < _lastHealth - 0.01f`) немедленно сбивает таймер в ноль, исключая мгновенную упаковку/развертывание под огнем.
+4. **Двусторонняя сцепка/отцепка (Combat <-> Travel)**:
+   - Отцепка (походный -> боевой): активирует орудие и камни, освобождает коня от ограничения скорости шага (2.2 м/с).
+   - Впряжка (боевой -> походный): деактивирует орудие, сохраняет оставшийся боезапас (`SavedAmmo = SiegeWeapon.AmmoCount`), находит свободного коня в радиусе 3.5м дышла (включая трофейных коней врага и оседланного коня артиллериста) и привязывает орудие в походную упряжь.
+5. **Сетевой протокол**:
+   - `RequestToggleArtilleryHitchMessage` (клиент -> сервер): `EngineId`, `HorseAgentIndex`, `Attach`.
+   - `SetArtilleryCombatStateMessage` (сервер -> клиент): дополнен `HorseAgentIndex` и `RemainingAmmo` для синхронизации клиента.
+   - Полномочия: только создатель орудия или союзный артиллерист (`mp_Artillerist`).
+
+#### 3. Модифицированные и созданные артефакты
+- [GUI/Prefabs/DWDN_ArtilleryHitchHUD.xml](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/GUI/Prefabs/DWDN_ArtilleryHitchHUD.xml)
+- [ModuleData/scripts/DWDN_Script/Client/UI/DWDN_ArtilleryHitchVM.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Client/UI/DWDN_ArtilleryHitchVM.cs)
+- [ModuleData/scripts/DWDN_Script/Client/UI/DWDN_ArtilleryHitchView.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Client/UI/DWDN_ArtilleryHitchView.cs)
+- [ModuleData/scripts/DWDN_Script/Common/Network/DWDN_NetworkMessages.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Common/Network/DWDN_NetworkMessages.cs)
+- [ModuleData/scripts/DWDN_Script/DWDN_FieldArtilleryBehavior.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/DWDN_FieldArtilleryBehavior.cs)
+- [ModuleData/scripts/DWDN_Script/Client/Behaviors/DWDN_ClientMissionComponent.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Client/Behaviors/DWDN_ClientMissionComponent.cs)
+- [ModuleData/scripts/DWDN_Script/DWDN_Script.csproj](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/DWDN_Script.csproj)
+- [sync_all.ps1](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/sync_all.ps1)
+
+#### 4. Верификация
+- `dotnet build DWDN_Script.csproj` (Client Release): 0 ошибок, 23 предупреждения MSIL (штатные).
+- `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок, 0 предупреждений.
+- `MechanicsTester.exe --cli`: 28/28 тестов пройдено (100% pass).
+- `sync_all.ps1`: Все бинарники, скрипты, XML и GUI prefabs синхронизированы в Dedicated Server (`DaewdenM` и `DWDN_TRY`).

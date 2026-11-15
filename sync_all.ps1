@@ -131,4 +131,15 @@ if (Test-Path "$masterDir\ModuleData\mpitems") {
     Copy-Item "$masterDir\ModuleData\mpitems\*" "$banAiDir\ModuleData\mpitems\" -Recurse -Force
 }
 
+# 8. Mirror GUI prefabs
+if (Test-Path "$masterDir\GUI") {
+    Write-Host "Mirroring GUI prefabs..." -ForegroundColor Gray
+    New-Item -ItemType Directory -Force -Path "$serverDir\GUI" | Out-Null
+    New-Item -ItemType Directory -Force -Path "$serverDir2\GUI" | Out-Null
+    New-Item -ItemType Directory -Force -Path "$banAiDir\GUI" | Out-Null
+    Copy-Item "$masterDir\GUI\*" "$serverDir\GUI\" -Recurse -Force
+    Copy-Item "$masterDir\GUI\*" "$serverDir2\GUI\" -Recurse -Force
+    Copy-Item "$masterDir\GUI\*" "$banAiDir\GUI\" -Recurse -Force
+}
+
 Write-Host "Sync successful! Master DWDN_TRY -> DaewdenM (Dedicated Server) fully deployed." -ForegroundColor Green

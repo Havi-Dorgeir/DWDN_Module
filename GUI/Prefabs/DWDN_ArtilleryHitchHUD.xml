@@ -1,0 +1,33 @@
+<Prefab>
+  <Window>
+    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" DoNotAcceptNavigation="true" DoNotPassEventsToChildren="false">
+      <Children>
+        
+        <!-- 1. 3D-Маяк в мире на дышле орудия (показывает игроку, куда наводиться) -->
+        <Widget Id="Hitch3DMarker" SuggestedWidth="20" SuggestedHeight="20" PositionXOffset="@MarkerX" PositionYOffset="@MarkerY" IsVisible="@IsMarkerVisible" Sprite="BlankWhiteSquare_9" Color="#38BDF8B0" AlphaFactor="0.85">
+          <Children>
+            <Widget SuggestedWidth="10" SuggestedHeight="10" HorizontalAlignment="Center" VerticalAlignment="Center" Sprite="BlankWhiteSquare_9" Color="#FFFFFFFF" />
+          </Children>
+        </Widget>
+
+        <!-- 2. Прицельный HUD взаимодействия прямо под перекрестием -->
+        <Widget Id="CrosshairPromptPanel" SuggestedWidth="420" SuggestedHeight="60" HorizontalAlignment="Center" VerticalAlignment="Center" MarginTop="70" IsVisible="@IsPromptVisible" Sprite="panel_dent_9" Color="#070A10F4">
+          <Children>
+            
+            <!-- Статусная строка действия -->
+            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginTop="10" MarginLeft="12" MarginRight="12" Brush="MPLobby.Clan.Paragraph.Text" Brush.FontSize="15" Brush.TextHorizontalAlignment="Center" Text="@PromptText" />
+
+            <!-- Полоса удержания [F] (Hold Progress Bar, 2.0 сек) -->
+            <Widget SuggestedWidth="340" SuggestedHeight="8" HorizontalAlignment="Center" MarginTop="38" Sprite="BlankWhiteSquare_9" Color="#1E293B99">
+              <Children>
+                <Widget HorizontalAlignment="Left" WidthSizePolicy="Fixed" SuggestedWidth="@ProgressFillWidth" SuggestedHeight="8" Sprite="BlankWhiteSquare_9" Color="#38BDF8FF" />
+              </Children>
+            </Widget>
+
+          </Children>
+        </Widget>
+
+      </Children>
+    </Widget>
+  </Window>
+</Prefab>

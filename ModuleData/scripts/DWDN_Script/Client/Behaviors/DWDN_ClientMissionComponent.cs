@@ -60,6 +60,19 @@ namespace DWDN_Script.Client.Behaviors
                     }
                 }
 
+                if (Mission.GetMissionBehavior<DWDN_ArtilleryHitchView>() == null)
+                {
+                    try
+                    {
+                        screen.AddMissionView(new DWDN_ArtilleryHitchView());
+                        Debug.Print("[DWDN] DWDN_ArtilleryHitchView успешно установлен через AddMissionView.");
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Debug.Print($"[DWDN ERROR] Ошибка при установке DWDN_ArtilleryHitchView: {ex}");
+                    }
+                }
+
                 _installed = true;
             }
         }

@@ -39,6 +39,45 @@ namespace DWDN_Script.Common.Network
     }
 
     /// <summary>
+    /// Сетевой пакет: запрос игрока на сцепку или отцепку коня (двустороннее действие).
+    /// Отправляется клиентом на сервер при удержании [F] на дышле орудия.
+    /// </summary>
+    [DefineGameNetworkMessageTypeForMod(GameNetworkMessageSendType.FromClient)]
+    public sealed class RequestToggleArtilleryHitchMessage : GameNetworkMessage
+    {
+        public int EngineId { get; set; }
+        public int HorseAgentIndex { get; set; } = -1;
+        public bool Attach { get; set; }
+
+        public RequestToggleArtilleryHitchMessage() { }
+        public RequestToggleArtilleryHitchMessage(int engineId, int horseAgentIndex, bool attach)
+        {
+            EngineId = engineId;
+            HorseAgentIndex = horseAgentIndex;
+            Attach = attach;
+        }
+
+        protected override void OnWrite()
+        {
+            WriteIntToPacket(EngineId, CompressionBasic.DebugIntNonCompressionInfo);
+            WriteAgentIndexToPacket(HorseAgentIndex);
+            WriteBoolToPacket(Attach);
+        }
+
+        protected override bool OnRead()
+        {
+            bool bufferReadValid = true;
+            EngineId = ReadIntFromPacket(CompressionBasic.DebugIntNonCompressionInfo, ref bufferReadValid);
+            HorseAgentIndex = ReadAgentIndexFromPacket(ref bufferReadValid);
+            Attach = ReadBoolFromPacket(ref bufferReadValid);
+            return bufferReadValid;
+        }
+
+        protected override MultiplayerMessageFilter OnGetLogFilter() => MultiplayerMessageFilter.GameMode;
+        protected override string OnGetLogFormat() => $"RequestToggleArtilleryHitchMessage: EngineId={EngineId}, Horse={HorseAgentIndex}, Attach={Attach}";
+    }
+
+    /// <summary>
     /// Сетевой пакет: полная рекурсивная синхронизация MissionObjectId всех вложенных
     /// узлов осадного орудия (StandingPoint, SiegeMachineStonePile, ammo_pos и др.) от сервера к клиентам.
     /// Также передает индекс упряжной лошади и флаг использования ванильной тележки.
@@ -117,6 +156,8 @@ namespace DWDN_Script.Common.Network
         public int EngineId { get; set; }
         public bool IsCombatState { get; set; }
         public MatrixFrame Frame { get; set; }
+        public int HorseAgentIndex { get; set; } = -1;
+        public int RemainingAmmo { get; set; } = 25;
 
         public SetArtilleryCombatStateMessage() { }
         public SetArtilleryCombatStateMessage(int engineId, bool isCombatState, MatrixFrame frame)
@@ -124,6 +165,16 @@ namespace DWDN_Script.Common.Network
             EngineId = engineId;
             IsCombatState = isCombatState;
             Frame = frame;
+            HorseAgentIndex = -1;
+            RemainingAmmo = 25;
+        }
+        public SetArtilleryCombatStateMessage(int engineId, bool isCombatState, MatrixFrame frame, int horseAgentIndex, int remainingAmmo)
+        {
+            EngineId = engineId;
+            IsCombatState = isCombatState;
+            Frame = frame;
+            HorseAgentIndex = horseAgentIndex;
+            RemainingAmmo = remainingAmmo;
         }
 
         protected override void OnWrite()
@@ -131,6 +182,8 @@ namespace DWDN_Script.Common.Network
             WriteIntToPacket(EngineId, CompressionBasic.DebugIntNonCompressionInfo);
             WriteBoolToPacket(IsCombatState);
             WriteMatrixFrameToPacket(Frame);
+            WriteAgentIndexToPacket(HorseAgentIndex);
+            WriteIntToPacket(RemainingAmmo, CompressionBasic.DebugIntNonCompressionInfo);
         }
 
         protected override bool OnRead()
@@ -139,11 +192,13 @@ namespace DWDN_Script.Common.Network
             EngineId = ReadIntFromPacket(CompressionBasic.DebugIntNonCompressionInfo, ref bufferReadValid);
             IsCombatState = ReadBoolFromPacket(ref bufferReadValid);
             Frame = ReadMatrixFrameFromPacket(ref bufferReadValid);
+            HorseAgentIndex = ReadAgentIndexFromPacket(ref bufferReadValid);
+            RemainingAmmo = ReadIntFromPacket(CompressionBasic.DebugIntNonCompressionInfo, ref bufferReadValid);
             return bufferReadValid;
         }
 
         protected override MultiplayerMessageFilter OnGetLogFilter() => MultiplayerMessageFilter.GameMode;
-        protected override string OnGetLogFormat() => $"SetArtilleryCombatStateMessage: EngineId={EngineId}, Combat={IsCombatState}";
+        protected override string OnGetLogFormat() => $"SetArtilleryCombatStateMessage: EngineId={EngineId}, Combat={IsCombatState}, Horse={HorseAgentIndex}, Ammo={RemainingAmmo}";
     }
 
     /// <summary>
