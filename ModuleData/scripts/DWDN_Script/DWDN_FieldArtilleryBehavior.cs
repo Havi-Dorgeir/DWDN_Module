@@ -888,8 +888,9 @@ namespace DWDN_Script
                     {
                         horseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.Index == message.HorseAgentIndex);
                     }
-                    if (horseAgent == null || !horseAgent.IsMount || !horseAgent.IsActive())
+                    if (horseAgent == null || !horseAgent.IsMount || !horseAgent.IsActive() || (horseAgent.RiderAgent != null && horseAgent.RiderAgent != agent))
                     {
+                        horseAgent = null;
                         // Fallback: ищем ближайшего свободного коня (включая трофейных коней врага!)
                         float closestDistSq = 4.0f * 4.0f;
                         foreach (var a in Mission.Current.Agents)
@@ -949,6 +950,7 @@ namespace DWDN_Script
             lock (_lockObject)
             {
                 engine.SetCombatState(true);
+                engine.HorseAgent = null;
 
                 if (GameNetwork.IsServer)
                 {

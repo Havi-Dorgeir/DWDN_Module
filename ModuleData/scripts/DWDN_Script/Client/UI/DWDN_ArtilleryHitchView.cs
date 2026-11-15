@@ -101,10 +101,13 @@ namespace DWDN_Script.Client.UI
             if (cam != null)
             {
                 Vec3 vp = cam.WorldPointToViewPortPoint(ref hitchPos);
-                if (vp.z > 0f && vp.x >= 0f && vp.x <= 1f && vp.y >= 0f && vp.y <= 1f)
+                if (!float.IsNaN(vp.x) && !float.IsNaN(vp.y) && vp.z > 0.2f && vp.x >= 0f && vp.x <= 1f && vp.y >= 0f && vp.y <= 1f)
                 {
-                    _viewModel.MarkerX = (vp.x * Screen.RealScreenResolutionWidth) - 10f;
-                    _viewModel.MarkerY = ((1.0f - vp.y) * Screen.RealScreenResolutionHeight) - 10f;
+                    float scale = (_layer != null && _layer.Scale > 0.01f) ? _layer.Scale : 1.0f;
+                    float screenW = Screen.RealScreenResolutionWidth / scale;
+                    float screenH = Screen.RealScreenResolutionHeight / scale;
+                    _viewModel.MarkerX = (vp.x * screenW) - 10f;
+                    _viewModel.MarkerY = ((1.0f - vp.y) * screenH) - 10f;
                     _viewModel.IsMarkerVisible = true;
                 }
                 else
