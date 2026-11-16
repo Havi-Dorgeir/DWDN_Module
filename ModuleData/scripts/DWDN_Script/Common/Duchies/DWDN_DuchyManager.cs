@@ -225,8 +225,8 @@ namespace DWDN_Script.Common.Duchies
             artillerist.AllowedLegs.AddRange(new[] { "banobranyi_leg", "crossbowman_leggings", "officer_legs" });
             // Слот 0: Оружие ближнего боя на выбор (строго одно оружие)
             artillerist.AllowedWeaponsSlot0.AddRange(new[] { "dwdn_cleaver", "dwdn_falchion", "mp_vlandian_hammer", "mp_vlandian_short_sword" });
-            // Слот 1: Заявка на осадное орудие на выбор
-            artillerist.AllowedWeaponsSlot1.AddRange(new[] { "dwdn_order_mangonel", "dwdn_order_ballista" });
+            // Слот 1: Заявка на осадное орудие на выбор (или пустой слот - пеший бой без орудия)
+            artillerist.AllowedWeaponsSlot1.AddRange(new[] { "dwdn_order_mangonel", "dwdn_order_ballista", "" });
             // Слоты 2 и 3 намеренно не заполняются, чтобы не плодить пустые строки в интерфейсе
             artillerist.DefaultLoadout = artillerist.CreateDefaultLoadout(banreich.Id);
             banreich.Classes.Add(artillerist);

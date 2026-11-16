@@ -807,7 +807,8 @@ namespace DWDN_Script
                 Agent horseAgent = null;
                 if (message.HorseAgentIndex >= 0)
                 {
-                    horseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.Index == message.HorseAgentIndex);
+                    horseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.IsMount && a.Index == message.HorseAgentIndex)
+                                 ?? Mission.Current?.Agents?.FirstOrDefault(a => a.IsMount);
                     if (horseAgent != null && horseAgent.IsActive())
                     {
                         try
@@ -878,16 +879,22 @@ namespace DWDN_Script
                 var engine = _activeEngines.FirstOrDefault(e => e.Id == message.EngineId);
                 if (engine == null || engine.IsDestroyed) return false;
 
-                // 1. Проверка прав: создатель орудия или класс артиллериста
+                // 1. Проверка прав: создатель орудия, возница, класс артиллериста или союзник
                 bool isOwner = !string.IsNullOrEmpty(engine.OwnerPlayerId) &&
                                (engine.OwnerPlayerId == (peer.VirtualPlayer?.Id.ToString() ?? "") ||
                                 engine.OwnerPlayerId == peer.UserName);
                 bool isArtillerist = agent.Character?.StringId?.IndexOf("artillerist", StringComparison.OrdinalIgnoreCase) >= 0;
-                if (!isOwner && !isArtillerist) return false;
+                bool isDriver = (agent.MountAgent != null && engine.HorseAgent == agent.MountAgent);
+                bool isFriendly = !GameNetwork.IsMultiplayer || agent.Team == null || agent.Team.Side == engine.TeamSide;
 
-                // 2. Проверка дистанции бойца до дышла
-                float dist = agent.Position.Distance(engine.HitchPosition);
-                if (dist > 3.4f) return false;
+                if (!isOwner && !isArtillerist && !isDriver && !isFriendly) return false;
+
+                // 2. Проверка дистанции бойца до дышла (для возницы дистанция гарантирована)
+                if (!isDriver)
+                {
+                    float dist = agent.Position.Distance(engine.HitchPosition);
+                    if (dist > 3.8f) return false;
+                }
 
                 // 3. Выполнение сцепки или отцепки
                 if (message.Attach)
@@ -897,7 +904,7 @@ namespace DWDN_Script
                     Agent horseAgent = null;
                     if (message.HorseAgentIndex >= 0)
                     {
-                        horseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.Index == message.HorseAgentIndex);
+                        horseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.IsMount && a.Index == message.HorseAgentIndex);
                     }
                     if (horseAgent == null || !horseAgent.IsMount || !horseAgent.IsActive() || (horseAgent.RiderAgent != null && horseAgent.RiderAgent != agent) || IsHorseHitched(horseAgent))
                     {
@@ -1013,7 +1020,8 @@ namespace DWDN_Script
 
                 if (!message.IsCombatState && message.HorseAgentIndex >= 0)
                 {
-                    engine.HorseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.Index == message.HorseAgentIndex);
+                    engine.HorseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.IsMount && a.Index == message.HorseAgentIndex)
+                                        ?? Mission.Current?.Agents?.FirstOrDefault(a => a.IsMount);
                 }
 
                 engine.SavedAmmo = message.RemainingAmmo;
@@ -1303,8 +1311,8 @@ namespace DWDN_Script
                 catch { }
             }
 
-            // Если не артиллерист и нет чертежей — спавнить ничего не нужно
-            if (!isArtillerist && !hasArtilleryBlueprint) return;
+            // Если нет чертежей осадного орудия — спавнить ничего не нужно (артиллерист воюет пешим)
+            if (!hasArtilleryBlueprint) return;
 
             EngineTypeSpec chosenSpec = wantsBallista ? GetSpecForType("ballista") : GetSpecForType("mangonel");
             if (chosenSpec == null) return;
@@ -1401,10 +1409,15 @@ namespace DWDN_Script
                     _spawnedAgentIndices.Add(agent.Index);
                 }
 
+                if (engine.HorseAgent != null && agent.MountAgent == null)
+                {
+                    try { agent.Mount(engine.HorseAgent); } catch { }
+                }
+
                 if (agent.IsPlayerControlled)
                 {
                     InformationManager.DisplayMessage(new InformationMessage(
-                        $"[DWDN Артиллерия] Ваш {chosenSpec.Name} запряжен и готов к движению! Садитесь на лошадь верхом. На позиции нажмите [F], чтобы отцепить коня.",
+                        $"[DWDN Артиллерия] Ваш {chosenSpec.Name} запряжен и готов к движению! На позиции нажмите [F], чтобы отцепить коня.",
                         Colors.Green
                     ));
                 }

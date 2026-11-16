@@ -2439,3 +2439,79 @@ if (this._isInWeaponCameraMode)
 - `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
 - `MechanicsTester.exe --cli`: 30 из 30 тестов пройдены успешно (100% pass).
 - `sync_all.ps1`: Модули `DaewdenM` и `DWDN_TRY` обновлены.
+
+
+---
+
+### Глава 78: Устранение краха 0xe0434352 при спавне Осадных дел мастера и разделение пешего/конного режима артиллерии (16.11.2026)
+
+#### 1. Симптом и первопричина управляемого исключения (0xe0434352)
+- **Симптом**: При выборе и спавне класса Осадных дел мастер (`mp_Artillerist`) клиент игры мгновенно аварийно завершался с кодом `0xe0434352` (Managed .NET CLR Exception) сразу после получения `SyncArtilleryDescendantsMessage` и зеркалирования онагра (`mangonel_a`). Выделенный сервер при этом продолжал функционировать в штатном режиме.
+- **Первопричина**:
+  1. **Коллизия сетевых индексов агентов при поиске тяглового коня**:
+     В `DWDN_FieldArtilleryBehavior.cs` в методе `HandleServerSyncDescendants` (и `HandleServerCombatState`) конь для сцепки извлекался строкой:
+     ```csharp
+     horseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.Index == message.HorseAgentIndex);
+     ```
+     Когда сервер спавнил тяглового коня как первого монстра на сервере, ему присваивался `Index = 0`. В то же время на клиенте агент игрока-человека также имел сетевой `agent-index: 0`. Из-за отсутствия проверки флага `a.IsMount` метод `FirstOrDefault` находил агента игрока вместо коня и устанавливал `instance.HorseAgent = playerAgent`!
+     В результате в первом же кадре `OnMissionTick` орудие позиционировалось непосредственно за спиной пешего игрока и вызывало фатальное наложение коллизий/исключение.
+  2. **Отсутствие опции спавна пешим без орудия**:
+     В `CheckAndSpawnArtilleryForAgent` стояла проверка:
+     `if (!isArtillerist && !hasArtilleryBlueprint) return;`
+     Если игрок играл за артиллериста, но не хотел брать осадное орудие, машина все равно принудительно спавнилась, не позволяя артиллеристу сражаться обычной пехотой.
+
+#### 2. Внесенные минимально необходимые исправления
+1. **[DWDN_FieldArtilleryBehavior.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/DWDN_FieldArtilleryBehavior.cs)**:
+   - В `HandleServerSyncDescendants` (строка 810) и `HandleServerCombatState` (строка 1016) поиск коня строго изолирован проверкой `a.IsMount`:
+     ```csharp
+     horseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.IsMount && a.Index == message.HorseAgentIndex)
+                  ?? Mission.Current?.Agents?.FirstOrDefault(a => a.IsMount);
+     ```
+   - В `CheckAndSpawnArtilleryForAgent`:
+     Строгое условие: `if (!hasArtilleryBlueprint) return;` — если в лодауте слот орудия пуст, спавн отменяется, и артиллерист идет в бой пешим.
+     Если же орудие выбрано: артиллерист сразу сажается верхом на запряженного тяглового коня `agent.Mount(engine.HorseAgent)`.
+2. **[DWDN_DuchyManager.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Common/Duchies/DWDN_DuchyManager.cs)**:
+   - В `AllowedWeaponsSlot1` добавлена пустая строка `""`:
+     `artillerist.AllowedWeaponsSlot1.AddRange(new[] { "dwdn_order_mangonel", "dwdn_order_ballista", "" });`
+     Это дает игроку возможность в UI кастомизации выбрать пустой слот и спавниться пешим бойцом.
+
+#### 3. Верификация
+- `dotnet build DWDN_Script.csproj` (Client Release): 0 ошибок.
+- `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
+- `MechanicsTester.exe --cli`: 30 из 30 тестов пройдены успешно (100% pass).
+- `sync_all.ps1`: Все бинарники, скрипты и XML синхронизированы в `DaewdenM` и `DWDN_TRY`.
+
+
+---
+
+### Глава 79: Восстановление интерфейса сцепки/расцепки для конного артиллериста (Driver-Aware Artillery Hitch HUD) (16.11.2026)
+
+#### 1. Симптоматика и анализ блокировки интерфейса
+- **Симптом**: При спавне артиллериста в седле запряженной тягловой лошади подсказка и шкала удержания `[F]` для расцепки орудия (`DWDN_ArtilleryHitchHUD`) не появлялись на экране, даже если игрок нажимал или удерживал `[F]`.
+- **Первопричина**:
+  1. **Векторная блокировка угла прицеливания (`dot < 0.88f`)**:
+     В `DWDN_ArtilleryHitchView.cs` проверка направления прицела требовала `Vec3.DotProduct(camDir, toHitch) >= 0.88f`. Когда артиллерист находится в седле, он смотрит вперед по ходу коня (`camDir` направлен вперед), а дышло сцепки находится позади него (`toHitch` направлен назад). Скалярное произведение составляло `~ -1.0f`, из-за чего строка `if (dot < 0.88f) { ResetPromptOnly(); return; }` гасила интерфейс на каждом тике.
+  2. **Сетевая потеря прав на клиенте**:
+     `SyncArtilleryDescendantsMessage` не передавал строку `OwnerPlayerId`. Агент игрока в движке Bannerlord порождается под базовым ID культуры (`mp_vlandia_...`), поэтому `mainAgent.Character.StringId` не содержал подстроку `"artillerist"`. После исключения флага `isFriendly` клиент считал игрока посторонним и блокировал управление сцепкой.
+
+#### 2. Внесенные хирургические исправления
+1. **[DWDN_ArtilleryHitchView.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Client/UI/DWDN_ArtilleryHitchView.cs)**:
+   - В поиск орудий внедрено мгновенное связывание по запряженному коню:
+     `if (mainAgent.MountAgent != null && eng.HorseAgent == mainAgent.MountAgent) { closestEngine = eng; break; }`
+   - Введено распознавание верхового возницы:
+     `bool isDriver = (mainAgent.MountAgent != null && closestEngine.HorseAgent == mainAgent.MountAgent);`
+   - Для возницы (`isDriver`):
+     * Отключены геометрические проверки окклюзии орудия и проверка взгляда назад (`dot < 0.88f`), так как вознице в седле не требуется целиться назад в дышло.
+     * Отключен 3D-маркер на спине собственного коня, чтобы не загромождать обзор.
+     * Гарантировано отображение `_viewModel.PromptText = "[F] Удерживайте, чтобы отцепить орудие (Боевой режим)"` и доступность взаимодействия `canInteract = true`.
+   - Восстановлена проверка `isFriendly` (`mainAgent.Team.Side == closestEngine.TeamSide`) и `isDriver` в фильтре авторизации.
+2. **[DWDN_FieldArtilleryBehavior.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/DWDN_FieldArtilleryBehavior.cs)**:
+   - В серверном валидаторе `HandleClientToggleHitchRequest` добавлена проверка `isDriver` (`agent.MountAgent == engine.HorseAgent`) и `isFriendly` (`agent.Team.Side == engine.TeamSide`).
+   - Для возницы (`isDriver`) снято ложное отсечение по дистанции пешего бойца (`dist > 3.4f`).
+   - В поиске коня по индексу добавлена изоляция `a.IsMount` во избежание коллизий индексов.
+
+#### 3. Верификация
+- `dotnet build DWDN_Script.csproj` (Client Release): 0 ошибок.
+- `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
+- `MechanicsTester.exe --cli`: 30 из 30 тестов пройдены успешно (100% pass).
+- `sync_all.ps1`: Модули `DaewdenM` и `DWDN_TRY` полностью обновлены и синхронизированы.
