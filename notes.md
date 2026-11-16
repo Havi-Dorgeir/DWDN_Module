@@ -2515,3 +2515,21 @@ if (this._isInWeaponCameraMode)
 - `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
 - `MechanicsTester.exe --cli`: 30 из 30 тестов пройдены успешно (100% pass).
 - `sync_all.ps1`: Модули `DaewdenM` и `DWDN_TRY` полностью обновлены и синхронизированы.
+
+
+---
+
+### Глава 80: Временная консервация класса Хорунжий (mp_Khorunzhiy) (16.11.2026)
+
+#### 1. Задача и цель вмешательства
+- **Цель**: По распоряжению Создателя временно законсервировать (закомментировать) класс Хорунжий (`mp_Khorunzhiy`) в доступном ростере классов герцогства Banreich, не затрагивая при этом остальные классы и наработанную стабильность артиллерии.
+
+#### 2. Внесенные изменения
+- **[DWDN_DuchyManager.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Common/Duchies/DWDN_DuchyManager.cs)**:
+  Блок регистрации класса `mp_Khorunzhiy` и вызов `banreich.Classes.Add(khorunzhiy)` временно обернуты в блочный комментарий `/* ... */`. Класс исключен из списка выбора классов в UI (`DWDN_SelectionMissionView`).
+
+#### 3. Верификация
+- `dotnet build DWDN_Script.csproj` (Client Release): 0 ошибок.
+- `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
+- `MechanicsTester.exe --cli`: 30 из 30 тестов пройдены успешно (100% pass).
+- `sync_all.ps1`: Обновленные библиотеки развернуты на `DaewdenM` и `DWDN_TRY`.

@@ -132,7 +132,8 @@ namespace DWDN_Script.Common.Duchies
             sotnik.DefaultLoadout = sotnik.CreateDefaultLoadout(banreich.Id);
             banreich.Classes.Add(sotnik);
 
-            // 6.1 Хорунжий (Элитный пехотинец в доспехах Рюндаля)
+            // 6.1 Хорунжий (Элитный пехотинец в доспехах Рюндаля) - ВРЕМЕННО ОТКЛЮЧЕН
+            /*
             var khorunzhiy = new DWDN_ClassDefinition(
                 "mp_Khorunzhiy",
                 "Хорунжий",
@@ -148,6 +149,7 @@ namespace DWDN_Script.Common.Duchies
             khorunzhiy.AllowedWeaponsSlot1.AddRange(new[] { "rundal_shield", "" });
             khorunzhiy.DefaultLoadout = khorunzhiy.CreateDefaultLoadout(banreich.Id);
             banreich.Classes.Add(khorunzhiy);
+            */
 
             // 7. Знаменосец (Штандарт герцогства)
             var bannerman = new DWDN_ClassDefinition(
