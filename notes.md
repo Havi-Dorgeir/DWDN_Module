@@ -2533,3 +2533,22 @@ if (this._isInWeaponCameraMode)
 - `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
 - `MechanicsTester.exe --cli`: 30 из 30 тестов пройдены успешно (100% pass).
 - `sync_all.ps1`: Обновленные библиотеки развернуты на `DaewdenM` и `DWDN_TRY`.
+
+
+---
+
+### Глава 81: Релиз v1.1.0: Публикация модуля и актуализация версии для лаунчера (17.11.2026)
+
+#### 1. Цель
+- **Цель**: Актуализировать отображение версии модуля в официальном лаунчере Bannerlord до `v1.1.0`, зафиксировать стабильное состояние в истории Git с тегом `v1.1.0`, отправить изменения в удаленный репозиторий GitHub и опубликовать релиз.
+
+#### 2. Внесенные изменения
+- **[SubModule.xml](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/SubModule.xml)**:
+  Параметр `<Version value="v1.0.0.0"/>` обновлен на `<Version value="v1.1.0"/>`. Теперь в лаунчере игры модуль отображается с версией **v1.1.0**.
+- **Синхронизация**: Скрипт `sync_all.ps1` обновил `SubModule.xml` и бинарники в модулях `DaewdenM` (Dedicated Server) и локальных каталогах.
+
+#### 3. Верификация
+- `MechanicsTester.exe --cli`: 30 из 30 тестов пройдены успешно (100% pass rate).
+- `git tag -a v1.1.0 -m "Release v1.1.0"`: создан релизный тег.
+- `git push origin main --tags`: отправлено на GitHub.
+- GitHub Release `v1.1.0`: сформирован и опубликован через REST API с прикрепленным архивом модуля.
