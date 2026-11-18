@@ -2607,3 +2607,33 @@ if (this._isInWeaponCameraMode)
 #### 3. Верификация
 - MechanicsTester.exe --cli: 30 из 30 тестов пройдены успешно (100% pass rate).
 - sync_all.ps1: Все XML матрицы перенесены на Dedicated Server DaewdenM.
+
+---
+
+### Глава 83: Балансировка кавалерии: пешая скорость тяжелой пехоты, кони и бронирование (18.11.2026)
+
+#### 1. Тактический замысел
+- **Пеший строй кавалерии**: По указанию Создателя все спешенные всадники приравнены по скорости и ускорению к тяжелой пехоте (combat_movement_speed="0.68 - 0.69", movement_speed="0.72 - 0.73", cceleration="1.8 - 2.0").
+- **Скорость на коне**: Обычный всадник (mp_DWDN_Cav) снаряжен более легким и быстроходным конем охотничьей породы (mp_vlandia_horse_faster, базовая скорость 42), повышенным навыком верховой езды (Riding="140") и более легкой полукольчужной попоной (mp_halfchain_barding, вес 65 кг, броня 20). В результате всадник превосходит в скорости тяжелых рыцарей, баронов и короля.
+- **Бронирование всадника и коня**: 
+  * Рыцари, бароны и король защищены сверхтяжелой броней (всадник 38-42, боевой конь mp_vlandia_horse_war / mp_battania_horse_war с полным доспехом mp_chain_barding брони 25 и запасом здоровья 60-70 HP).
+  * Обычный всадник (mp_DWDN_Cav) имеет облегченное бронирование (всадник 28, конь mp_halfchain_barding брони 20 и запасом здоровья 15 HP).
+
+#### 2. Внесенные изменения
+1. **[mpclassdivisions.xml](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpclassdivisions.xml)**:
+   - mp_DWDN_Cav: rmor="28", movement_speed="0.73", combat_movement_speed="0.69", cceleration="2.0".
+   - mp_Knight: rmor="38", movement_speed="0.72", combat_movement_speed="0.68", cceleration="1.8". В перке "Warhorse" конь заменен на mp_vlandia_horse_war.
+   - mp_Bergen_Klaus: rmor="40", movement_speed="0.72", combat_movement_speed="0.68", cceleration="1.8".
+   - mp_Finnard_Valerian: rmor="40", movement_speed="0.72", combat_movement_speed="0.68", cceleration="1.8".
+   - mp_ALberic_Devald_hero: rmor="42", movement_speed="0.72", combat_movement_speed="0.68", cceleration="1.8".
+
+2. **[mpcharacters.xml](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpcharacters.xml)**:
+   - mp_DWDN_Cav (_hero & _troop): Конь заменен на Item.mp_vlandia_horse_faster (Hunter, скорость 42), попона на Item.mp_halfchain_barding (броня 20, вес 65 кг), навык Riding="140".
+   - mp_Knight (_hero & _troop): Навык Riding="130".
+   - mp_Bergen_Klaus (_hero & _troop): Конь заменен на Item.mp_vlandia_horse_war (Charger, скорость 35, здоровье 60), навык Riding="135".
+   - mp_Finnard_Valerian (_hero & _troop): Конь заменен на Item.mp_vlandia_horse_war (Charger, скорость 35, здоровье 60), навык Riding="135".
+   - mp_ALberic_Devald (_hero & _troop): Навык Riding="140".
+
+#### 3. Верификация
+- MechanicsTester.exe --cli: 30 из 30 тестов пройдены успешно (100% pass rate).
+- sync_all.ps1: Все XML матрицы развернуты на Dedicated Server DaewdenM.

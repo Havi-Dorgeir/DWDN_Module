@@ -7,7 +7,7 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="150" />
+			<skill id="Riding" value="140" />
 			<skill id="OneHanded" value="150" />
 			<skill id="TwoHanded" value="140" />
 			<skill id="Polearm" value="140" />
@@ -37,7 +37,7 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="150" />
+			<skill id="Riding" value="135" />
 			<skill id="OneHanded" value="140" />
 			<skill id="TwoHanded" value="130" />
 			<skill id="Polearm" value="140" />
@@ -55,7 +55,7 @@
 				<equipment slot="Leg" id="Item.bergen_legs" />
 				<equipment slot="Cape" id="Item.bergen_hood" />
 				<equipment slot="Gloves" id="Item.gothic_gloves" />
-				<equipment slot="Horse" id="Item.mp_vlandia_horse" />
+				<equipment slot="Horse" id="Item.mp_vlandia_horse_war" />
 				<equipment slot="HorseHarness" id="Item.mp_chain_barding" />
 			</EquipmentRoster>
 		</Equipments>
@@ -68,7 +68,7 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="150" />
+			<skill id="Riding" value="135" />
 			<skill id="OneHanded" value="140" />
 			<skill id="TwoHanded" value="120" />
 			<skill id="Polearm" value="150" />
@@ -85,7 +85,7 @@
 				<equipment slot="Leg" id="Item.Baron_Finard_gothiclegs" />
 				<equipment slot="Cape" id="Item.finard_cape" />
 				<equipment slot="Gloves" id="Item.Baron_Finard_gauntlet" />
-				<equipment slot="Horse" id="Item.mp_vlandia_horse" />
+				<equipment slot="Horse" id="Item.mp_vlandia_horse_war" />
 				<equipment slot="HorseHarness" id="Item.mp_chain_barding" />
 				<equipment slot="Item0" id="Item.mp_vlandia_cavalry_sword" />
 			</EquipmentRoster>
@@ -100,7 +100,7 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="130" />
+			<skill id="Riding" value="140" />
 			<skill id="OneHanded" value="110" />
 			<skill id="TwoHanded" value="80" />
 			<skill id="Polearm" value="125" />
@@ -110,8 +110,8 @@
 		</skills>
 		<Equipments>
 			<EquipmentRoster>
-				<equipment slot="Horse" id="Item.mp_vlandia_horse" />
-				<equipment slot="HorseHarness" id="Item.mp_chain_barding" />
+				<equipment slot="Horse" id="Item.mp_vlandia_horse_faster" />
+				<equipment slot="HorseHarness" id="Item.mp_halfchain_barding" />
 				<equipment slot="Gloves" id="Item.plate_gauntlet" />
 				<equipment slot="Body" id="Item.plate_cav_cuirass" />
 				<equipment slot="Head" id="Item.bannreich_cav_helmet_visor" />
@@ -301,7 +301,7 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="140" />
+			<skill id="Riding" value="130" />
 			<skill id="OneHanded" value="135" />
 			<skill id="TwoHanded" value="120" />
 			<skill id="Polearm" value="135" />
@@ -513,7 +513,7 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="150" />
+			<skill id="Riding" value="140" />
 			<skill id="OneHanded" value="150" />
 			<skill id="TwoHanded" value="140" />
 			<skill id="Polearm" value="140" />
@@ -542,7 +542,7 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="150" />
+			<skill id="Riding" value="135" />
 			<skill id="OneHanded" value="140" />
 			<skill id="TwoHanded" value="130" />
 			<skill id="Polearm" value="140" />
@@ -560,7 +560,7 @@
 				<equipment slot="Leg" id="Item.bergen_legs" />
 				<equipment slot="Cape" id="Item.bergen_hood" />
 				<equipment slot="Gloves" id="Item.gothic_gloves" />
-				<equipment slot="Horse" id="Item.mp_vlandia_horse" />
+				<equipment slot="Horse" id="Item.mp_vlandia_horse_war" />
 				<equipment slot="HorseHarness" id="Item.mp_chain_barding" />
 			</EquipmentRoster>
 		</Equipments>
@@ -572,7 +572,7 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="150" />
+			<skill id="Riding" value="135" />
 			<skill id="OneHanded" value="140" />
 			<skill id="TwoHanded" value="120" />
 			<skill id="Polearm" value="150" />
@@ -589,7 +589,7 @@
 				<equipment slot="Leg" id="Item.Baron_Finard_gothiclegs" />
 				<equipment slot="Cape" id="Item.finard_cape" />
 				<equipment slot="Gloves" id="Item.Baron_Finard_gauntlet" />
-				<equipment slot="Horse" id="Item.mp_vlandia_horse" />
+				<equipment slot="Horse" id="Item.mp_vlandia_horse_war" />
 				<equipment slot="HorseHarness" id="Item.mp_chain_barding" />
 				<equipment slot="Item0" id="Item.mp_vlandia_cavalry_sword" />
 			</EquipmentRoster>
@@ -602,7 +602,7 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="130" />
+			<skill id="Riding" value="140" />
 			<skill id="OneHanded" value="110" />
 			<skill id="TwoHanded" value="80" />
 			<skill id="Polearm" value="125" />
@@ -612,8 +612,8 @@
 		</skills>
 		<Equipments>
 			<EquipmentRoster>
-				<equipment slot="Horse" id="Item.mp_vlandia_horse" />
-				<equipment slot="HorseHarness" id="Item.mp_chain_barding" />
+				<equipment slot="Horse" id="Item.mp_vlandia_horse_faster" />
+				<equipment slot="HorseHarness" id="Item.mp_halfchain_barding" />
 				<equipment slot="Gloves" id="Item.plate_gauntlet" />
 				<equipment slot="Body" id="Item.plate_cav_cuirass" />
 				<equipment slot="Head" id="Item.bannreich_cav_helmet_visor" />
@@ -799,7 +799,7 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="140" />
+			<skill id="Riding" value="130" />
 			<skill id="OneHanded" value="135" />
 			<skill id="TwoHanded" value="120" />
 			<skill id="Polearm" value="135" />
