@@ -2552,3 +2552,58 @@ if (this._isInWeaponCameraMode)
 - `git tag -a v1.1.0 -m "Release v1.1.0"`: создан релизный тег.
 - `git push origin main --tags`: отправлено на GitHub.
 - GitHub Release `v1.1.0`: сформирован и опубликован через REST API с прикрепленным архивом модуля.
+
+
+---
+
+### Глава 82: Священная калибровка баланса классов: скорость, ускорение, броня и оружейное мастерство (18.11.2026)
+
+#### 1. Задача и тактический замысел
+- **Цель**: Гармонизация физических и боевых характеристик всех 16 классов модуля в строгом соответствии с формулой боевого баланса Создателя:
+  * **Легкая пехота (Ратай)**: Самая высокая скорость передвижения и ускорение (маневренность), минимальная броня, низкие боевые навыки и слабое обращение с оружием (медленные замахи, низкий урон).
+  * **Средняя пехота (Банобранные, Пикинеры)**: Сбалансированные средние показатели скорости, бронирования и владения оружием. Пикинеры обладают узкой специализацией на древковом оружии.
+  * **Стрелки (Лучники, Арбалетчики, Артиллеристы)**: Немного медленнее средней пехоты, но ощутимо быстрее тяжелой пехоты. Умеренная/легкая броня, высокие стрелковые навыки, базовые навыки ближнего боя.
+  * **Тяжелая пехота (Знаменосец, Збройный, Хорунжий, Офицер, Сотник)**: Медленнее стрелков, высокое бронирование, отточенное оружейное мастерство (высокая скорость ударов в ближнем бою и сокрушительный урон).
+  * **Спешенная кавалерия (Рыцари, Кавалерия, Бароны, Король)**: Минимальная скорость пешего боя (тяжелое снаряжение сковывает спешенного всадника), максимальная скорость на коне.
+
+#### 2. Внесенные изменения
+1. **[mpclassdivisions.xml](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpclassdivisions.xml)**:
+   - **Легкая пехота**:
+     * mp_Ratay: movement_speed="0.88" | combat_movement_speed="0.90" | cceleration="2.5" | rmor="10"
+   - **Средняя пехота**:
+     * mp_Banobranny: movement_speed="0.81" | combat_movement_speed="0.82" | cceleration="2.1" | rmor="25"
+     * mp_Pikeman: movement_speed="0.81" | combat_movement_speed="0.80" | cceleration="2.1" | rmor="20"
+   - **Стрелки**:
+     * mp_DWDN_Archer: movement_speed="0.78" | combat_movement_speed="0.75" | cceleration="2.2" | rmor="10"
+     * mp_DWDN_Crossbowman: movement_speed="0.76" | combat_movement_speed="0.73" | cceleration="2.1" | rmor="20"
+     * mp_Artillerist: movement_speed="0.75" | combat_movement_speed="0.72" | cceleration="2.1" | rmor="26"
+   - **Тяжелая пехота**:
+     * mp_Bannerman: movement_speed="0.74" | combat_movement_speed="0.71" | cceleration="2.0" | rmor="35"
+     * mp_Zbroyniy: movement_speed="0.73" | combat_movement_speed="0.69" | cceleration="1.8" | rmor="40"
+     * mp_Khorunzhiy: movement_speed="0.73" | combat_movement_speed="0.69" | cceleration="1.8" | rmor="45"
+     * mp_Officer: movement_speed="0.72" | combat_movement_speed="0.68" | cceleration="1.8" | rmor="44"
+     * mp_Sotnik: movement_speed="0.72" | combat_movement_speed="0.68" | cceleration="1.8" | rmor="48"
+   - **Спешенная кавалерия**:
+     * mp_DWDN_Cav: movement_speed="0.72" | combat_movement_speed="0.64" | cceleration="2.6" | rmor="32"
+     * mp_Knight: movement_speed="0.70" | combat_movement_speed="0.62" | cceleration="2.4" | rmor="38"
+     * mp_Bergen_Klaus: movement_speed="0.70" | combat_movement_speed="0.62" | cceleration="2.4" | rmor="38"
+     * mp_Finnard_Valerian: movement_speed="0.70" | combat_movement_speed="0.62" | cceleration="2.4" | rmor="38"
+     * mp_ALberic_Devald_hero: movement_speed="0.71" | combat_movement_speed="0.63" | cceleration="2.4" | rmor="40"
+
+2. **[mpcharacters.xml](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpcharacters.xml)**:
+   - Обновлены боевые навыки (skills) для всех 32 персонажей (_hero и _troop):
+     * mp_Ratay: OneHanded="50", TwoHanded="40", Polearm="50", Throwing="40" (ополченцы, низкий урон, медленный взмах).
+     * mp_Banobranny: OneHanded="85", TwoHanded="65", Polearm="80", Throwing="50".
+     * mp_Pikeman: OneHanded="60", TwoHanded="50", Polearm="130", Throwing="20".
+     * mp_Zbroyniy: OneHanded="125", TwoHanded="110", Polearm="100", Throwing="60".
+     * mp_Officer: OneHanded="140", TwoHanded="120", Polearm="120", Throwing="70".
+     * mp_Sotnik: OneHanded="150", TwoHanded="130", Polearm="130", Throwing="80".
+     * mp_DWDN_Archer: OneHanded="60", TwoHanded="30", Polearm="40", Bow="120", Crossbow="70", Throwing="40".
+     * mp_DWDN_Crossbowman: OneHanded="65", TwoHanded="30", Polearm="40", Crossbow="125", Bow="30", Throwing="40".
+     * mp_Artillerist: OneHanded="70", TwoHanded="60", Polearm="40", Crossbow="120", Bow="30", Throwing="50".
+     * mp_Knight: OneHanded="135", TwoHanded="120", Polearm="135", Riding="140", Throwing="60".
+     * mp_DWDN_Cav: OneHanded="110", TwoHanded="80", Polearm="125", Riding="130", Throwing="50".
+
+#### 3. Верификация
+- MechanicsTester.exe --cli: 30 из 30 тестов пройдены успешно (100% pass rate).
+- sync_all.ps1: Все XML матрицы перенесены на Dedicated Server DaewdenM.
