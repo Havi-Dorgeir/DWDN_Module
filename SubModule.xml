@@ -1,7 +1,7 @@
 <Module>
 	<Name value="Daewden module"/>
 	<Id value="DWDN_TRY"/>
-	<Version value="v1.1.1"/>
+	<Version value="v1.1.2"/>
 	<DefaultModule value="false"/>
 	<ModuleCategory value="Multiplayer"/>
 	<Official value="false"/>
