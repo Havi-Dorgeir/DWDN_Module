@@ -218,6 +218,9 @@ namespace DWDN_Script.Common.Duchies
             handgonner.DefaultLoadout = handgonner.CreateDefaultLoadout(banreich.Id);
             banreich.Classes.Add(handgonner);
 
+            // ВРЕМЕННО ОТКЛЮЧЁН (22.11.2026): после появления онагра с тягловой лошадью главный поток
+            // выделенного сервера ушёл в бесконечный цикл (100% CPU), сервер завис для всех. См. issue #12.
+            /*
             // 9. Артиллерист (Передвижная Артиллерия: Онагры и Баллисты)
             var artillerist = new DWDN_ClassDefinition(
                 "mp_Artillerist",
@@ -237,6 +240,7 @@ namespace DWDN_Script.Common.Duchies
             // Слоты 2 и 3 намеренно не заполняются, чтобы не плодить пустые строки в интерфейсе
             artillerist.DefaultLoadout = artillerist.CreateDefaultLoadout(banreich.Id);
             banreich.Classes.Add(artillerist);
+            */
 
             // 9. Кавалерия (Всадник Даевдена)
             var cav = new DWDN_ClassDefinition(
