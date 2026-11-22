@@ -470,6 +470,11 @@ namespace DWDN_Script.Client.UI
                 {
                     offHandWeaponIndex = EquipmentIndex.None;
                 }
+                // Защита манекена на пьедестале: знамя в левой руке не имеет валидной MP-анимации покоя (idle) и крашит C++ рендерер
+                if (offHandWeaponIndex != EquipmentIndex.None && customEquip[offHandWeaponIndex].Item?.ItemType == ItemObject.ItemTypeEnum.Banner)
+                {
+                    offHandWeaponIndex = EquipmentIndex.None;
+                }
                 data.RightWieldedItemIndex((int)mainHandWeaponIndex);
                 data.LeftWieldedItemIndex((int)offHandWeaponIndex);
 

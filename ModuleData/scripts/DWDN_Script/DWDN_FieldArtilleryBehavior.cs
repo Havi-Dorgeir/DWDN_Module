@@ -623,8 +623,8 @@ namespace DWDN_Script
                 ItemObject horseItem = MBObjectManager.Instance?.GetObject<ItemObject>("mp_vlandia_horse")
                                     ?? MBObjectManager.Instance?.GetObject<ItemObject>("sumpter_horse")
                                     ?? MBObjectManager.Instance?.GetObject<ItemObject>("mule");
-                ItemObject harnessItem = MBObjectManager.Instance?.GetObject<ItemObject>("mp_vlandia_horse_harness")
-                                      ?? MBObjectManager.Instance?.GetObject<ItemObject>("saddle_horse");
+                ItemObject harnessItem = MBObjectManager.Instance?.GetObject<ItemObject>("mp_light_harness")
+                                      ?? MBObjectManager.Instance?.GetObject<ItemObject>("mp_chain_barding");
 
                 Agent horseAgent = null;
                 try
@@ -1118,10 +1118,23 @@ namespace DWDN_Script
                         {
                             if (engine.HorseAgent != null && engine.HorseAgent.IsActive())
                             {
+                                // Если у тягловой лошади нет всадника (артиллерист спешился или еще не сел), орудие не перемещается
+                                if (engine.HorseAgent.RiderAgent == null)
+                                {
+                                    continue;
+                                }
+
                                 // Обновляем позицию тележки/орудия за лошадью
                                 Vec3 horsePos = engine.HorseAgent.Position;
+                                if (float.IsNaN(horsePos.x) || float.IsInfinity(horsePos.x) ||
+                                    float.IsNaN(horsePos.y) || float.IsInfinity(horsePos.y) ||
+                                    float.IsNaN(horsePos.z) || float.IsInfinity(horsePos.z))
+                                {
+                                    continue;
+                                }
+
                                 Vec2 horseFwd = engine.HorseAgent.Frame.rotation.f.AsVec2.Normalized();
-                                if (horseFwd.LengthSquared < 0.01f) horseFwd = new Vec2(0f, 1f);
+                                if (horseFwd.LengthSquared < 0.01f || float.IsNaN(horseFwd.x) || float.IsInfinity(horseFwd.x)) horseFwd = new Vec2(0f, 1f);
 
                                 float hitchDistance = 3.6f;
                                 Vec3 targetPos = horsePos - new Vec3(horseFwd.x * hitchDistance, horseFwd.y * hitchDistance, 0f);
@@ -1139,7 +1152,7 @@ namespace DWDN_Script
                                         {
                                             Mission.Current.Scene.GetHeightAtPoint(targetPos.AsVec2, BodyFlags.CommonCollisionExcludeFlags, ref gz);
                                         }
-                                        if (Math.Abs(gz - horsePos.z) < 3.5f)
+                                        if (!float.IsNaN(gz) && !float.IsInfinity(gz) && Math.Abs(gz - horsePos.z) < 3.5f)
                                         {
                                             targetPos.z = gz;
                                         }
@@ -1147,12 +1160,27 @@ namespace DWDN_Script
                                 }
                                 catch { }
 
+                                if (float.IsNaN(targetPos.x) || float.IsInfinity(targetPos.x) ||
+                                    float.IsNaN(targetPos.y) || float.IsInfinity(targetPos.y) ||
+                                    float.IsNaN(targetPos.z) || float.IsInfinity(targetPos.z))
+                                {
+                                    continue;
+                                }
+
                                 Vec2 toHorse = (horsePos.AsVec2 - targetPos.AsVec2).Normalized();
-                                if (toHorse.LengthSquared < 0.01f) toHorse = horseFwd;
+                                if (toHorse.LengthSquared < 0.01f || float.IsNaN(toHorse.x) || float.IsInfinity(toHorse.x)) toHorse = horseFwd;
 
                                 MatrixFrame f = MatrixFrame.Identity;
                                 f.origin = targetPos;
                                 f.rotation.RotateAboutUp((float)Math.Atan2(toHorse.x, toHorse.y));
+
+                                // Защита от передачи невалидных координат в нативный движок C++ (предотвращает OOM 34GB)
+                                if (float.IsNaN(f.origin.x) || float.IsInfinity(f.origin.x) ||
+                                    float.IsNaN(f.origin.y) || float.IsInfinity(f.origin.y) ||
+                                    float.IsNaN(f.origin.z) || float.IsInfinity(f.origin.z))
+                                {
+                                    continue;
+                                }
 
                                 // Если дистанция изменилась, сдвигаем тележку и орудие
                                 if (engine.Position.DistanceSquared(targetPos) > 0.04f || Math.Abs(engine.Position.z - targetPos.z) > 0.05f)

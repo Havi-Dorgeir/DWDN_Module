@@ -377,7 +377,8 @@ namespace DWDN_Script.Server.Behaviors
                 if (targetSelection != null)
                 {
                     // Если игрок выбрал пеший бой, но у агента по какой-то причине есть лошадь (например, спавн в warmup) - спешиваем и удаляем её
-                    if (string.IsNullOrEmpty(targetSelection.HorseId) && agent.MountAgent != null)
+                    // Защита: класс mp_Artillerist не спешивается, так как он использует тягловую лошадь артиллерийского орудия
+                    if (string.IsNullOrEmpty(targetSelection.HorseId) && agent.MountAgent != null && !string.Equals(targetSelection.ClassId, "mp_Artillerist", StringComparison.OrdinalIgnoreCase))
                     {
                         try
                         {
@@ -441,9 +442,13 @@ namespace DWDN_Script.Server.Behaviors
                         EquipmentIndex wieldedOffhand = agent.GetOffhandWieldedItemIndex();
                         if (wieldedOffhand != EquipmentIndex.None && !agent.Equipment[wieldedOffhand].IsEmpty)
                         {
-                            GameNetwork.BeginBroadcastModuleEvent();
-                            GameNetwork.WriteMessage(new SetWieldedItemIndex(agent.Index, true, true, true, wieldedOffhand, 0));
-                            GameNetwork.EndBroadcastModuleEvent(GameNetwork.EventBroadcastFlags.AddToMissionRecord, null);
+                            // Защита: не рассылаем SetWieldedItemIndex для знамени в левую руку, так как нативный MP протокол ожидает только щит/факел
+                            if (agent.Equipment[wieldedOffhand].Item?.ItemType != ItemObject.ItemTypeEnum.Banner)
+                            {
+                                GameNetwork.BeginBroadcastModuleEvent();
+                                GameNetwork.WriteMessage(new SetWieldedItemIndex(agent.Index, true, true, true, wieldedOffhand, 0));
+                                GameNetwork.EndBroadcastModuleEvent(GameNetwork.EventBroadcastFlags.AddToMissionRecord, null);
+                            }
                         }
                     }
 

@@ -2637,3 +2637,41 @@ if (this._isInWeaponCameraMode)
 #### 3. Верификация
 - MechanicsTester.exe --cli: 30 из 30 тестов пройдены успешно (100% pass rate).
 - sync_all.ps1: Все XML матрицы развернуты на Dedicated Server DaewdenM.
+
+
+---
+
+### Глава 84: Ликвидация OOM-аварии 34.2 ГБ Артиллериста и стабилизация Знаменосца в меню и сети (22.11.2026)
+
+#### 1. Диагностика и анализ проявлений скрапкода
+1. **Катастрофическая аллокация памяти Артиллериста (`mp_Artillerist`)**:
+   - *Журнал сбоя*: В `rgl_log_24940.txt` зафиксирован отказ ОС: `Application crashed because it could not get new memory from the operating system. Requested memory size is 34225520640 bytes` (34.2 ГБ).
+   - *Первопричина*: В `DWDN_ServerLoadoutBehavior.cs` блок анти-чит спешивания пеших классов (`string.IsNullOrEmpty(targetSelection.HorseId) && agent.MountAgent != null`) при спавне Артиллериста ошибочно идентифицировал тяглового коня артиллерии (`Draft Horse`) как нелегального маунта и вызывал `mount.FadeOut(hideInstantly: true)`. Деспавненный конь терял ориентацию, физические координаты его трансформации обращались в `+Infinity` (`0x7F800000`). В методе `DWDN_FieldArtilleryBehavior.OnMissionTick` орудие позиционировалось за конем без проверки всадника (`RiderAgent == null`) и без верификации чисел на `float.IsNaN` / `float.IsInfinity`. Передача бесконечной матрицы в `engine.RootEntity.SetFrame` заставляла нативный физический движок Havok вычислять размерность пространственного дерева: `+inf / cell_size`, что при сдвиге на 4 бита давало шестнадцатеричный размер `0x7F8000000` (ровно 34 225 520 640 байт). Windows отклоняла аллокацию и роняла сервер.
+   - *Дефект сбруи*: В методе `SpawnEngine` коню передавался `harnessItem = saddle_horse` (предмет коня вместо сбруи из-за отсутствия `mp_vlandia_horse_harness` в мультиплеере).
+
+2. **Сбой Знаменосца (`mp_Bannerman`) на пьедестале UI и в мультиплеере**:
+   - *Первопричина на клиенте*: В `DWDN_SelectionMissionView.cs` при выборе класса знамя `dwdn_banner1` в слоте 1 определялось методом `GetInitialWeaponIndicesToEquip` как предмет для левой руки (`offHandWeaponIndex = 1`). Вызов `data.LeftWieldedItemIndex((int)offHandWeaponIndex)` на манекене `agentVisual` приводил к C++ assertion failure, так как у манекена в анимации `act_walk_idle_unarmed` отсутствует валидный слот оффхенд-знамени.
+   - *Первопричина на сервере*: В `DWDN_ServerLoadoutBehavior.cs` выполнялась широковещательная рассылка `SetWieldedItemIndex(isLeftHand: true)` для оффхенда знамени, что вызывало сетевой ассерт у клиентов, ожидающих в левой руке только щит или факел.
+   - *Синтаксический мусор*: В `mpclassdivisions.xml` на строке 208 находился оторванный комментарий `<!--item="mp_sturgia_heavy_axe" /> -->`.
+
+#### 2. Внесенные исправления
+1. **[DWDN_ServerLoadoutBehavior.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Server/Behaviors/DWDN_ServerLoadoutBehavior.cs)**:
+   - В логику спешивания добавлен защитный фильтр: `&& !string.Equals(targetSelection.ClassId, "mp_Artillerist", StringComparison.OrdinalIgnoreCase)`. Тягловый конь артиллериста защищен от деспавна.
+   - В сетевую рассылку `SetWieldedItemIndex` внедрен запрет отправки пакета для предметов `ItemTypeEnum.Banner` в левую руку.
+
+2. **[DWDN_FieldArtilleryBehavior.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/DWDN_FieldArtilleryBehavior.cs)**:
+   - В `OnMissionTick` добавлен строгий шлюз: расчет движения сцепки прерывается (`continue`), если у тяглового коня нет живого всадника (`engine.HorseAgent.RiderAgent == null`).
+   - Внедрена жесткая математическая валидация координат: `float.IsNaN` / `float.IsInfinity` для `horsePos`, `horseFwd`, `targetPos` и `f.origin`. Попадание бесконечных или неопределенных величин в C++ Havok и `SetFrame` исключено на 100%.
+   - В методе `SpawnEngine` поиск несуществующей сбруи `mp_vlandia_horse_harness` заменен на валидные мультиплеерные ассеты: `mp_light_harness` (легкая сбруя) и `mp_chain_barding`.
+
+3. **[DWDN_SelectionMissionView.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Client/UI/DWDN_SelectionMissionView.cs)**:
+   - Добавлена проверка типа оффхенд-оружия: если `customEquip[offHandWeaponIndex].Item?.ItemType == ItemObject.ItemTypeEnum.Banner`, то `offHandWeaponIndex = EquipmentIndex.None` перед установкой `LeftWieldedItemIndex`. Знамя визуализируется за спиной манекена, предотвращая C++ рендер-краш.
+
+4. **[mpclassdivisions.xml](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpclassdivisions.xml)**:
+   - Удален оторванный комментарий на строке 208.
+
+#### 3. Верификация
+- `dotnet build DWDN_Script.csproj` (Client Release): 0 ошибок, 23 предупреждения архитектуры.
+- `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок, 0 предупреждений.
+- `MechanicsTester.exe --cli`: 30 из 30 тестов пройдены успешно (100% pass rate).
+- `sync_all.ps1`: Все исполняемые сборки и XML матрицы зеркалированы на `DaewdenM` (Dedicated Server).

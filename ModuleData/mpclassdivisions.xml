@@ -205,7 +205,6 @@
 			</Perk>
 		</Perks>
 	</MPClassDivision>
-	<!--item="mp_sturgia_heavy_axe" /> -->
 	<!-- Ranged -->
 	<MPClassDivision id="mp_DWDN_Archer" hero="mp_DWDN_Archer_hero" troop="mp_DWDN_Archer_troop" hero_idle_anim="act_empire_mp_archer_militia_idle" troop_idle_anim="act_idle_bow_1" multiplier="0.65" cost="120" icon="Archer_Light" melee_ai="40" ranged_ai="90" armor="10" movement_speed="0.78" combat_movement_speed="0.75" acceleration="2.2" hitpoints="100">
 		<Perks>
