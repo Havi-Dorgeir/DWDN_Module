@@ -172,10 +172,11 @@ namespace DWDN_Script
                 mission.AddMissionBehavior(new DWDN_GrenadeBehavior());
             }
 
-            if (mission.GetMissionBehavior<DWDN_BannerAuraBehavior>() == null)
-            {
-                mission.AddMissionBehavior(new DWDN_BannerAuraBehavior());
-            }
+            // ВРЕМЕННО ОТКЛЮЧЕНО (14.11.2026) вместе со знаменосцем: краш клиентов на BL v1.5.7.
+            // if (mission.GetMissionBehavior<DWDN_BannerAuraBehavior>() == null)
+            // {
+            //     mission.AddMissionBehavior(new DWDN_BannerAuraBehavior());
+            // }
 
             if (mission.GetMissionBehavior<DWDN_FieldArtilleryBehavior>() == null)
             {
