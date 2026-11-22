@@ -151,6 +151,10 @@ namespace DWDN_Script.Common.Duchies
             banreich.Classes.Add(khorunzhiy);
             */
 
+            // ВРЕМЕННО ОТКЛЮЧЁН (14.11.2026): появление знаменосца со знаменем роняет клиент
+            // у всех, кто его видит (access violation в TaleWorlds.Native.dll на BL v1.5.7).
+            // Вернуть, когда найдём причину (знамя dwdn_banner1 или аура DWDN_BannerAuraBehavior).
+            /*
             // 7. Знаменосец (Штандарт герцогства)
             var bannerman = new DWDN_ClassDefinition(
                 "mp_Bannerman",
@@ -166,6 +170,7 @@ namespace DWDN_Script.Common.Duchies
             bannerman.AllowedWeaponsSlot1.AddRange(new[] { "dwdn_banner1" });
             bannerman.DefaultLoadout = bannerman.CreateDefaultLoadout(banreich.Id);
             banreich.Classes.Add(bannerman);
+            */
 
             // 7. Стрелок (Объединенный класс лучников и арбалетчиков)
             var marksman = new DWDN_ClassDefinition(
@@ -213,6 +218,9 @@ namespace DWDN_Script.Common.Duchies
             handgonner.DefaultLoadout = handgonner.CreateDefaultLoadout(banreich.Id);
             banreich.Classes.Add(handgonner);
 
+            // ВРЕМЕННО ОТКЛЮЧЁН (22.11.2026): после появления онагра с тягловой лошадью главный поток
+            // выделенного сервера ушёл в бесконечный цикл (100% CPU), сервер завис для всех. См. issue #12.
+            /*
             // 9. Артиллерист (Передвижная Артиллерия: Онагры и Баллисты)
             var artillerist = new DWDN_ClassDefinition(
                 "mp_Artillerist",
@@ -232,6 +240,7 @@ namespace DWDN_Script.Common.Duchies
             // Слоты 2 и 3 намеренно не заполняются, чтобы не плодить пустые строки в интерфейсе
             artillerist.DefaultLoadout = artillerist.CreateDefaultLoadout(banreich.Id);
             banreich.Classes.Add(artillerist);
+            */
 
             // 9. Кавалерия (Всадник Даевдена)
             var cav = new DWDN_ClassDefinition(

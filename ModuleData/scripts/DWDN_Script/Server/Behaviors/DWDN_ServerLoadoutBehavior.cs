@@ -30,6 +30,11 @@ namespace DWDN_Script.Server.Behaviors
 
         // Список агентов, которым уже применен кастомный лодаут
         private static readonly HashSet<int> _customizedAgentIndices = new HashSet<int>();
+
+        // Агенты, у которых сняли коня и ждут, пока он уйдёт, — время снятия.
+        // Переодевать всадника в том же такте, что и снимать коня, нельзя (см. TryApplyLoadoutToAgent).
+        private static readonly Dictionary<int, float> _dismountPending = new Dictionary<int, float>();
+        private const float DismountWaitSeconds = 2f;
         private static bool _handlerRegistered = false;
 
         public override void OnBehaviorInitialize()
@@ -82,6 +87,7 @@ namespace DWDN_Script.Server.Behaviors
         {
             base.OnClearScene();
             _customizedAgentIndices.Clear();
+            _dismountPending.Clear();
         }
 
         private bool HandleClientCustomLoadout(NetworkCommunicator peer, RequestCustomLoadoutMessage msg)
@@ -228,6 +234,7 @@ namespace DWDN_Script.Server.Behaviors
             if (affectedAgent != null)
             {
                 _customizedAgentIndices.Remove(affectedAgent.Index);
+                _dismountPending.Remove(affectedAgent.Index);
             }
         }
 
@@ -237,6 +244,7 @@ namespace DWDN_Script.Server.Behaviors
             if (affectedAgent != null)
             {
                 _customizedAgentIndices.Remove(affectedAgent.Index);
+                _dismountPending.Remove(affectedAgent.Index);
             }
         }
 
@@ -376,20 +384,40 @@ namespace DWDN_Script.Server.Behaviors
                 // 5. Применяем экипировку
                 if (targetSelection != null)
                 {
-                    // Если игрок выбрал пеший бой, но у агента по какой-то причине есть лошадь (например, спавн в warmup) - спешиваем и удаляем её
+                    // Если игрок выбрал пеший бой, но у агента по какой-то причине есть лошадь (например, спавн в warmup) - спешиваем и удаляем её.
+                    // ВАЖНО (14.11.2026): снять коня и в том же такте позвать UpdateSpawnEquipmentAndRefreshVisuals
+                    // нельзя — на BL v1.5.7 это роняет ВЕСЬ выделенный сервер (segfault в Agent::preload_tick
+                    // из PreloadForRendering; дважды за день на mp_ALberic_Devald_hero). Поэтому коня снимаем
+                    // и выходим, а снаряжение надеваем в следующих тактах (OnMissionTick зовёт нас снова),
+                    // когда агент уже пеший.
                     if (string.IsNullOrEmpty(targetSelection.HorseId) && agent.MountAgent != null)
                     {
-                        try
+                        float now = Mission.Current?.CurrentTime ?? 0f;
+                        if (!_dismountPending.TryGetValue(agent.Index, out float since))
                         {
-                            Agent mount = agent.MountAgent;
-                            agent.TeleportToPosition(mount.Position);
-                            mount.FadeOut(hideInstantly: true, hideMount: false);
+                            _dismountPending[agent.Index] = now;
+                            try
+                            {
+                                Agent mount = agent.MountAgent;
+                                agent.TeleportToPosition(mount.Position);
+                                mount.FadeOut(hideInstantly: true, hideMount: false);
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.Print($"[DWDN Server ERROR] Despawn mount: {ex}");
+                            }
+                            return;
                         }
-                        catch (Exception ex)
-                        {
-                            Debug.Print($"[DWDN Server ERROR] Despawn mount: {ex}");
-                        }
+                        if (now - since < DismountWaitSeconds)
+                            return;
+
+                        // Конь так и не ушёл — не переодеваем вовсе: штатное снаряжение лучше упавшего сервера.
+                        _dismountPending.Remove(agent.Index);
+                        _customizedAgentIndices.Add(agent.Index);
+                        Debug.Print($"[DWDN Server] Mount of {agent.Name} (Index: {agent.Index}) did not go away; custom loadout skipped.");
+                        return;
                     }
+                    _dismountPending.Remove(agent.Index);
 
                     Equipment baseEquipment = agent.SpawnEquipment ?? new Equipment();
                     Equipment customizedEquipment = ApplySelectionToEquipment(targetSelection, baseEquipment);
@@ -451,11 +479,13 @@ namespace DWDN_Script.Server.Behaviors
                     Debug.Print($"[DWDN Server] Loadout applied to {agent.Name} (Index: {agent.Index}) for class {targetSelection.ClassId}");
 
                     // Проверяем заявку на полевую артиллерию после применения кастомного лодаута
-                    try
-                    {
-                        DWDN_FieldArtilleryBehavior.CheckAndSpawnArtilleryForAgent(agent);
-                    }
-                    catch { }
+                    // ВРЕМЕННО ОТКЛЮЧЕНО (22.11.2026) вместе с классом артиллериста: после появления онагра
+                    // с тягловой лошадью сервер завис в бесконечном цикле главного потока. См. issue #12.
+                    // try
+                    // {
+                    //     DWDN_FieldArtilleryBehavior.CheckAndSpawnArtilleryForAgent(agent);
+                    // }
+                    // catch { }
                 }
             }
             catch (Exception ex)
