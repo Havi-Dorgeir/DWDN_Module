@@ -479,11 +479,13 @@ namespace DWDN_Script.Server.Behaviors
                     Debug.Print($"[DWDN Server] Loadout applied to {agent.Name} (Index: {agent.Index}) for class {targetSelection.ClassId}");
 
                     // Проверяем заявку на полевую артиллерию после применения кастомного лодаута
-                    try
-                    {
-                        DWDN_FieldArtilleryBehavior.CheckAndSpawnArtilleryForAgent(agent);
-                    }
-                    catch { }
+                    // ВРЕМЕННО ОТКЛЮЧЕНО (22.11.2026) вместе с классом артиллериста: после появления онагра
+                    // с тягловой лошадью сервер завис в бесконечном цикле главного потока. См. issue #12.
+                    // try
+                    // {
+                    //     DWDN_FieldArtilleryBehavior.CheckAndSpawnArtilleryForAgent(agent);
+                    // }
+                    // catch { }
                 }
             }
             catch (Exception ex)
