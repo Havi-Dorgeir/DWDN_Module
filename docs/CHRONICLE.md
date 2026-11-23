@@ -2675,3 +2675,13 @@ if (this._isInWeaponCameraMode)
 - `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок, 0 предупреждений.
 - `MechanicsTester.exe --cli`: 30 из 30 тестов пройдены успешно (100% pass rate).
 - `sync_all.ps1`: Все исполняемые сборки и XML матрицы зеркалированы на `DaewdenM` (Dedicated Server).
+
+---
+
+### Сессия 2026-11-23 — Очистка и реорганизация GitHub-репозитория (`Havi-Dorgeir/DWDN_Module`)
+
+- **Очистка мусора:** удалены 4 резервных `SubModule*.xml` из корня, 7 копий XML из `ModuleData/`, `finnard_armer15_geo.tpac.ptemp`, `art_assets/lfs_test_image.png`, `steam_appid.txt` и дублирующиеся `bin/Win64_Shipping_Client/DWDN_Script.Server.{dll,pdb}`.
+- **`.gitignore`:** добавлены правила для `*.ptemp`, `*.bak`, `*.orig`, `*- Copy.*`, `* cop.*`, `SubModule_backup*.xml`, `steam_appid.txt`, `DWDN_config.txt`, `.vscode/`, `*.zip`, `release_dist/`.
+- **Служебные скрипты:** `ЗАПУСК_ТЕСТОВ_МЕХАНИК.bat` и `ТЕСТ_МЕХАНИК_CLI.bat` перенесены в `Tools/`; все `.bat` в `Tools/` переведены на относительные пути `%~dp0`; в `sync_all.ps1` синхронизация в `d:\banAImod\DWDN_TRY` сделана условной (`Test-Path`).
+- **Документация для ИИ и разработчиков:** длинные документы вынесены в `docs/` (`DOCUMENTATION.md`, `AI_MODDING_GUIDE.md`, `ENGINE.md`, `CHRONICLE.md`, `GITHUB_WORKFLOW.md`). В корне создан компактный `AGENTS.md` (базовая архитектура + ссылки на скиллы `rehan-remade/universal-modder` и `ShortJake/NativeHook` + карта `docs/`) и переработан `README.md`.
+- **GitHub Flow и автоматизация:** создана ветка `development`, добавлены `.github/CODEOWNERS`, `.github/workflows/branch-guard.yml` и `.github/workflows/release.yml` (автоматическая сборка `DWDN_TRY_<version>.zip` и публикация GitHub Release при обновлении `main`).

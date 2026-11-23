@@ -37,7 +37,9 @@ $serverRoot = Join-Path $steamCommon "Mount & Blade II Dedicated Server"
 $serverDir     = Join-Path $serverRoot "Modules\DaewdenM"
 $serverDir2    = Join-Path $serverRoot "Modules\DWDN_TRY"
 $serverBinDir  = Join-Path $serverRoot "bin\Win64_Shipping_Server"
-$banAiDir      = "d:\banAImod\DWDN_TRY"
+$banAiRoot     = "d:\banAImod"
+$useBanAiDir   = Test-Path $banAiRoot
+$banAiDir      = Join-Path $banAiRoot "DWDN_TRY"
 
 $masterClientDll = "$masterDir\bin\Win64_Shipping_Client\DWDN_Script.dll"
 $masterClientPdb = "$masterDir\bin\Win64_Shipping_Client\DWDN_Script.pdb"
@@ -53,14 +55,17 @@ if ($procs) {
 }
 
 # 2. Ensure target directories exist
-@(
+$targetDirs = @(
     "$serverDir\bin\Win64_Shipping_Client",
     "$serverDir\bin\Win64_Shipping_Server",
     "$serverDir2\bin\Win64_Shipping_Client",
     "$serverDir2\bin\Win64_Shipping_Server",
-    "$serverBinDir",
-    "$banAiDir\bin\Win64_Shipping_Client"
-) | ForEach-Object {
+    "$serverBinDir"
+)
+if ($useBanAiDir) {
+    $targetDirs += "$banAiDir\bin\Win64_Shipping_Client"
+}
+$targetDirs | ForEach-Object {
     if (-not (Test-Path $_)) { New-Item -ItemType Directory -Force -Path $_ | Out-Null }
 }
 
@@ -88,17 +93,17 @@ if (Test-Path $masterServerPdb) {
     Copy-Item $masterServerPdb "$serverBinDir\DWDN_Script.Server.pdb" -Force
 }
 
-# 4. Mirror scripts from Master DWDN_TRY to Server and banAiDir
+# 4. Mirror scripts from Master DWDN_TRY to Server and optional banAiDir
 Write-Host "Mirroring scripts across modules..." -ForegroundColor Gray
 Copy-Item "$masterDir\ModuleData\scripts\*" "$serverDir\ModuleData\scripts\" -Recurse -Force
 Copy-Item "$masterDir\ModuleData\scripts\*" "$serverDir2\ModuleData\scripts\" -Recurse -Force
-Copy-Item "$masterDir\ModuleData\scripts\*" "$banAiDir\ModuleData\scripts\" -Recurse -Force
+if ($useBanAiDir) { Copy-Item "$masterDir\ModuleData\scripts\*" "$banAiDir\ModuleData\scripts\" -Recurse -Force }
 
 # 5. Mirror SubModule.xml
 Write-Host "Mirroring SubModule.xml..." -ForegroundColor Gray
 Copy-Item "$masterDir\SubModule.xml" "$serverDir\SubModule.xml" -Force
 Copy-Item "$masterDir\SubModule.xml" "$serverDir2\SubModule.xml" -Force
-Copy-Item "$masterDir\SubModule.xml" "$banAiDir\SubModule.xml" -Force
+if ($useBanAiDir) { Copy-Item "$masterDir\SubModule.xml" "$banAiDir\SubModule.xml" -Force }
 
 # 6. Mirror XMLs
 Write-Host "Mirroring XML data..." -ForegroundColor Gray
@@ -116,7 +121,7 @@ foreach ($xml in $xmlFiles) {
     if (Test-Path $srcXml) {
         Copy-Item $srcXml "$serverDir\ModuleData\$xml" -Force
         Copy-Item $srcXml "$serverDir2\ModuleData\$xml" -Force
-        Copy-Item $srcXml "$banAiDir\ModuleData\$xml" -Force
+        if ($useBanAiDir) { Copy-Item $srcXml "$banAiDir\ModuleData\$xml" -Force }
     }
 }
 
@@ -125,10 +130,12 @@ if (Test-Path "$masterDir\ModuleData\mpitems") {
     Write-Host "Mirroring mpitems directory..." -ForegroundColor Gray
     New-Item -ItemType Directory -Force -Path "$serverDir\ModuleData\mpitems" | Out-Null
     New-Item -ItemType Directory -Force -Path "$serverDir2\ModuleData\mpitems" | Out-Null
-    New-Item -ItemType Directory -Force -Path "$banAiDir\ModuleData\mpitems" | Out-Null
     Copy-Item "$masterDir\ModuleData\mpitems\*" "$serverDir\ModuleData\mpitems\" -Recurse -Force
     Copy-Item "$masterDir\ModuleData\mpitems\*" "$serverDir2\ModuleData\mpitems\" -Recurse -Force
-    Copy-Item "$masterDir\ModuleData\mpitems\*" "$banAiDir\ModuleData\mpitems\" -Recurse -Force
+    if ($useBanAiDir) {
+        New-Item -ItemType Directory -Force -Path "$banAiDir\ModuleData\mpitems" | Out-Null
+        Copy-Item "$masterDir\ModuleData\mpitems\*" "$banAiDir\ModuleData\mpitems\" -Recurse -Force
+    }
 }
 
 # 8. Mirror GUI prefabs
@@ -136,10 +143,12 @@ if (Test-Path "$masterDir\GUI") {
     Write-Host "Mirroring GUI prefabs..." -ForegroundColor Gray
     New-Item -ItemType Directory -Force -Path "$serverDir\GUI" | Out-Null
     New-Item -ItemType Directory -Force -Path "$serverDir2\GUI" | Out-Null
-    New-Item -ItemType Directory -Force -Path "$banAiDir\GUI" | Out-Null
     Copy-Item "$masterDir\GUI\*" "$serverDir\GUI\" -Recurse -Force
     Copy-Item "$masterDir\GUI\*" "$serverDir2\GUI\" -Recurse -Force
-    Copy-Item "$masterDir\GUI\*" "$banAiDir\GUI\" -Recurse -Force
+    if ($useBanAiDir) {
+        New-Item -ItemType Directory -Force -Path "$banAiDir\GUI" | Out-Null
+        Copy-Item "$masterDir\GUI\*" "$banAiDir\GUI\" -Recurse -Force
+    }
 }
 
 Write-Host "Sync successful! Master DWDN_TRY -> DaewdenM (Dedicated Server) fully deployed." -ForegroundColor Green

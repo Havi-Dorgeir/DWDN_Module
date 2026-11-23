@@ -2,12 +2,14 @@
 # Daewden Module (DWDN) Git Ignore
 # ====================================================================
 
-# TaleWorlds Baked & Cached Packages (1.1GB+ binary exceeding GitHub 100MB limit)
+# TaleWorlds Baked, Cached & Temp Packages (exceeds GitHub 100MB limit)
 AssetPackages/
 RuntimeDataCache/
+*.ptemp
 
-# Visual Studio / Rider / IDE Caches
+# Visual Studio / Rider / VS Code / IDE Caches
 .vs/
+.vscode/
 .idea/
 *.user
 *.suo
@@ -17,11 +19,27 @@ RuntimeDataCache/
 # Build Intermediate Outputs
 ModuleData/scripts/DWDN_Script/bin/
 ModuleData/scripts/DWDN_Script/obj/
+ModuleData/scripts/DWDN_Script.Server/bin/
+ModuleData/scripts/DWDN_Script.Server/obj/
 Tools/**/bin/
 Tools/**/obj/
 Tools/**/output/
 **/obj/
+
+# Accidental Backups, Copies & Local Steam Files
 SubModules.xml
+SubModule_backup*.xml
+*- Copy.*
+* cop.*
+*.bak
+*.orig
+steam_appid.txt
+DWDN_config.txt
+
+# Release & Archive Artifacts
+*.zip
+*.7z
+release_dist/
 
 # Windows & OS Artifacts
 Thumbs.db
@@ -29,3 +47,4 @@ Desktop.ini
 $RECYCLE.BIN/
 *.tmp
 *.log
+.DS_Store
