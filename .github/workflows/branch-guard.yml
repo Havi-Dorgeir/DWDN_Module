@@ -1,0 +1,42 @@
+name: Branch & PR Guard
+
+on:
+  pull_request:
+    branches:
+      - main
+      - development
+
+jobs:
+  guard:
+    name: Branch & PR Guard
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Restrict merges into main to repository owner
+        if: github.base_ref == 'main'
+        run: |
+          ACTOR="${{ github.event.pull_request.user.login }}"
+          HEAD_REF="${{ github.head_ref }}"
+          echo "PR into main from '$HEAD_REF' by '$ACTOR'"
+          if [ "$ACTOR" != "Havi-Dorgeir" ]; then
+            echo "::error::В ветку main может вливать изменения только владелец репозитория (@Havi-Dorgeir). Откройте PR в ветку development."
+            exit 1
+          fi
+          if [[ "$HEAD_REF" != "development" && "$HEAD_REF" != hotfix/* ]]; then
+            echo "::warning::Рекомендуется вливать в main только ветки development или hotfix/* (сейчас: $HEAD_REF)."
+          fi
+
+      - name: Validate SubModule.xml and check for junk files
+        run: |
+          python3 -c "import xml.etree.ElementTree as ET; ET.parse('SubModule.xml'); print('SubModule.xml OK')"
+          JUNK=$(git ls-files | grep -E '(\.ptemp$|SubModule_backup| - Copy\.| cop\.|steam_appid\.txt$)' || true)
+          if [ -n "$JUNK" ]; then
+            echo "::error::Обнаружены мусорные или временные файлы в репозитории:"
+            echo "$JUNK"
+            exit 1
+          fi
