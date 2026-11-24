@@ -24,7 +24,7 @@ namespace DWDN_Script.Server.Admin
         private static readonly HashSet<NetworkCommunicator> _frozenPeers = new HashSet<NetworkCommunicator>();
         private static readonly Dictionary<NetworkCommunicator, Vec3> _markedPositions = new Dictionary<NetworkCommunicator, Vec3>();
 
-        private static string _adminPassword = "25";
+        private static string _adminPassword = null;
         private static bool _initialized = false;
 
         public static void Initialize()
@@ -945,10 +945,10 @@ namespace DWDN_Script.Server.Admin
             if (peer == null) return false;
             Initialize();
 
-            if (string.IsNullOrWhiteSpace(password)) return false;
+            if (string.IsNullOrWhiteSpace(_adminPassword) || string.IsNullOrWhiteSpace(password)) return false;
             string pass = password.Trim();
 
-            if (pass == _adminPassword || pass.Equals(_adminPassword, StringComparison.OrdinalIgnoreCase) || pass == "25")
+            if (string.Equals(pass, _adminPassword, StringComparison.OrdinalIgnoreCase))
             {
                 SetPeerAdmin(peer, true);
                 SendToPeer(peer, "Успешная авторизация! Добро пожаловать, Администратор.");
