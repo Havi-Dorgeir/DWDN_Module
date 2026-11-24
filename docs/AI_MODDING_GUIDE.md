@@ -590,10 +590,10 @@ $$\text{Position}_{n} = \text{Length}_{n-1} + (\text{previous\_piece\_offset}_{n
   * Для отображения динамических списков (например, списка игроков `PlayerRows`) виджет `<ListPanel Id="PlayerList">` с вложенным `<ItemTemplate>` **обязан** иметь атрибут `DataSource="{PlayerRows}"`. Без этого атрибута движок игнорирует `ItemTemplate` и список остается пустым.
 * **Универсальная Авторизация Администратора**:
   * Кастомный админ-инструмент должен выдаваться игроку независимо от того, как он авторизовался:
-    1. **Через нативную консоль**: `adminpassword 25`. В `DWDN_AdminService.TickMission` сервер проверяет `peer.IsAdmin && !_authenticatedPeers.Contains(peer)`, автоматически промоутит игрока в `_authenticatedPeers` и рассылает клиенту `SyncAdminStateMessage(true)`.
-    2. **Через чат**: `!login 25`.
+    1. **Через нативную консоль**: `adminpassword <пароль_сервера>`. В `DWDN_AdminService.TickMission` сервер проверяет `peer.IsAdmin && !_authenticatedPeers.Contains(peer)`, автоматически промоутит игрока в `_authenticatedPeers` и рассылает клиенту `SyncAdminStateMessage(true)`.
+    2. **Через чат**: `!login <пароль_сервера>`.
     3. **Через GUI-диалог ввода пароля**: при нажатии `[F10]` или `[Insert]` неавторизованным игроком клиент открывает нативный диалог `InformationManager.ShowTextInquiry` ("Введите пароль администратора:"). Валидатор ввода: `(text) => new Tuple<bool, string>(!string.IsNullOrWhiteSpace(text), "")`. При подтверждении отправляется `RequestAdminActionMessage("login", "", password)`.
-    4. Сервер в `HandleClientEventRequestAdminAction` обрабатывает `Action == "login"` **до проверки прав админа**, проверяет пароль (`_adminPassword` или `"25"`), вызывает `SetPeerAdmin(peer, true)` и отправляет `SyncAdminStateMessage(true)`.
+    4. Сервер в `HandleClientEventRequestAdminAction` обрабатывает `Action == "login"` **до проверки прав админа**, проверяет пароль (строго против `_adminPassword`, загруженного из `MultiplayerOptions.OptionType.AdminPassword` или `DWDN_config.txt`), вызывает `SetPeerAdmin(peer, true)` и отправляет `SyncAdminStateMessage(true)`.
     5. Клиент при получении `SyncAdminStateMessage(true)` автоматически открывает графическую панель администратора.
 
 ---
