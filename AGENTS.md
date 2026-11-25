@@ -48,6 +48,8 @@ dotnet run --project Tools/MechanicsTester/MechanicsTester.csproj -c Release -- 
 Перед сложными задачами по движку, нативному коду, ассетам или декомпиляции обязательно опирайтесь на следующие проверенные скиллы и репозитории:
 
 ### Universal Modder (`rehan-remade/universal-modder`)
+> Подробное руководство по локально установленному плагину (когда, зачем и как использовать каждый скилл, субагентов `mod-orchestrator` / `mod-offline-worker` / `mod-game-worker`, CLI `um` и типовые сценарии DWDN) вынесено в **[`docs/UNIVERSAL_MODDER_GUIDE.md`](docs/UNIVERSAL_MODDER_GUIDE.md)**.
+
 - **Bannerlord Engine Reference** — специфика движка TaleWorlds, модулей и XML/C# пайплайна:
   [engines/bannerlord.md](https://github.com/rehan-remade/universal-modder/blob/main/.agents/skills/mod-any-game/references/engines/bannerlord.md)
 - **Mod Any Game (Core Skill)** — базовый протокол исследования и разработки модов:
@@ -90,3 +92,4 @@ dotnet run --project Tools/MechanicsTester/MechanicsTester.csproj -c Release -- 
 | [`docs/ENGINE.md`](docs/ENGINE.md) | Энциклопедия реверс-инжиниринга ядра Bannerlord: `DotNetObject`, `project.mbproj` vs `MBObjectManager`, форматы `.tpac`/`.rdc`, скелет, сетевой протокол. |
 | [`docs/CHRONICLE.md`](docs/CHRONICLE.md) | Полная хроника разработки, решённых багов, балансных правок и конспект предыдущих ИИ-сессий. |
 | [`docs/GITHUB_WORKFLOW.md`](docs/GITHUB_WORKFLOW.md) | Модель веток (`development` / `main`), правила PR, настройка Branch Protection / Rulesets и автоматический релизный пайплайн. |
+| [`docs/UNIVERSAL_MODDER_GUIDE.md`](docs/UNIVERSAL_MODDER_GUIDE.md) | Подробное руководство по плагину `universal-modder`: скиллы, субагенты (`mod-orchestrator`, `mod-offline-worker`, `mod-game-worker`), CLI `um` и сценарии для DWDN. |
