@@ -484,6 +484,10 @@ namespace DWDN_Script
                 {
                     mission.Scene.GetHeightAtPoint(position.AsVec2, BodyFlags.CommonCollisionExcludeFlags, ref groundZ);
                 }
+                if (float.IsNaN(groundZ) || float.IsInfinity(groundZ))
+                {
+                    groundZ = position.z;
+                }
                 position.z = groundZ;
 
                 MatrixFrame rootFrame = MatrixFrame.Identity;
@@ -617,6 +621,10 @@ namespace DWDN_Script
                 {
                     mission.Scene.GetHeightAtPoint(horsePos.AsVec2, BodyFlags.CommonCollisionExcludeFlags, ref hZ);
                 }
+                if (float.IsNaN(hZ) || float.IsInfinity(hZ))
+                {
+                    hZ = position.z;
+                }
                 horsePos.z = hZ;
 
                 Vec2 horseHeading = heading;
@@ -627,26 +635,33 @@ namespace DWDN_Script
                                       ?? MBObjectManager.Instance?.GetObject<ItemObject>("mp_chain_barding");
 
                 Agent horseAgent = null;
-                try
+                if (horseItem != null)
                 {
-                    horseAgent = mission.SpawnMonster(
-                        new ItemRosterElement(horseItem, 1),
-                        new ItemRosterElement(harnessItem, 1),
-                        horsePos,
-                        horseHeading,
-                        (int)teamSide
-                    );
-
-                    if (horseAgent != null)
+                    try
                     {
-                        // ЖЕСТКИЙ ЗАПРЕТ БЕГА И ГАЛОПА: ТОЛЬКО ШАГ
-                        horseAgent.SetMaximumSpeedLimit(2.2f, false);
-                        horseAgent.UpdateAgentProperties();
+                        ItemRosterElement harnessElement = harnessItem != null
+                            ? new ItemRosterElement(harnessItem, 1)
+                            : ItemRosterElement.Invalid;
+
+                        horseAgent = mission.SpawnMonster(
+                            new ItemRosterElement(horseItem, 1),
+                            harnessElement,
+                            horsePos,
+                            horseHeading,
+                            -1
+                        );
+
+                        if (horseAgent != null)
+                        {
+                            // ЖЕСТКИЙ ЗАПРЕТ БЕГА И ГАЛОПА: ТОЛЬКО ШАГ
+                            horseAgent.SetMaximumSpeedLimit(2.2f, false);
+                            horseAgent.UpdateAgentProperties();
+                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    Debug.Print($"[DWDN Artillery] Horse spawn exception: {ex.Message}");
+                    catch (Exception ex)
+                    {
+                        Debug.Print($"[DWDN Artillery] Horse spawn exception: {ex.Message}");
+                    }
                 }
 
                 MissionObject rootMissionObject = allObjects.FirstOrDefault();
@@ -704,9 +719,11 @@ namespace DWDN_Script
         {
             if (message == null || Mission.Current?.Scene == null) return;
 
-            lock (_lockObject)
+            try
             {
-                if (_activeEngines.Any(e => e.Id == message.EngineId)) return;
+                lock (_lockObject)
+                {
+                    if (_activeEngines.Any(e => e.Id == message.EngineId)) return;
 
                 var spec = GetSpecForType(message.PrefabName);
                 if (spec == null)
@@ -807,8 +824,7 @@ namespace DWDN_Script
                 Agent horseAgent = null;
                 if (message.HorseAgentIndex >= 0)
                 {
-                    horseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.IsMount && a.Index == message.HorseAgentIndex)
-                                 ?? Mission.Current?.Agents?.FirstOrDefault(a => a.IsMount);
+                    horseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.IsMount && a.Index == message.HorseAgentIndex);
                     if (horseAgent != null && horseAgent.IsActive())
                     {
                         try
@@ -842,6 +858,11 @@ namespace DWDN_Script
 
                 _activeEngines.Add(instance);
                 Debug.Print($"[DWDN Artillery Client] Mirrored {spec.Name} (ID: {instance.Id}, Cart: {message.UsesCart})");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.Print($"[DWDN Artillery Client] HandleServerSyncDescendants exception: {ex.Message}");
             }
         }
 
@@ -1013,37 +1034,43 @@ namespace DWDN_Script
         {
             if (message == null) return;
 
-            lock (_lockObject)
+            try
             {
-                var engine = _activeEngines.FirstOrDefault(e => e.Id == message.EngineId);
-                if (engine == null) return;
-
-                if (!message.IsCombatState && message.HorseAgentIndex >= 0)
+                lock (_lockObject)
                 {
-                    engine.HorseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.IsMount && a.Index == message.HorseAgentIndex)
-                                        ?? Mission.Current?.Agents?.FirstOrDefault(a => a.IsMount);
+                    var engine = _activeEngines.FirstOrDefault(e => e.Id == message.EngineId);
+                    if (engine == null) return;
+
+                    if (!message.IsCombatState && message.HorseAgentIndex >= 0)
+                    {
+                        engine.HorseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.IsMount && a.Index == message.HorseAgentIndex);
+                    }
+
+                    engine.SavedAmmo = message.RemainingAmmo;
+                    engine.SetCombatState(message.IsCombatState);
+
+                    if (message.IsCombatState)
+                    {
+                        engine.HorseAgent = null;
+                    }
+
+                    if (message.Frame.origin.LengthSquared > 0.01f)
+                    {
+                        engine.Frame = message.Frame;
+                        MatrixFrame f = message.Frame;
+                        engine.RootEntity?.SetFrame(ref f);
+                        engine.CartEntity?.SetFrame(ref f);
+                    }
+
+                    string msg = message.IsCombatState
+                        ? $"[DWDN Артиллерия] {engine.Spec.Name} приведен в боевое положение!"
+                        : $"[DWDN Артиллерия] {engine.Spec.Name} запряжен в походное положение!";
+                    InformationManager.DisplayMessage(new InformationMessage(msg, Colors.Green));
                 }
-
-                engine.SavedAmmo = message.RemainingAmmo;
-                engine.SetCombatState(message.IsCombatState);
-
-                if (message.IsCombatState)
-                {
-                    engine.HorseAgent = null;
-                }
-
-                if (message.Frame.origin.LengthSquared > 0.01f)
-                {
-                    engine.Frame = message.Frame;
-                    MatrixFrame f = message.Frame;
-                    engine.RootEntity?.SetFrame(ref f);
-                    engine.CartEntity?.SetFrame(ref f);
-                }
-
-                string msg = message.IsCombatState
-                    ? $"[DWDN Артиллерия] {engine.Spec.Name} приведен в боевое положение!"
-                    : $"[DWDN Артиллерия] {engine.Spec.Name} запряжен в походное положение!";
-                InformationManager.DisplayMessage(new InformationMessage(msg, Colors.Green));
+            }
+            catch (Exception ex)
+            {
+                Debug.Print($"[DWDN Artillery Client] HandleServerCombatState exception: {ex.Message}");
             }
         }
 
