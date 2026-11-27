@@ -2685,3 +2685,13 @@ if (this._isInWeaponCameraMode)
 - **Служебные скрипты:** `ЗАПУСК_ТЕСТОВ_МЕХАНИК.bat` и `ТЕСТ_МЕХАНИК_CLI.bat` перенесены в `Tools/`; все `.bat` в `Tools/` переведены на относительные пути `%~dp0`; в `sync_all.ps1` синхронизация в `d:\banAImod\DWDN_TRY` сделана условной (`Test-Path`).
 - **Документация для ИИ и разработчиков:** длинные документы вынесены в `docs/` (`DOCUMENTATION.md`, `AI_MODDING_GUIDE.md`, `ENGINE.md`, `CHRONICLE.md`, `GITHUB_WORKFLOW.md`). В корне создан компактный `AGENTS.md` (базовая архитектура + ссылки на скиллы `rehan-remade/universal-modder` и `ShortJake/NativeHook` + карта `docs/`) и переработан `README.md`.
 - **GitHub Flow и автоматизация:** создана ветка `development`, добавлены `.github/CODEOWNERS`, `.github/workflows/branch-guard.yml` и `.github/workflows/release.yml` (автоматическая сборка `DWDN_TRY_<version>.zip` и публикация GitHub Release при обновлении `main`).
+
+---
+
+## [fix/intermission-giant-shield] Исправление гигантского гербового щита на экране смены карты (MultiplayerIntermission)
+- **Опровержение старой гипотезы:** прямая инспекция всех 559 ассетов AssetPackages\pack0.tpac показала, что в pack0.tpac нет UI-спрайтов (dwdn_loading / dwdn_faction отсутствуют).
+- **Истинная причина (подтверждена дампом [DWDN_DIAG], декомпиляцией TwoDimensionEnginePlatform и живым запуском):** TaleWorlds.Engine.Texture.CreateFromMemory(bytes) создаёт нативную текстуру с пустым именем Texture.Name == "". В TwoDimensionView.GetOrCreateMaterial материалы кэшируются по имени текстуры. На экране MultiplayerIntermission на одном GauntletLayer (Layer[0]) одновременно рисуются фон Standard_Background (dwdn_screen_load_1, Name="") и малый щит Icon (dwdn_faction_1, Name=""), из-за чего второй вызов перетирал DiffuseMap общего материала на dwdn_faction_1.png и растягивал щит на весь экран 2560x1440.
+- **Решение (ModuleData/scripts/DWDN_Script/SubModule.cs):**
+  1. После Texture.CreateFromMemory(bytes) задаётся уникальное имя engineTex.Name = "dwdn_mem_" + Path.GetFileNameWithoutExtension(fullPath);.
+  2. В UpdateSpriteGenericInPlace добавлена поддержка <SpritePart>k__BackingField (auto-property в TaleWorlds.TwoDimension.SpriteGeneric).
+  3. В CleanIntermissionWidgets для ScreenBackgroundBrushWidget обновляются все Brush.Styles, Brush.Sprite и Brush.DefaultLayer.Sprite.
