@@ -12,7 +12,7 @@
 	<!-- DWDN Ratay Falchion (Укороченный ополченский тесак Ратая — слабее тесака Банобранного) -->
 	<CraftedItem id="dwdn_ratay_falchion" name="Ополченский тесак" crafting_template="OneHandedSword" culture="Culture.neutral_culture" modifier_group="sword" multiplayer_item="true">
 		<Pieces>
-			<Piece id="dwdn_ratay_falchion_blade" Type="Blade" scale_factor="80" />
+			<Piece id="dwdn_ratay_falchion_blade" Type="Blade" scale_factor="100" />
 			<Piece id="mp_battania_short_sword_guard" Type="Guard" scale_factor="95" />
 			<Piece id="mp_vlandian_short_sword_grip" Type="Handle" scale_factor="95" />
 			<Piece id="mp_vlandian_short_sword_pommel" Type="Pommel" scale_factor="95" />

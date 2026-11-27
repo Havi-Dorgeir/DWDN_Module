@@ -1094,6 +1094,8 @@
 			<AvailablePiece
 				id="mp_battania_cleaver_blade" />
 			<AvailablePiece
+				id="dwdn_ratay_falchion_blade" />
+			<AvailablePiece
 				id="mp_battania_noble_sword_blade" />
 			<AvailablePiece
 				id="mp_battania_long_sword_guard" />
