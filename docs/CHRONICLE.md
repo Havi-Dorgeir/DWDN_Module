@@ -2685,3 +2685,18 @@ if (this._isInWeaponCameraMode)
 - **Служебные скрипты:** `ЗАПУСК_ТЕСТОВ_МЕХАНИК.bat` и `ТЕСТ_МЕХАНИК_CLI.bat` перенесены в `Tools/`; все `.bat` в `Tools/` переведены на относительные пути `%~dp0`; в `sync_all.ps1` синхронизация в `d:\banAImod\DWDN_TRY` сделана условной (`Test-Path`).
 - **Документация для ИИ и разработчиков:** длинные документы вынесены в `docs/` (`DOCUMENTATION.md`, `AI_MODDING_GUIDE.md`, `ENGINE.md`, `CHRONICLE.md`, `GITHUB_WORKFLOW.md`). В корне создан компактный `AGENTS.md` (базовая архитектура + ссылки на скиллы `rehan-remade/universal-modder` и `ShortJake/NativeHook` + карта `docs/`) и переработан `README.md`.
 - **GitHub Flow и автоматизация:** создана ветка `development`, добавлены `.github/CODEOWNERS`, `.github/workflows/branch-guard.yml` и `.github/workflows/release.yml` (автоматическая сборка `DWDN_TRY_<version>.zip` и публикация GitHub Release при обновлении `main`).
+
+---
+
+### Сессия 2026-11-27 — Исправление стихийного убегания тяглового коня артиллерии (ix/artillery-hitched-horse-wandering)
+
+- **Проблема:** при спавне артиллериста с любым орудием прицепленный тягловый конь сразу убегал в случайном направлении.
+- **Истинная причина (реверс-инжиниринг TaleWorlds.MountAndBlade.dll, SandBox.dll, Native/ModuleData/monsters.xml через ilspycmd):**
+  1. У horse в Native/ModuleData/monsters.xml выставлены флаги CanWander="true" и RunsAwayWhenHit="true", а Agent.BuildAgent принудительно ставит Controller = AgentControllerType.AI не-гуманоидам. C++ ИИ блуждания/бегства лошади игнорирует SetMaximumSpeedLimit(0.0001f, false) и MovementInputVector = Vec2.Zero.
+  2. Официальный паттерн TaleWorlds (SandBoxHelpers.SpawnHorses → TaleWorlds.MountAndBlade.Objects.AnimalSpawnSettings): nimalAgent.SetAgentFlags(animalAgent.GetAgentFlags() & ~AgentFlag.CanWander).
+  3. Дополнительно: в SpawnEngine конь спавнился с лимитом 2.2f и (int)teamSide вместо orcedAgentIndex = -1, а gent.Mount(engine.HorseAgent) на дистанции 8.3 м не срабатывал.
+- **Исправления в ModuleData/scripts/DWDN_Script/DWDN_FieldArtilleryBehavior.cs:**
+  1. Добавлены AutonomousMountBehaviorFlags (CanWander | RunsAwayWhenHit | CanGetScared | CanRetreat | MoveAsHerd), EngineInstance.LastKnownHasRider, ApplyHitchedHorseKinematics и ReleaseHitchedHorse.
+  2. В упряжке (SpawnEngine, HandleServerSyncDescendants, SetCombatState(false), OnMissionTick) снимаются флаги блуждания/бегства; без всадника удерживается стоп  .0001f, при посадке в седло включается шаг 2.2f. При расцепке и уничтожении орудия возвращаются CanWander | RunsAwayWhenHit и -1f.
+  3. Дистанции упряжки выровнены до 4.0f, убран нерабочий вызов gent.Mount(engine.HorseAgent) на спавне; подтянуты защитные правки (SpawnMonster(..., -1), проверки NaN/Infinity, 	ry/catch и строгий поиск коня по индексу в сетевых хендлерах).
+- **Верификация:** DWDN_Script.csproj (0 ошибок), DWDN_Script.Server.csproj (0 ошибок), MechanicsTester --cli (30/30 PASSED).
