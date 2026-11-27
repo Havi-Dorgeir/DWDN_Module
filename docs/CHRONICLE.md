@@ -2880,3 +2880,18 @@ if (this._isInWeaponCameraMode)
   1. После Texture.CreateFromMemory(bytes) задаётся уникальное имя engineTex.Name = "dwdn_mem_" + Path.GetFileNameWithoutExtension(fullPath);.
   2. В UpdateSpriteGenericInPlace добавлена поддержка <SpritePart>k__BackingField (auto-property в TaleWorlds.TwoDimension.SpriteGeneric).
   3. В CleanIntermissionWidgets для ScreenBackgroundBrushWidget обновляются все Brush.Styles, Brush.Sprite и Brush.DefaultLayer.Sprite.
+
+
+---
+
+### Сессия 2026-11-27 — Синхронизация ХП баллисты/мангонели и устранение «призрачного» 0-ХП орудия (`fix/artillery-hp-sync`)
+
+- **Причины (реверс-инжиниринг `MissionMainAgentInteractionComponent.FocusedItemHealthTick` + `AgentInteractionInterfaceVM.SetHealth` + анализ лога `rgl_log_4492.txt`):**
+  1. **Невидимое ХП баллисты (и первых попаданий по мангонели):** в `HandleServerSyncDescendants` на клиенте не выставлялся `dc.MaxHitPoint = spec.MaxHp` (оставался префабный `800f`, тогда как на сервере `1100f`/`1400f`), а в `SpawnEngine` на сервере `dc.HitPoint = spec.MaxHp` вызывался *до* рассылки `SyncArtilleryDescendantsMessage` (пакет `SyncObjectHitpoints` терялся на клиенте с `MissionObject with ID ... could not be found`). При ударах клиент получал `HitPoint > 800`, вычислял `TargetHealth = (int)(100 * HitPoint / 800) >= 100`, и `SetHealth(..., hideHealthBarWhenFull: true)` скрывал полоску (`ShowHealthBar = TargetHealth < 100`).
+  2. **Пустая полоска 0 ХП («уже уничтожена») у мангонели:** при переспавне игрока `CheckAndSpawnArtilleryForAgent` ставил старому орудию `existingEngine.Destructable.HitPoint = 0f` (рассылая `SyncObjectHitpoints(Id, 0)`) и вызывал `RootEntity.FadeOut(0.5f, false)` *только на сервере*. На клиенте целая модель (`CurrentState == "clean"`) оставалась стоять с `HitPoint = 0`, показывая пустую полоску ХП.
+- **Исправления в `ModuleData/scripts/DWDN_Script/DWDN_FieldArtilleryBehavior.cs`:**
+  1. `SpawnEngine`: выставляется `dc.CanBeDestroyedInitially = true`, `dc.MaxHitPoint = spec.MaxHp`; присвоение `dc.HitPoint = spec.MaxHp` перенесено *после* рассылки `SyncArtilleryDescendantsMessage`.
+  2. `HandleServerSyncDescendants`: добавлен вызов `LoadConfig()`, а на `DestructableComponent` выставляются `dc.CanBeDestroyedInitially = true`, `dc.MaxHitPoint = spec.MaxHp` и `dc.HitPoint = spec.MaxHp`.
+  3. `SyncEnginesToPeer`: для поздно подключившихся клиентов после `SyncArtilleryDescendantsMessage` дополнительно отправляется `NetworkMessages.FromServer.SyncObjectHitpoints` с актуальным `HitPoint`.
+  4. `OnMissionTick`: на клиенте при `engine.Destructable.IsDestroyed`, если сущность всё ещё в состоянии `clean` (утилизирована сервером без боевого разрушения на обломки), вызывается `FadeOut(0.5f, false)` для `RootEntity` и `CartEntity`.
+- **Верификация:** `DWDN_Script.csproj` (0 ошибок), `DWDN_Script.Server.csproj` (0 ошибок, 0 предупреждений), `MechanicsTester --cli` (30/30 PASSED).
