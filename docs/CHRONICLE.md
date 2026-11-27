@@ -2855,3 +2855,18 @@ if (this._isInWeaponCameraMode)
   - При выстреле создаётся несинхронизируемая `GameEntity.CreateEmpty(scene, false, false, false)` (без привязки к оружию в руках). Основной эмиттер `prt_steam_bath` замедлен через `SetRuntimeTimeMultiplier(0.58f)` (~5.15 с жизни каждой частицы) с огибающей эмиссии `3.8x` (0–0.32 с) → плавный спад `1.8x -> 0` (к 2.2 с), что даёт ~6–8+ с зависающего белого облака с баллистическим торможением вперёд (`vel *= exp(-6.5*dt)`) и сносом по `scene.GetGlobalWindVelocity()`.
   - Защита FPS и стабильности: жёсткий лимит `MaxActiveClouds = 48`, дистанционный LOD (`<45м` со струйкой, `<90м` полный, `90–160м` упрощённый, `>160м` пропуск), удаление только после `!HasAliveParticles()` (или таймаута `9.5с`), guard `Mission.CurrentState == Continuing` в `OnMissionTick`/`DisposeCloud` и безопасный `ResetSmokeStateOnly()` (без `Remove(0)`) в `OnClearScene`/`OnEndMission`/`OnRemoveBehavior` по правилу Сессии 4.
 - **Верификация:** `DWDN_Script.csproj` (0 ошибок, 0 предупреждений), `DWDN_Script.Server.csproj` (0 ошибок, 0 предупреждений), `MechanicsTester --cli` (30/30 PASSED).
+
+---
+
+### Сессия 2026-11-27 — Исправление стихийного убегания тяглового коня артиллерии (ix/artillery-hitched-horse-wandering)
+
+- **Проблема:** при спавне артиллериста с любым орудием прицепленный тягловый конь сразу убегал в случайном направлении.
+- **Истинная причина (реверс-инжиниринг TaleWorlds.MountAndBlade.dll, SandBox.dll, Native/ModuleData/monsters.xml через ilspycmd):**
+  1. У horse в Native/ModuleData/monsters.xml выставлены флаги CanWander="true" и RunsAwayWhenHit="true", а Agent.BuildAgent принудительно ставит Controller = AgentControllerType.AI не-гуманоидам. C++ ИИ блуждания/бегства лошади игнорирует SetMaximumSpeedLimit(0.0001f, false) и MovementInputVector = Vec2.Zero.
+  2. Официальный паттерн TaleWorlds (SandBoxHelpers.SpawnHorses → TaleWorlds.MountAndBlade.Objects.AnimalSpawnSettings): nimalAgent.SetAgentFlags(animalAgent.GetAgentFlags() & ~AgentFlag.CanWander).
+  3. Дополнительно: в SpawnEngine конь спавнился с лимитом 2.2f и (int)teamSide вместо orcedAgentIndex = -1, а gent.Mount(engine.HorseAgent) на дистанции 8.3 м не срабатывал.
+- **Исправления в ModuleData/scripts/DWDN_Script/DWDN_FieldArtilleryBehavior.cs:**
+  1. Добавлены AutonomousMountBehaviorFlags (CanWander | RunsAwayWhenHit | CanGetScared | CanRetreat | MoveAsHerd), EngineInstance.LastKnownHasRider, ApplyHitchedHorseKinematics и ReleaseHitchedHorse.
+  2. В упряжке (SpawnEngine, HandleServerSyncDescendants, SetCombatState(false), OnMissionTick) снимаются флаги блуждания/бегства; без всадника удерживается стоп  .0001f, при посадке в седло включается шаг 2.2f. При расцепке и уничтожении орудия возвращаются CanWander | RunsAwayWhenHit и -1f.
+  3. Дистанции упряжки выровнены до 4.0f, убран нерабочий вызов gent.Mount(engine.HorseAgent) на спавне; подтянуты защитные правки (SpawnMonster(..., -1), проверки NaN/Infinity, 	ry/catch и строгий поиск коня по индексу в сетевых хендлерах).
+- **Верификация:** DWDN_Script.csproj (0 ошибок), DWDN_Script.Server.csproj (0 ошибок), MechanicsTester --cli (30/30 PASSED).
