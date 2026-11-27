@@ -63,6 +63,17 @@ namespace DWDN_Script.Server.Behaviors
             }
         }
 
+        protected override void OnEndMission()
+        {
+            if (GameNetwork.IsServer && _handlerRegistered)
+            {
+                DWDN_NetworkHelper.UnregisterClientMessageHandler<RequestCustomLoadoutMessage>(HandleClientCustomLoadout);
+                _handlerRegistered = false;
+            }
+            _customizedAgentIndices.Clear();
+            base.OnEndMission();
+        }
+
         public override void OnRemoveBehavior()
         {
             if (GameNetwork.IsServer && _handlerRegistered)
@@ -88,6 +99,9 @@ namespace DWDN_Script.Server.Behaviors
         {
             if (peer == null || msg == null)
                 return false;
+
+            if (Mission == null || Mission.CurrentState != Mission.State.Continuing)
+                return true;
 
             try
             {
@@ -183,7 +197,7 @@ namespace DWDN_Script.Server.Behaviors
         {
             base.OnMissionTick(dt);
 
-            if (!GameNetwork.IsServer)
+            if (!GameNetwork.IsServer || Mission == null || Mission.CurrentState != Mission.State.Continuing)
                 return;
 
             EnsureHandlerRegistered();

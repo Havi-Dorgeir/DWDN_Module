@@ -139,6 +139,17 @@ namespace DWDN_Script.Client.UI
             if (_layer == null || Mission == null)
                 return;
 
+            bool isEnding = IsMissionEnding();
+            if (isEnding)
+            {
+                _pedestalUpdatePending = false;
+                if (_visible)
+                {
+                    Hide();
+                }
+                return;
+            }
+
             MissionPeer myPeer = GameNetwork.IsMyPeerReady ? GameNetwork.MyPeer?.GetComponent<MissionPeer>() : null;
             bool hasTeam = myPeer != null && myPeer.Team != null && (int)myPeer.Team.Side != -1;
 
@@ -158,7 +169,6 @@ namespace DWDN_Script.Client.UI
 
             UpdateSpawnState(isAlive);
 
-            bool isEnding = IsMissionEnding();
             bool isDwdn = IsLocalPlayerDwdn(myPeer);
 
             // Переключение меню по клавише M (или U)
