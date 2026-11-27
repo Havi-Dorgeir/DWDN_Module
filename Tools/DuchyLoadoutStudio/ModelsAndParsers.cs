@@ -58,12 +58,90 @@ public class DuchyModel
     public List<ClassModel> Classes { get; set; } = new();
 }
 
+public class SlotModel
+{
+    public SlotCategory Target { get; set; } = SlotCategory.Weapon0;
+    public string Category { get; set; } = "Вооружение";
+    public string Label { get; set; } = "Оружие";
+    public bool Visible { get; set; } = true;
+    public bool AllowEmpty { get; set; } = false;
+    public List<string> Items { get; set; } = new();
+
+    public SlotModel Clone() => new()
+    {
+        Target = Target,
+        Category = Category,
+        Label = Label,
+        Visible = Visible,
+        AllowEmpty = AllowEmpty,
+        Items = new List<string>(Items)
+    };
+
+    public static string TargetToXmlName(SlotCategory cat) => cat switch
+    {
+        SlotCategory.HeadArmor => "Head",
+        SlotCategory.Cape      => "Cape",
+        SlotCategory.BodyArmor => "Body",
+        SlotCategory.Gloves    => "Gloves",
+        SlotCategory.Legs      => "Legs",
+        SlotCategory.Weapon0   => "Weapon0",
+        SlotCategory.Weapon1   => "Weapon1",
+        SlotCategory.Weapon2   => "Weapon2",
+        SlotCategory.Weapon3   => "Weapon3",
+        SlotCategory.Mount     => "Horse",
+        _ => "Weapon0"
+    };
+
+    public static bool TryParseXmlTarget(string raw, out SlotCategory cat)
+    {
+        cat = SlotCategory.Weapon0;
+        switch ((raw ?? "").Trim().ToLowerInvariant())
+        {
+            case "head": case "headarmor": cat = SlotCategory.HeadArmor; return true;
+            case "cape": cat = SlotCategory.Cape; return true;
+            case "body": case "bodyarmor": cat = SlotCategory.BodyArmor; return true;
+            case "gloves": case "handarmor": cat = SlotCategory.Gloves; return true;
+            case "legs": case "leg": case "legarmor": cat = SlotCategory.Legs; return true;
+            case "weapon0": case "item0": cat = SlotCategory.Weapon0; return true;
+            case "weapon1": case "item1": cat = SlotCategory.Weapon1; return true;
+            case "weapon2": case "item2": cat = SlotCategory.Weapon2; return true;
+            case "weapon3": case "item3": cat = SlotCategory.Weapon3; return true;
+            case "horse": case "mount": cat = SlotCategory.Mount; return true;
+            default: return false;
+        }
+    }
+
+    public static string DefaultCategoryFor(SlotCategory cat) => cat switch
+    {
+        SlotCategory.HeadArmor or SlotCategory.Cape or SlotCategory.BodyArmor or SlotCategory.Gloves or SlotCategory.Legs => "Броня",
+        SlotCategory.Mount => "Верховая езда",
+        _ => "Вооружение"
+    };
+
+    public static string DefaultLabelFor(SlotCategory cat) => cat switch
+    {
+        SlotCategory.HeadArmor => "Шлем",
+        SlotCategory.Cape      => "Наплечники",
+        SlotCategory.BodyArmor => "Доспех",
+        SlotCategory.Gloves    => "Перчатки",
+        SlotCategory.Legs      => "Обувь",
+        SlotCategory.Weapon0   => "Оружие I",
+        SlotCategory.Weapon1   => "Оружие II",
+        SlotCategory.Weapon2   => "Оружие III",
+        SlotCategory.Weapon3   => "Оружие IV",
+        SlotCategory.Mount     => "Скакун",
+        _ => cat.ToString()
+    };
+}
+
 public class ClassModel
 {
     public string Id { get; set; } = "mp_NewClass";
     public string Name { get; set; } = "Новый Класс";
     public string Description { get; set; } = "Описание боевой роли класса...";
     public string TroopId { get; set; } = "mp_NewClass_hero";
+    public string IconSpriteName { get; set; } = "";
+    public bool IsEnabled { get; set; } = true;
     public string Group { get; set; } = "Infantry"; // Infantry, Ranged, Cavalry
     public string IconType { get; set; } = "Infantry_Heavy";
     public int Cost { get; set; } = 120;
@@ -82,7 +160,10 @@ public class ClassModel
     public int SkillCrossbow { get; set; } = 60;
     public int SkillRiding { get; set; } = 100;
 
-    // 10 Equipment Pools (List of Item IDs; "" means empty/unequip allowed)
+    // Dynamic ordered slots (primary model for ModuleData/dwdn_loadouts.xml)
+    public List<SlotModel> Slots { get; set; } = new();
+
+    // 10 Equipment Pools (kept synced with Slots for 3D Mannequin & legacy helpers)
     public Dictionary<SlotCategory, List<string>> Pools { get; set; } = new()
     {
         { SlotCategory.HeadArmor, new List<string>() },
@@ -100,6 +181,36 @@ public class ClassModel
     // Currently previewed item index per slot in the 3D Mannequin
     public Dictionary<SlotCategory, string> PreviewSelectedItem { get; set; } = new();
 
+    public void SyncPoolsFromSlots()
+    {
+        foreach (var kv in Pools) kv.Value.Clear();
+        foreach (var s in Slots)
+        {
+            Pools[s.Target].Clear();
+            Pools[s.Target].AddRange(s.Items);
+            if (s.AllowEmpty && !Pools[s.Target].Contains(""))
+                Pools[s.Target].Add("");
+        }
+    }
+
+    public void EnsureSlotsFromPools()
+    {
+        if (Slots.Count > 0) return;
+        foreach (SlotCategory cat in Enum.GetValues(typeof(SlotCategory)))
+        {
+            if (Pools[cat].Count == 0) continue;
+            Slots.Add(new SlotModel
+            {
+                Target = cat,
+                Category = SlotModel.DefaultCategoryFor(cat),
+                Label = SlotModel.DefaultLabelFor(cat),
+                Visible = true,
+                AllowEmpty = Pools[cat].Contains(""),
+                Items = new List<string>(Pools[cat])
+            });
+        }
+    }
+
     public string GetPreviewOrDefault(SlotCategory slot)
     {
         if (PreviewSelectedItem.TryGetValue(slot, out var sel) && Pools[slot].Contains(sel))
@@ -115,6 +226,8 @@ public class ClassModel
             Name = Name + " (Копия)",
             Description = Description,
             TroopId = TroopId + "_Copy",
+            IconSpriteName = IconSpriteName,
+            IsEnabled = IsEnabled,
             Group = Group,
             IconType = IconType,
             Cost = Cost,
@@ -131,8 +244,9 @@ public class ClassModel
             SkillCrossbow = SkillCrossbow,
             SkillRiding = SkillRiding
         };
-        foreach (var kv in Pools)
-            c.Pools[kv.Key] = new List<string>(kv.Value);
+        foreach (var s in Slots)
+            c.Slots.Add(s.Clone());
+        c.SyncPoolsFromSlots();
         return c;
     }
 }
@@ -161,7 +275,28 @@ public static class StudioDataLoader
             IsCustomModItem = true
         };
 
-        // 1. Load custom DWDN items first
+        // 1. Load vanilla Native mpitems first (so custom DWDN items can cleanly override if needed)
+        string nativeMpItemsFile = Path.Combine(nativePath, @"ModuleData\mpitems.xml");
+        if (File.Exists(nativeMpItemsFile))
+            ParseItemsXml(nativeMpItemsFile, isCustomMod: false, dict);
+
+        string nativeItemsDir = Path.Combine(nativePath, @"ModuleData\mpitems");
+        if (Directory.Exists(nativeItemsDir))
+        {
+            foreach (var xml in Directory.GetFiles(nativeItemsDir, "*.xml"))
+                ParseItemsXml(xml, isCustomMod: false, dict);
+        }
+
+        // Also check Modules/Multiplayer/ModuleData/mpitems.xml if present
+        string modulesDir = Directory.GetParent(nativePath)?.FullName ?? "";
+        if (!string.IsNullOrEmpty(modulesDir))
+        {
+            string mpModuleFile = Path.Combine(modulesDir, @"Multiplayer\ModuleData\mpitems.xml");
+            if (File.Exists(mpModuleFile))
+                ParseItemsXml(mpModuleFile, isCustomMod: false, dict);
+        }
+
+        // 2. Load custom DWDN items second (marked with IsCustomModItem = true)
         string modItemsDir = Path.Combine(modPath, @"ModuleData\mpitems");
         if (Directory.Exists(modItemsDir))
         {
@@ -171,14 +306,6 @@ public static class StudioDataLoader
         string rootItemsXml = Path.Combine(modPath, @"ModuleData\items.xml");
         if (File.Exists(rootItemsXml))
             ParseItemsXml(rootItemsXml, isCustomMod: true, dict);
-
-        // 2. Load vanilla Native mpitems
-        string nativeItemsDir = Path.Combine(nativePath, @"ModuleData\mpitems");
-        if (Directory.Exists(nativeItemsDir))
-        {
-            foreach (var xml in Directory.GetFiles(nativeItemsDir, "*.xml"))
-                ParseItemsXml(xml, isCustomMod: false, dict);
-        }
 
         return dict;
     }
@@ -255,23 +382,88 @@ public static class StudioDataLoader
     }
 
     /// <summary>
-    /// Parses DWDN_DuchyManager.cs + mpclassdivisions.xml + mpcharacters.xml into editable DuchyModel & ClassModel objects.
+    /// Loads Duchies & Classes from ModuleData/dwdn_loadouts.xml (primary), falling back to DWDN_DuchyManager.cs if XML is absent.
+    /// Enriches stats & skills from mpclassdivisions.xml and mpcharacters.xml.
     /// </summary>
     public static List<DuchyModel> LoadDuchiesAndClasses(string modPath)
     {
+        string loadoutsXmlPath = Path.Combine(modPath, @"ModuleData\dwdn_loadouts.xml");
         string csPath = Path.Combine(modPath, @"ModuleData\scripts\DWDN_Script\Common\Duchies\DWDN_DuchyManager.cs");
         string divXmlPath = Path.Combine(modPath, @"ModuleData\mpclassdivisions.xml");
         string charXmlPath = Path.Combine(modPath, @"ModuleData\mpcharacters.xml");
 
         var duchies = new List<DuchyModel>();
-        var varToDuchy = new Dictionary<string, DuchyModel>();
-        var varToClass = new Dictionary<string, ClassModel>();
 
-        if (File.Exists(csPath))
+        if (File.Exists(loadoutsXmlPath))
         {
+            var doc = XDocument.Load(loadoutsXmlPath);
+            var duchiesEl = doc.Root?.Element("Duchies") ?? doc.Root;
+            if (duchiesEl != null)
+            {
+                foreach (var dEl in duchiesEl.Elements("Duchy"))
+                {
+                    var d = new DuchyModel
+                    {
+                        Id = dEl.Attribute("id")?.Value ?? "",
+                        Name = dEl.Attribute("name")?.Value ?? "",
+                        Description = dEl.Attribute("description")?.Value ?? "",
+                        BannerCode = dEl.Attribute("banner_code")?.Value ?? "",
+                        IsAvailable = !string.Equals(dEl.Attribute("enabled")?.Value, "false", StringComparison.OrdinalIgnoreCase)
+                    };
+
+                    foreach (var cEl in dEl.Elements("Class"))
+                    {
+                        var c = new ClassModel
+                        {
+                            Id = cEl.Attribute("id")?.Value ?? "",
+                            Name = cEl.Attribute("name")?.Value ?? "",
+                            Description = cEl.Attribute("description")?.Value ?? "",
+                            TroopId = cEl.Attribute("troop_id")?.Value ?? "",
+                            IconSpriteName = cEl.Attribute("icon")?.Value ?? "",
+                            IsEnabled = !string.Equals(cEl.Attribute("enabled")?.Value, "false", StringComparison.OrdinalIgnoreCase)
+                        };
+
+                        foreach (var sEl in cEl.Elements("Slot"))
+                        {
+                            if (!SlotModel.TryParseXmlTarget(sEl.Attribute("target")?.Value ?? "", out var target))
+                                continue;
+
+                            var sm = new SlotModel
+                            {
+                                Target = target,
+                                Category = sEl.Attribute("category")?.Value ?? SlotModel.DefaultCategoryFor(target),
+                                Label = sEl.Attribute("label")?.Value ?? SlotModel.DefaultLabelFor(target),
+                                Visible = !string.Equals(sEl.Attribute("visible")?.Value, "false", StringComparison.OrdinalIgnoreCase),
+                                AllowEmpty = string.Equals(sEl.Attribute("allow_empty")?.Value, "true", StringComparison.OrdinalIgnoreCase)
+                            };
+
+                            foreach (var iEl in sEl.Elements("Item"))
+                            {
+                                string itemId = iEl.Attribute("id")?.Value ?? "";
+                                if (itemId.StartsWith("Item.", StringComparison.OrdinalIgnoreCase))
+                                    itemId = itemId.Substring(5);
+                                sm.Items.Add(itemId);
+                                if (string.IsNullOrEmpty(itemId))
+                                    sm.AllowEmpty = true;
+                            }
+
+                            c.Slots.Add(sm);
+                        }
+
+                        c.SyncPoolsFromSlots();
+                        d.Classes.Add(c);
+                    }
+
+                    duchies.Add(d);
+                }
+            }
+        }
+        else if (File.Exists(csPath))
+        {
+            var varToDuchy = new Dictionary<string, DuchyModel>();
+            var varToClass = new Dictionary<string, ClassModel>();
             string code = File.ReadAllText(csPath);
 
-            // Match: var banreich = new DWDN_Duchy("id", "Name", "Desc", "Banner", true/false);
             var duchyRegex = new Regex(
                 @"var\s+(\w+)\s*=\s*new\s+DWDN_Duchy\(\s*""([^""]*)""\s*,\s*""([^""]*)""\s*,\s*""([^""]*)""\s*,\s*""([^""]*)""\s*,\s*(true|false)\s*\)",
                 RegexOptions.Multiline);
@@ -289,7 +481,6 @@ public static class StudioDataLoader
                 duchies.Add(d);
             }
 
-            // Match: var ratay = new DWDN_ClassDefinition("id", "Name", "Desc", "TroopId");
             var classRegex = new Regex(
                 @"var\s+(\w+)\s*=\s*new\s+DWDN_ClassDefinition\(\s*""([^""]*)""\s*,\s*""([^""]*)""\s*,\s*""([^""]*)""\s*,\s*""([^""]*)""\s*\)",
                 RegexOptions.Multiline);
@@ -305,7 +496,6 @@ public static class StudioDataLoader
                 varToClass[m.Groups[1].Value] = c;
             }
 
-            // Match pool additions: varName.AllowedHelmets.AddRange(new[] { "a", "b" });
             var poolMap = new Dictionary<string, SlotCategory>
             {
                 { "AllowedHelmets",      SlotCategory.HeadArmor },
@@ -330,19 +520,17 @@ public static class StudioDataLoader
                 if (varToClass.TryGetValue(cVar, out var cls) && poolMap.TryGetValue(prop, out var slot))
                 {
                     foreach (Match im in Regex.Matches(itemsRaw, @"""([^""]*)"""))
-                    {
                         cls.Pools[slot].Add(im.Groups[1].Value);
-                    }
                 }
             }
 
-            // Match: banreich.Classes.Add(ratay);
             var addClassRegex = new Regex(@"(\w+)\.Classes\.Add\((\w+)\)");
             foreach (Match m in addClassRegex.Matches(code))
             {
                 if (varToDuchy.TryGetValue(m.Groups[1].Value, out var d) &&
                     varToClass.TryGetValue(m.Groups[2].Value, out var c))
                 {
+                    c.EnsureSlotsFromPools();
                     d.Classes.Add(c);
                 }
             }
@@ -1085,6 +1273,202 @@ public static class StudioDataLoader
                 rosterEl.Add(new XElement("equipment", new XAttribute("slot", "HorseHarness"), new XAttribute("id", existingHarness)));
             }
         }
+    }
+
+    public static string ResolveModRoot()
+    {
+        // Walk up from executable directory looking for SubModule.xml
+        string dir = AppContext.BaseDirectory;
+        for (int i = 0; i < 8 && !string.IsNullOrEmpty(dir); i++)
+        {
+            if (File.Exists(Path.Combine(dir, "SubModule.xml")))
+                return dir;
+            dir = Directory.GetParent(dir)?.FullName;
+        }
+
+        string cwd = Directory.GetCurrentDirectory();
+        if (File.Exists(Path.Combine(cwd, "SubModule.xml")))
+            return cwd;
+
+        return @"E:\SteamLibrary\steamapps\common\Mount & Blade II Bannerlord\Modules\DWDN_TRY";
+    }
+
+    public static string ResolveNativeRoot(string modRoot)
+    {
+        try
+        {
+            string modulesDir = Directory.GetParent(modRoot)?.FullName;
+            if (!string.IsNullOrEmpty(modulesDir))
+            {
+                string candidate = Path.Combine(modulesDir, "Native");
+                if (Directory.Exists(candidate)) return candidate;
+            }
+        }
+        catch { }
+        return @"E:\SteamLibrary\steamapps\common\Mount & Blade II Bannerlord\Modules\Native";
+    }
+
+    public static string ResolveDedicatedServerModRoot(string modRoot)
+    {
+        try
+        {
+            // <steamapps/common>/Mount & Blade II Bannerlord/Modules/DWDN_TRY
+            string commonDir = Directory.GetParent(modRoot)?.Parent?.Parent?.FullName;
+            if (!string.IsNullOrEmpty(commonDir))
+            {
+                string candidate = Path.Combine(commonDir, "Mount & Blade II Dedicated Server", "Modules", "DaewdenM");
+                if (Directory.Exists(candidate)) return candidate;
+            }
+        }
+        catch { }
+        return null;
+    }
+
+    public static XDocument BuildLoadoutsXDocument(List<DuchyModel> duchies)
+    {
+        var duchiesEl = new XElement("Duchies");
+        foreach (var d in duchies)
+        {
+            var dEl = new XElement("Duchy",
+                new XAttribute("id", d.Id ?? ""),
+                new XAttribute("name", d.Name ?? ""),
+                new XAttribute("description", d.Description ?? ""),
+                new XAttribute("banner_code", d.BannerCode ?? ""),
+                new XAttribute("enabled", d.IsAvailable ? "true" : "false")
+            );
+
+            foreach (var c in d.Classes)
+            {
+                c.SyncPoolsFromSlots();
+                var cEl = new XElement("Class",
+                    new XAttribute("id", c.Id ?? ""),
+                    new XAttribute("name", c.Name ?? ""),
+                    new XAttribute("description", c.Description ?? ""),
+                    new XAttribute("troop_id", c.TroopId ?? ""),
+                    new XAttribute("icon", c.IconSpriteName ?? ""),
+                    new XAttribute("enabled", c.IsEnabled ? "true" : "false")
+                );
+
+                foreach (var s in c.Slots)
+                {
+                    bool allowEmpty = s.AllowEmpty || s.Items.Contains("");
+                    var sEl = new XElement("Slot",
+                        new XAttribute("target", SlotModel.TargetToXmlName(s.Target)),
+                        new XAttribute("category", string.IsNullOrWhiteSpace(s.Category) ? SlotModel.DefaultCategoryFor(s.Target) : s.Category.Trim()),
+                        new XAttribute("label", string.IsNullOrWhiteSpace(s.Label) ? SlotModel.DefaultLabelFor(s.Target) : s.Label.Trim()),
+                        new XAttribute("visible", s.Visible ? "true" : "false"),
+                        new XAttribute("allow_empty", allowEmpty ? "true" : "false")
+                    );
+
+                    foreach (var itemId in s.Items)
+                    {
+                        string clean = itemId ?? "";
+                        if (clean.StartsWith("Item.", StringComparison.OrdinalIgnoreCase))
+                            clean = clean.Substring(5);
+                        sEl.Add(new XElement("Item", new XAttribute("id", clean)));
+                    }
+
+                    if (allowEmpty && !s.Items.Contains(""))
+                    {
+                        sEl.Add(new XElement("Item", new XAttribute("id", "")));
+                    }
+
+                    cEl.Add(sEl);
+                }
+
+                dEl.Add(cEl);
+            }
+
+            duchiesEl.Add(dEl);
+        }
+
+        return new XDocument(
+            new XDeclaration("1.0", "utf-8", null),
+            new XElement("DWDNLoadouts", new XAttribute("version", "1"), duchiesEl)
+        );
+    }
+
+    public static string GenerateLoadoutsXml(List<DuchyModel> duchies)
+    {
+        var doc = BuildLoadoutsXDocument(duchies);
+        using var sw = new StringWriter();
+        doc.Save(sw);
+        return sw.ToString();
+    }
+
+    public static string SaveLoadoutsXmlAtomic(string xmlPath, string backupDir, List<DuchyModel> duchies)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(xmlPath)!);
+        Directory.CreateDirectory(backupDir);
+
+        string backupFile = "";
+        if (File.Exists(xmlPath))
+        {
+            backupFile = Path.Combine(backupDir, $"dwdn_loadouts_{DateTime.Now:yyyyMMdd_HHmmss}.xml.bak");
+            File.Copy(xmlPath, backupFile, overwrite: true);
+        }
+
+        string tmpPath = xmlPath + ".tmp";
+        var doc = BuildLoadoutsXDocument(duchies);
+        doc.Save(tmpPath);
+        File.Move(tmpPath, xmlPath, overwrite: true);
+        return backupFile;
+    }
+
+    public static string GetLatestBackupPath(string backupDir)
+    {
+        if (!Directory.Exists(backupDir)) return null;
+        return Directory.GetFiles(backupDir, "dwdn_loadouts_*.xml.bak")
+            .OrderByDescending(f => f, StringComparer.OrdinalIgnoreCase)
+            .FirstOrDefault();
+    }
+
+    public static List<(bool IsError, string Message)> ValidateLoadouts(List<DuchyModel> duchies, Dictionary<string, GameItemEntry> catalog)
+    {
+        var issues = new List<(bool IsError, string Message)>();
+        var seenClassIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var d in duchies)
+        {
+            if (string.IsNullOrWhiteSpace(d.Id))
+                issues.Add((true, $"Герцогство '{d.Name}' имеет пустой ID."));
+
+            foreach (var c in d.Classes)
+            {
+                if (string.IsNullOrWhiteSpace(c.Id))
+                    issues.Add((true, $"Класс '{c.Name}' в герцогстве '{d.Name}' имеет пустой ID."));
+                else if (!seenClassIds.Add(c.Id))
+                    issues.Add((true, $"Дублирующийся ID класса: '{c.Id}'."));
+
+                var usedTargets = new HashSet<SlotCategory>();
+                foreach (var s in c.Slots)
+                {
+                    if (!usedTargets.Add(s.Target))
+                        issues.Add((true, $"Класс '{c.Name}': физический слот '{SlotModel.TargetToXmlName(s.Target)}' добавлен дважды! Удалите дубликат."));
+
+                    if (s.Items.Count == 0)
+                        issues.Add((false, $"Класс '{c.Name}', слот '{s.Label}': пустой список предметов."));
+
+                    foreach (var id in s.Items)
+                    {
+                        if (string.IsNullOrEmpty(id)) continue;
+                        if (id.StartsWith("Item.", StringComparison.OrdinalIgnoreCase))
+                            issues.Add((true, $"Класс '{c.Name}', слот '{s.Label}': запрещённый префикс 'Item.' в '{id}'."));
+                        else if (catalog.Count > 1 && !catalog.ContainsKey(id))
+                            issues.Add((false, $"Класс '{c.Name}', слот '{s.Label}': предмет '{id}' не найден в локальном каталоге DWDN/Native (проверьте ID)."));
+                    }
+                }
+
+                if (c.IsEnabled)
+                {
+                    var bodySlot = c.Slots.FirstOrDefault(s => s.Target == SlotCategory.BodyArmor);
+                    if (bodySlot == null || bodySlot.Items.Count == 0 || string.IsNullOrEmpty(bodySlot.Items[0]))
+                        issues.Add((false, $"Класс '{c.Name}': нет базового доспеха тела (персонаж может заспавниться голым)."));
+                }
+            }
+        }
+
+        return issues;
     }
 
     private static string SanitizeVarName(string raw, string fallback)
