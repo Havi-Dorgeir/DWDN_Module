@@ -215,6 +215,16 @@ namespace DWDN_MechanicsTester.Suites
                 Assert.IsTrue(heroBanner == null, "mp_Khorunzhiy_hero НЕ должен иметь знамени в mpcharacters.xml");
                 var troopBanner = troopNode?.SelectSingleNode(".//equipment[@id='Item.dwdn_banner1']");
                 Assert.IsTrue(troopBanner == null, "mp_Khorunzhiy_troop НЕ должен иметь знамени в mpcharacters.xml");
+
+                // 5. Проверка ModuleData/dwdn_loadouts.xml (единый конфиг слотов и категорий)
+                string loadoutsXmlPath = Path.Combine(moduleDataDir, "dwdn_loadouts.xml");
+                Assert.IsTrue(File.Exists(loadoutsXmlPath), "ModuleData/dwdn_loadouts.xml обязан существовать");
+                var loadoutsDoc = new System.Xml.XmlDocument();
+                loadoutsDoc.Load(loadoutsXmlPath);
+                var xmlClasses = loadoutsDoc.SelectNodes("//Class[@enabled='true']");
+                Assert.IsTrue(xmlClasses != null && xmlClasses.Count >= 13, $"Ожидается >= 13 активных классов в dwdn_loadouts.xml (найдено: {xmlClasses?.Count})");
+                var badItems = loadoutsDoc.SelectNodes("//Item[starts-with(@id, 'Item.')]");
+                Assert.IsTrue(badItems == null || badItems.Count == 0, "В dwdn_loadouts.xml обнаружен запрещённый префикс 'Item.'!");
             });
 
             sw.Stop();
