@@ -573,10 +573,10 @@ namespace DWDN_Script
                     if (mo is DestructableComponent dc)
                     {
                         dc.BattleSide = BattleSideEnum.None;
+                        dc.CanBeDestroyedInitially = true;
                         if (spec.MaxHp > 0f)
                         {
                             dc.MaxHitPoint = spec.MaxHp;
-                            dc.HitPoint = spec.MaxHp;
                         }
                     }
                 }
@@ -691,6 +691,19 @@ namespace DWDN_Script
                     GameNetwork.EndBroadcastModuleEvent(GameNetwork.EventBroadcastFlags.AddToMissionRecord, null);
                 }
 
+                // Выставляем HitPoint ПОСЛЕ рассылки SyncArtilleryDescendantsMessage,
+                // чтобы SyncObjectHitpoints приходил клиентам уже после регистрации MissionObjectId.
+                if (spec.MaxHp > 0f)
+                {
+                    for (int i = 0; i < allObjects.Count; i++)
+                    {
+                        if (allObjects[i] is DestructableComponent dc)
+                        {
+                            dc.HitPoint = spec.MaxHp;
+                        }
+                    }
+                }
+
                 Debug.Print($"[DWDN Artillery] Spawned {spec.Name} (ID: {engineId}, Cart: {spec.UsesCart}) with Draft Horse (Index: {horseAgent?.Index})");
                 return instance;
             }
@@ -708,6 +721,7 @@ namespace DWDN_Script
             {
                 if (_activeEngines.Any(e => e.Id == message.EngineId)) return;
 
+                LoadConfig();
                 var spec = GetSpecForType(message.PrefabName);
                 if (spec == null)
                 {
@@ -796,6 +810,12 @@ namespace DWDN_Script
                     if (mo is DestructableComponent dc)
                     {
                         dc.BattleSide = BattleSideEnum.None;
+                        dc.CanBeDestroyedInitially = true;
+                        if (spec.MaxHp > 0f)
+                        {
+                            dc.MaxHitPoint = spec.MaxHp;
+                            dc.HitPoint = spec.MaxHp;
+                        }
                     }
                 }
 
@@ -1086,6 +1106,16 @@ namespace DWDN_Script
                             catch { }
                         }
                         engine.HorseAgent = null;
+
+                        // Если орудие утилизировано сервером (HitPoint обнулён без разрушения на обломки),
+                        // плавно скрываем сущность и на клиенте, чтобы не оставалось «призрака» с пустой полоской 0 ХП.
+                        if (GameNetwork.IsClient &&
+                            (engine.Destructable.CurrentState == null ||
+                             string.Equals(engine.Destructable.CurrentState.Name, "clean", StringComparison.OrdinalIgnoreCase)))
+                        {
+                            try { engine.RootEntity?.FadeOut(0.5f, false); } catch { }
+                            try { engine.CartEntity?.FadeOut(0.5f, false); } catch { }
+                        }
                         continue;
                     }
 
@@ -1598,6 +1628,13 @@ namespace DWDN_Script
                         engine.DescendantObjectIds
                     ));
                     GameNetwork.EndModuleEventAsServer();
+
+                    if (engine.Destructable != null)
+                    {
+                        GameNetwork.BeginModuleEventAsServer(peer);
+                        GameNetwork.WriteMessage(new NetworkMessages.FromServer.SyncObjectHitpoints(engine.Destructable.Id, engine.Destructable.HitPoint));
+                        GameNetwork.EndModuleEventAsServer();
+                    }
 
                     if (engine.IsCombatState)
                     {
