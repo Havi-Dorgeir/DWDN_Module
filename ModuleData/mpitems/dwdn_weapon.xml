@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Items>
-	<!-- DWDN Peasant Knife (Сельскохозяйственный нож Ратая) -->
+	<!-- DWDN Peasant Knife (Сельскохозяйственный нож) -->
 	<CraftedItem id="dwdn_peasant_knife" name="Сельскохозяйственный нож" crafting_template="Dagger" culture="Culture.neutral_culture" modifier_group="sword" multiplayer_item="true">
 		<Pieces>
 			<Piece id="mp_dagger_blade_1" Type="Blade" scale_factor="100" />
 			<Piece id="mp_battania_dagger_guard" Type="Guard" scale_factor="100" />
 			<Piece id="mp_battania_dagger_grip" Type="Handle" scale_factor="100" />
 			<Piece id="mp_battania_dagger_pommel" Type="Pommel" scale_factor="100" />
+		</Pieces>
+	</CraftedItem>
+	<!-- DWDN Ratay Falchion (Дешёвый ополченский тесак Ратая на базе vlandian_blade_9) -->
+	<CraftedItem id="dwdn_ratay_falchion" name="Ополченский тесак" crafting_template="OneHandedSword" culture="Culture.neutral_culture" modifier_group="sword" multiplayer_item="true">
+		<Pieces>
+			<Piece id="dwdn_ratay_falchion_blade" Type="Blade" scale_factor="100" />
+			<Piece id="mp_battania_short_sword_guard" Type="Guard" scale_factor="95" />
+			<Piece id="mp_vlandian_short_sword_grip" Type="Handle" scale_factor="95" />
+			<Piece id="mp_vlandian_short_sword_pommel" Type="Pommel" scale_factor="95" />
 		</Pieces>
 	</CraftedItem>
 	<!-- DWDN Cleaver (Тесак) -->

@@ -47,9 +47,9 @@ namespace DuchyLoadoutStudio
 
     public class StudioForm : Form
     {
-        private string _modRoot = @"E:\SteamLibrary\steamapps\common\Mount & Blade II Bannerlord\Modules\DWDN_TRY";
-        private string _nativeRoot = @"E:\SteamLibrary\steamapps\common\Mount & Blade II Bannerlord\Modules\Native";
-        private string _outDir = @"d:\banAImod\DuchyLoadoutStudio\output";
+        private string _modRoot = "";
+        private string _nativeRoot = "";
+        private string _backupDir = "";
 
         private List<DuchyModel> _duchies = new();
         private Dictionary<string, GameItemEntry> _catalog = new(StringComparer.OrdinalIgnoreCase);
@@ -57,6 +57,7 @@ namespace DuchyLoadoutStudio
 
         private DuchyModel? _selectedDuchy;
         private ClassModel? _selectedClass;
+        private SlotModel? _selectedSlot;
         private SlotCategory _activeSlotCategory = SlotCategory.HeadArmor;
         private bool _suppressEvents = false;
 
@@ -87,6 +88,7 @@ namespace DuchyLoadoutStudio
         private TextBox _txtTroopId = null!;
         private TextBox _txtClassName = null!;
         private TextBox _txtClassDesc = null!;
+        private CheckBox _chkClassEnabled = null!;
         private ComboBox _cmbGroup = null!;
         private ComboBox _cmbIcon = null!;
         private NumericUpDown _numCost = null!;
@@ -102,68 +104,57 @@ namespace DuchyLoadoutStudio
         private NumericUpDown _numBow = null!;
         private NumericUpDown _numCrossbow = null!;
 
-        // UI Controls - Center Panel (10-Slot Pool Editor + 3D Mannequin Viewport)
-        private Button[] _slotTabButtons = new Button[10];
+        // UI Controls - Center Panel (Dynamic Slot & Category Editor + 3D Mannequin Viewport)
+        private ListBox _lstClassSlots = null!;
+        private ComboBox _cmbSlotTarget = null!;
+        private ComboBox _cmbSlotCategory = null!;
+        private TextBox _txtSlotLabel = null!;
+        private CheckBox _chkSlotVisible = null!;
+        private CheckBox _chkSlotAllowEmpty = null!;
         private ListBox _lstAllowedPool = null!;
         private TextBox _txtCatalogSearch = null!;
         private CheckBox _chkOnlyCustomDwdn = null!;
+        private CheckBox _chkFilterBySlotType = null!;
         private ListBox _lstCatalog = null!;
         private Label _lblSelectedCatalogInfo = null!;
         private BufferedViewportPanel _viewport = null!;
         private Label _lblMannequinStats = null!;
 
-        // UI Controls - Right Panel (Code Generation & Sync)
+        // UI Controls - Right Panel (XML Preview, Validation & Safe Save)
         private TabControl _tabCode = null!;
-        private RichTextBox _rtbCSharp = null!;
+        private RichTextBox _rtbLoadoutsXml = null!;
         private RichTextBox _rtbXml = null!;
         private Label _lblStatus = null!;
 
         private static readonly (SlotCategory Cat, string Label, Color Accent)[] SlotTabs = new[]
         {
-            (SlotCategory.HeadArmor, "1. Шлемы", Color.FromArgb(56, 189, 248)),
-            (SlotCategory.Cape,      "2. Плащи", Color.FromArgb(168, 85, 247)),
-            (SlotCategory.BodyArmor, "3. Корпус", Color.FromArgb(52, 211, 153)),
-            (SlotCategory.Gloves,    "4. Перчатки", Color.FromArgb(251, 191, 36)),
-            (SlotCategory.Legs,      "5. Поножи", Color.FromArgb(244, 114, 182)),
-            (SlotCategory.Weapon0,   "6. Оружие 0", Color.FromArgb(248, 113, 113)),
-            (SlotCategory.Weapon1,   "7. Оружие 1", Color.FromArgb(251, 146, 60)),
-            (SlotCategory.Weapon2,   "8. Оружие 2", Color.FromArgb(250, 204, 21)),
-            (SlotCategory.Weapon3,   "9. Оружие 3", Color.FromArgb(163, 230, 53)),
-            (SlotCategory.Mount,     "10. Кони", Color.FromArgb(96, 165, 250))
+            (SlotCategory.HeadArmor, "Head (Шлем)", Color.FromArgb(56, 189, 248)),
+            (SlotCategory.Cape,      "Cape (Плащ)", Color.FromArgb(168, 85, 247)),
+            (SlotCategory.BodyArmor, "Body (Доспех)", Color.FromArgb(52, 211, 153)),
+            (SlotCategory.Gloves,    "Gloves (Перчатки)", Color.FromArgb(251, 191, 36)),
+            (SlotCategory.Legs,      "Legs (Обувь)", Color.FromArgb(244, 114, 182)),
+            (SlotCategory.Weapon0,   "Weapon0 (Слот 1)", Color.FromArgb(248, 113, 113)),
+            (SlotCategory.Weapon1,   "Weapon1 (Слот 2)", Color.FromArgb(251, 146, 60)),
+            (SlotCategory.Weapon2,   "Weapon2 (Слот 3)", Color.FromArgb(250, 204, 21)),
+            (SlotCategory.Weapon3,   "Weapon3 (Слот 4)", Color.FromArgb(163, 230, 53)),
+            (SlotCategory.Mount,     "Horse (Скакун)", Color.FromArgb(96, 165, 250))
         };
 
         private void ResolvePaths()
         {
-            if (!Directory.Exists(_modRoot))
-            {
-                DirectoryInfo dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-                while (dir != null)
-                {
-                    if (dir.Name.Equals("DWDN_TRY", StringComparison.OrdinalIgnoreCase) && File.Exists(Path.Combine(dir.FullName, "SubModule.xml")))
-                    {
-                        _modRoot = dir.FullName;
-                        break;
-                    }
-                    dir = dir.Parent;
-                }
-            }
-            if (!Directory.Exists(_nativeRoot))
-            {
-                DirectoryInfo modDir = new DirectoryInfo(_modRoot);
-                if (modDir.Parent != null)
-                {
-                    string native = Path.Combine(modDir.Parent.FullName, "Native");
-                    if (Directory.Exists(native)) _nativeRoot = native;
-                }
-            }
+            _modRoot = StudioDataLoader.ResolveModRoot();
+            _nativeRoot = StudioDataLoader.ResolveNativeRoot(_modRoot);
+            _backupDir = Directory.Exists(@"d:\banAImod")
+                ? @"d:\banAImod\backups\DuchyLoadoutStudio"
+                : Path.Combine(Path.GetTempPath(), "DuchyLoadoutStudio_backups");
         }
 
         public StudioForm()
         {
             ResolvePaths();
-            this.Text = "DWDN Duchy & Class Loadout Studio v1.0 — Визуальный конструктор герцогств, классов и 3D-манекена";
+            this.Text = "DWDN Duchy & Loadout Studio v2.0 — Конструктор слотов, категорий и снаряжения (XML)";
             this.Size = new Size(1680, 990);
-            this.MinimumSize = new Size(1380, 860);
+            this.MinimumSize = new Size(1400, 860);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = Color.FromArgb(18, 20, 26);
             this.ForeColor = Color.FromArgb(230, 235, 245);
@@ -221,17 +212,17 @@ namespace DuchyLoadoutStudio
                 BackColor = Color.Transparent
             };
 
-            var btnApplyMod = CreateFlatButton("⚡ АВТО-ПРИМЕНИТЬ В МОД DWDN_TRY", Color.FromArgb(217, 119, 6), Point.Empty, new Size(265, 31));
-            btnApplyMod.Margin = new Padding(6, 0, 0, 0);
-            btnApplyMod.Click += (s, e) => ApplyDirectlyToMod();
-            headerBtnBar.Controls.Add(btnApplyMod);
+            var btnSaveXml = CreateFlatButton("💾 СОХРАНИТЬ dwdn_loadouts.xml", Color.FromArgb(22, 101, 52), Point.Empty, new Size(245, 31));
+            btnSaveXml.Margin = new Padding(6, 0, 0, 0);
+            btnSaveXml.Click += (s, e) => SaveLoadoutsXmlToMod();
+            headerBtnBar.Controls.Add(btnSaveXml);
 
-            var btnSavePreview = CreateFlatButton("💾 Экспорт в output/", Color.FromArgb(22, 101, 52), Point.Empty, new Size(185, 31));
-            btnSavePreview.Margin = new Padding(6, 0, 0, 0);
-            btnSavePreview.Click += (s, e) => SaveGeneratedFilesToOutput();
-            headerBtnBar.Controls.Add(btnSavePreview);
+            var btnRollback = CreateFlatButton("↩️ Откатить бэкап", Color.FromArgb(180, 83, 9), Point.Empty, new Size(165, 31));
+            btnRollback.Margin = new Padding(6, 0, 0, 0);
+            btnRollback.Click += (s, e) => RollbackLoadoutsFromBackup();
+            headerBtnBar.Controls.Add(btnRollback);
 
-            var btnReload = CreateFlatButton("🔄 Перезагрузить из DWDN_TRY", Color.FromArgb(35, 48, 68), Point.Empty, new Size(215, 31));
+            var btnReload = CreateFlatButton("🔄 Перезагрузить из XML", Color.FromArgb(35, 48, 68), Point.Empty, new Size(195, 31));
             btnReload.Margin = new Padding(6, 0, 0, 0);
             btnReload.Click += (s, e) => LoadModData();
             headerBtnBar.Controls.Add(btnReload);
@@ -403,7 +394,16 @@ namespace DuchyLoadoutStudio
             _txtTroopId = AddLabeledTextBox(parent, "Troop ID:", 212, y, 64, 131);
             y += 26;
 
-            _txtClassName = AddLabeledTextBox(parent, "Имя:", 10, y, 68, 329);
+            _txtClassName = AddLabeledTextBox(parent, "Имя:", 10, y, 68, 220);
+            _chkClassEnabled = new CheckBox
+            {
+                Text = "Включён",
+                Location = new Point(308, y + 2),
+                Size = new Size(95, 22),
+                Checked = true,
+                ForeColor = Color.FromArgb(74, 222, 128)
+            };
+            parent.Controls.Add(_chkClassEnabled);
             y += 26;
             _txtClassDesc = AddLabeledTextBox(parent, "Роль/Опис:", 10, y, 68, 329);
             y += 26;
@@ -476,6 +476,7 @@ namespace DuchyLoadoutStudio
                 _selectedClass.Id = _txtClassId.Text.Trim();
                 _selectedClass.TroopId = _txtTroopId.Text.Trim();
                 _selectedClass.Name = _txtClassName.Text;
+                _selectedClass.IsEnabled = _chkClassEnabled.Checked;
                 _selectedClass.Description = _txtClassDesc.Text;
                 if (_cmbGroup.SelectedItem != null) _selectedClass.Group = _cmbGroup.SelectedItem.ToString()!;
                 if (_cmbIcon.SelectedItem != null) _selectedClass.IconType = _cmbIcon.SelectedItem.ToString()!;
@@ -501,6 +502,7 @@ namespace DuchyLoadoutStudio
             _txtClassId.TextChanged += classPropsChanged;
             _txtTroopId.TextChanged += classPropsChanged;
             _txtClassName.TextChanged += classPropsChanged;
+            _chkClassEnabled.CheckedChanged += classPropsChanged;
             _txtClassDesc.TextChanged += classPropsChanged;
             _cmbGroup.SelectedIndexChanged += classPropsChanged;
             _cmbIcon.SelectedIndexChanged += classPropsChanged;
@@ -520,56 +522,169 @@ namespace DuchyLoadoutStudio
 
         private void BuildCenterPanel(Panel parent)
         {
-            // Split Center into Top (10-Slot Equipment Pool Editor) and Bottom (3D Warrior Mannequin Viewport)
+            // Split Center into Top (Dynamic Slots & Categories Editor) and Bottom (3D Warrior Mannequin Viewport)
             var topSlotsPanel = new Panel
             {
                 Dock = DockStyle.Top,
-                Height = 365,
+                Height = 395,
                 BackColor = Color.FromArgb(20, 23, 31),
                 Padding = new Padding(8)
             };
 
             int y = 6;
-            topSlotsPanel.Controls.Add(CreateSectionHeader("4. ПУЛЫ ДОСТУПНОГО СНАРЯЖЕНИЯ КЛАССА (10 СЛОТОВ ЛОДАУТА)", ref y));
+            topSlotsPanel.Controls.Add(CreateSectionHeader("4. СЛОТЫ, КАТЕГОРИИ И ПУЛЫ СНАРЯЖЕНИЯ КЛАССА (dwdn_loadouts.xml)", ref y));
 
-            // 10 Slot Category Buttons (2 rows of 5 for full readability)
-            var tabBar = new Panel
+            // ---- Column A (Left): Dynamic List of Class Slots & Categories ----
+            var lblSlots = new Label
             {
+                Text = "Слоты класса (порядок в UI):",
                 Location = new Point(8, y),
-                Size = new Size(775, 56),
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
+                Size = new Size(225, 18),
+                ForeColor = Color.FromArgb(250, 204, 21),
+                Font = new Font("Segoe UI", 8.5f, FontStyle.Bold)
             };
-            for (int i = 0; i < SlotTabs.Length; i++)
-            {
-                var tab = SlotTabs[i];
-                int row = i / 5;
-                int col = i % 5;
-                var btn = new Button
-                {
-                    Text = tab.Label,
-                    Location = new Point(col * 154, row * 28),
-                    Size = new Size(150, 26),
-                    FlatStyle = FlatStyle.Flat,
-                    Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
-                    BackColor = Color.FromArgb(30, 36, 48),
-                    ForeColor = Color.White,
-                    Cursor = Cursors.Hand
-                };
-                btn.FlatAppearance.BorderSize = 1;
-                btn.FlatAppearance.BorderColor = tab.Accent;
-                btn.Click += (s, e) => SelectSlotCategory(tab.Cat);
-                _slotTabButtons[i] = btn;
-                tabBar.Controls.Add(btn);
-            }
-            topSlotsPanel.Controls.Add(tabBar);
-            y += 60;
+            topSlotsPanel.Controls.Add(lblSlots);
 
-            // Left column inside topSlotsPanel: Allowed Items in this Class Slot
+            _lstClassSlots = new ListBox
+            {
+                Location = new Point(8, y + 20),
+                Size = new Size(225, 290),
+                BackColor = Color.FromArgb(13, 16, 22),
+                ForeColor = Color.FromArgb(240, 246, 252),
+                BorderStyle = BorderStyle.FixedSingle,
+                Font = new Font("Consolas", 8.4f)
+            };
+            _lstClassSlots.SelectedIndexChanged += (s, e) =>
+            {
+                if (_suppressEvents || _selectedClass == null) return;
+                if (_lstClassSlots.SelectedIndex >= 0 && _lstClassSlots.SelectedIndex < _selectedClass.Slots.Count)
+                    SelectClassSlot(_selectedClass.Slots[_lstClassSlots.SelectedIndex]);
+            };
+            topSlotsPanel.Controls.Add(_lstClassSlots);
+
+            int slotBtnY = y + 314;
+            var btnAddSlot = CreateFlatButton("➕ Слот", Color.FromArgb(22, 101, 52), new Point(8, slotBtnY), new Size(70, 27));
+            btnAddSlot.Click += (s, e) => AddNewSlotToClass();
+            topSlotsPanel.Controls.Add(btnAddSlot);
+
+            var btnDelSlot = CreateFlatButton("🗑️ Удал.", Color.FromArgb(153, 27, 27), new Point(82, slotBtnY), new Size(68, 27));
+            btnDelSlot.Click += (s, e) => RemoveSelectedSlotFromClass();
+            topSlotsPanel.Controls.Add(btnDelSlot);
+
+            var btnSlotUp = CreateFlatButton("▲", Color.FromArgb(45, 55, 72), new Point(154, slotBtnY), new Size(37, 27));
+            btnSlotUp.Click += (s, e) => MoveSelectedSlot(-1);
+            topSlotsPanel.Controls.Add(btnSlotUp);
+
+            var btnSlotDown = CreateFlatButton("▼", Color.FromArgb(45, 55, 72), new Point(195, slotBtnY), new Size(38, 27));
+            btnSlotDown.Click += (s, e) => MoveSelectedSlot(1);
+            topSlotsPanel.Controls.Add(btnSlotDown);
+
+            // ---- Top-Right Properties Strip for the Selected Slot ----
+            int propX = 240;
+            var slotPropBox = new Panel
+            {
+                Location = new Point(propX, y),
+                Size = new Size(478, 62),
+                BackColor = Color.FromArgb(25, 30, 42),
+                BorderStyle = BorderStyle.FixedSingle
+            };
+
+            slotPropBox.Controls.Add(new Label { Text = "Слот движка:", Location = new Point(6, 7), Size = new Size(80, 18), ForeColor = Color.FromArgb(148, 163, 184), Font = new Font("Segoe UI", 8.1f) });
+            _cmbSlotTarget = new ComboBox
+            {
+                Location = new Point(86, 4),
+                Size = new Size(126, 23),
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                BackColor = Color.FromArgb(16, 20, 28),
+                ForeColor = Color.White
+            };
+            foreach (var tab in SlotTabs) _cmbSlotTarget.Items.Add(tab.Label);
+            slotPropBox.Controls.Add(_cmbSlotTarget);
+
+            slotPropBox.Controls.Add(new Label { Text = "Категория:", Location = new Point(218, 7), Size = new Size(66, 18), ForeColor = Color.FromArgb(250, 204, 21), Font = new Font("Segoe UI", 8.1f, FontStyle.Bold) });
+            _cmbSlotCategory = new ComboBox
+            {
+                Location = new Point(286, 4),
+                Size = new Size(184, 23),
+                DropDownStyle = ComboBoxStyle.DropDown, // Editable so user can create ANY new category!
+                BackColor = Color.FromArgb(16, 20, 28),
+                ForeColor = Color.White
+            };
+            slotPropBox.Controls.Add(_cmbSlotCategory);
+
+            slotPropBox.Controls.Add(new Label { Text = "Название UI:", Location = new Point(6, 35), Size = new Size(80, 18), ForeColor = Color.FromArgb(148, 163, 184), Font = new Font("Segoe UI", 8.1f) });
+            _txtSlotLabel = new TextBox
+            {
+                Location = new Point(86, 32),
+                Size = new Size(190, 23),
+                BackColor = Color.FromArgb(16, 20, 28),
+                ForeColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle
+            };
+            slotPropBox.Controls.Add(_txtSlotLabel);
+
+            _chkSlotVisible = new CheckBox
+            {
+                Text = "Видим в UI",
+                Location = new Point(286, 34),
+                Size = new Size(86, 20),
+                Checked = true,
+                ForeColor = Color.FromArgb(74, 222, 128),
+                Font = new Font("Segoe UI", 8.0f)
+            };
+            slotPropBox.Controls.Add(_chkSlotVisible);
+
+            _chkSlotAllowEmpty = new CheckBox
+            {
+                Text = "Снять (\"\")",
+                Location = new Point(376, 34),
+                Size = new Size(94, 20),
+                Checked = false,
+                ForeColor = Color.FromArgb(148, 163, 184),
+                Font = new Font("Segoe UI", 8.0f)
+            };
+            slotPropBox.Controls.Add(_chkSlotAllowEmpty);
+
+            EventHandler slotPropChanged = (s, e) =>
+            {
+                if (_suppressEvents || _selectedClass == null || _selectedSlot == null) return;
+                if (_cmbSlotTarget.SelectedIndex >= 0 && _cmbSlotTarget.SelectedIndex < SlotTabs.Length)
+                {
+                    _selectedSlot.Target = SlotTabs[_cmbSlotTarget.SelectedIndex].Cat;
+                    _activeSlotCategory = _selectedSlot.Target;
+                }
+                _selectedSlot.Category = _cmbSlotCategory.Text.Trim();
+                _selectedSlot.Label = _txtSlotLabel.Text;
+                _selectedSlot.Visible = _chkSlotVisible.Checked;
+                _selectedSlot.AllowEmpty = _chkSlotAllowEmpty.Checked;
+                if (_selectedSlot.AllowEmpty && !_selectedSlot.Items.Contains(""))
+                    _selectedSlot.Items.Add("");
+                else if (!_selectedSlot.AllowEmpty && _selectedSlot.Items.Contains(""))
+                    _selectedSlot.Items.RemoveAll(x => string.IsNullOrEmpty(x));
+
+                _selectedClass.SyncPoolsFromSlots();
+                RefreshClassSlotsList(keepSelection: true);
+                RefreshAllowedPoolList();
+                RefreshCatalogList();
+                RefreshCodePreview();
+                _viewport?.Invalidate();
+            };
+
+            _cmbSlotTarget.SelectedIndexChanged += slotPropChanged;
+            _cmbSlotCategory.TextChanged += slotPropChanged;
+            _txtSlotLabel.TextChanged += slotPropChanged;
+            _chkSlotVisible.CheckedChanged += slotPropChanged;
+            _chkSlotAllowEmpty.CheckedChanged += slotPropChanged;
+
+            topSlotsPanel.Controls.Add(slotPropBox);
+
+            // ---- Column B (Middle): Allowed Items in Selected Slot ----
+            int poolY = y + 68;
             var lblAllowed = new Label
             {
-                Text = "Доступно классу (1-й предмет = экипирован по умолчанию в XML):",
-                Location = new Point(8, y),
-                Size = new Size(375, 20),
+                Text = "Предметы слота (№1 = дефолт):",
+                Location = new Point(propX, poolY),
+                Size = new Size(240, 18),
                 ForeColor = Color.FromArgb(74, 222, 128),
                 Font = new Font("Segoe UI", 8.5f, FontStyle.Bold)
             };
@@ -577,87 +692,99 @@ namespace DuchyLoadoutStudio
 
             _lstAllowedPool = new ListBox
             {
-                Location = new Point(8, y + 22),
-                Size = new Size(365, 190),
+                Location = new Point(propX, poolY + 20),
+                Size = new Size(220, 222),
                 BackColor = Color.FromArgb(13, 16, 22),
                 ForeColor = Color.FromArgb(240, 246, 252),
                 BorderStyle = BorderStyle.FixedSingle,
-                Font = new Font("Consolas", 9.0f)
+                Font = new Font("Consolas", 8.4f)
             };
             _lstAllowedPool.SelectedIndexChanged += (s, e) =>
             {
-                if (_suppressEvents || _selectedClass == null) return;
-                var pool = _selectedClass.Pools[_activeSlotCategory];
+                if (_suppressEvents || _selectedClass == null || _selectedSlot == null) return;
+                var pool = _selectedSlot.Items;
                 if (_lstAllowedPool.SelectedIndex >= 0 && _lstAllowedPool.SelectedIndex < pool.Count)
                 {
                     string itemId = pool[_lstAllowedPool.SelectedIndex];
-                    _previewSelectedItems[_activeSlotCategory] = itemId;
+                    _previewSelectedItems[_selectedSlot.Target] = itemId;
                     ShowCatalogItemDetails(itemId);
                     _viewport?.Invalidate();
                 }
             };
             topSlotsPanel.Controls.Add(_lstAllowedPool);
 
-            // Action buttons under Allowed Pool
-            int btnY = y + 216;
-            var btnMakeDefault = CreateFlatButton("⭐ Сделать дефолтным (№1)", Color.FromArgb(30, 64, 175), new Point(8, btnY), new Size(172, 27));
+            var btnMakeDefault = CreateFlatButton("⭐ №1", Color.FromArgb(30, 64, 175), new Point(propX, slotBtnY), new Size(68, 27));
             btnMakeDefault.Click += (s, e) => MakeAllowedItemDefault();
             topSlotsPanel.Controls.Add(btnMakeDefault);
 
-            var btnAddEmpty = CreateFlatButton("➕ Пустой слот (\"\")", Color.FromArgb(55, 65, 81), new Point(185, btnY), new Size(115, 27));
+            var btnAddEmpty = CreateFlatButton("➕ \"\"", Color.FromArgb(55, 65, 81), new Point(propX + 72, slotBtnY), new Size(66, 27));
             btnAddEmpty.Click += (s, e) => AddItemToClassPool("");
             topSlotsPanel.Controls.Add(btnAddEmpty);
 
-            var btnRemovePool = CreateFlatButton("🗑️ Убрать", Color.FromArgb(153, 27, 27), new Point(305, btnY), new Size(68, 27));
+            var btnRemovePool = CreateFlatButton("🗑️ Убрать", Color.FromArgb(153, 27, 27), new Point(propX + 142, slotBtnY), new Size(78, 27));
             btnRemovePool.Click += (s, e) => RemoveSelectedFromClassPool();
             topSlotsPanel.Controls.Add(btnRemovePool);
 
-            // Right column inside topSlotsPanel: Master Catalog Search & Add
+            // ---- Column C (Right): Master Catalog Search & Add ----
+            int catX = propX + 228;
             var lblCatalog = new Label
             {
-                Text = "Каталог предметов (DWDN + Native):",
-                Location = new Point(388, y),
-                Size = new Size(220, 20),
+                Text = "Каталог (DWDN+Native):",
+                Location = new Point(catX, poolY),
+                Size = new Size(150, 18),
                 ForeColor = Color.FromArgb(56, 189, 248),
-                Font = new Font("Segoe UI", 8.5f, FontStyle.Bold)
+                Font = new Font("Segoe UI", 8.2f, FontStyle.Bold)
             };
             topSlotsPanel.Controls.Add(lblCatalog);
 
             _chkOnlyCustomDwdn = new CheckBox
             {
-                Text = "Только кастом DWDN",
-                Location = new Point(620, y - 1),
-                Size = new Size(155, 22),
+                Text = "Только DWDN",
+                Location = new Point(catX + 150, poolY - 1),
+                Size = new Size(100, 20),
                 Checked = false,
-                ForeColor = Color.FromArgb(250, 204, 21)
+                ForeColor = Color.FromArgb(250, 204, 21),
+                Font = new Font("Segoe UI", 7.8f)
             };
             _chkOnlyCustomDwdn.CheckedChanged += (s, e) => RefreshCatalogList();
             topSlotsPanel.Controls.Add(_chkOnlyCustomDwdn);
 
             _txtCatalogSearch = new TextBox
             {
-                Location = new Point(388, y + 22),
-                Size = new Size(255, 24),
+                Location = new Point(catX, poolY + 20),
+                Size = new Size(156, 23),
                 BackColor = Color.FromArgb(28, 33, 45),
                 ForeColor = Color.White,
                 BorderStyle = BorderStyle.FixedSingle,
-                PlaceholderText = "🔍 Поиск по ID или названию..."
+                PlaceholderText = "🔍 Поиск ID/имени..."
             };
             _txtCatalogSearch.TextChanged += (s, e) => RefreshCatalogList();
             topSlotsPanel.Controls.Add(_txtCatalogSearch);
 
-            var btnAddCatalogItem = CreateFlatButton("⬅️ Добавить в класс", Color.FromArgb(22, 101, 52), new Point(648, y + 21), new Size(130, 26));
+            var btnAddCatalogItem = CreateFlatButton("⬅️ Добавить", Color.FromArgb(22, 101, 52), new Point(catX + 160, poolY + 19), new Size(90, 25));
             btnAddCatalogItem.Click += (s, e) => AddSelectedCatalogItemToClass();
             topSlotsPanel.Controls.Add(btnAddCatalogItem);
 
+            _chkFilterBySlotType = new CheckBox
+            {
+                Text = "Безопасный фильтр по типу слота",
+                Location = new Point(catX, poolY + 46),
+                Size = new Size(250, 19),
+                Checked = true,
+                ForeColor = Color.FromArgb(74, 222, 128),
+                Font = new Font("Segoe UI", 8.0f)
+            };
+            _chkFilterBySlotType.CheckedChanged += (s, e) => RefreshCatalogList();
+            topSlotsPanel.Controls.Add(_chkFilterBySlotType);
+
             _lstCatalog = new ListBox
             {
-                Location = new Point(388, y + 50),
-                Size = new Size(390, 162),
+                Location = new Point(catX, poolY + 67),
+                Size = new Size(250, 175),
                 BackColor = Color.FromArgb(13, 16, 22),
                 ForeColor = Color.FromArgb(203, 213, 225),
                 BorderStyle = BorderStyle.FixedSingle,
-                Font = new Font("Consolas", 8.8f)
+                Font = new Font("Consolas", 8.3f)
             };
             _lstCatalog.DoubleClick += (s, e) => AddSelectedCatalogItemToClass();
             _lstCatalog.SelectedIndexChanged += (s, e) =>
@@ -665,7 +792,6 @@ namespace DuchyLoadoutStudio
                 if (_lstCatalog.SelectedItem is CatalogListEntry entry)
                 {
                     ShowCatalogItemDetails(entry.Item.Id);
-                    // Live preview on the 3D mannequin when clicking catalog items!
                     _previewSelectedItems[_activeSlotCategory] = entry.Item.Id;
                     _viewport?.Invalidate();
                 }
@@ -674,11 +800,11 @@ namespace DuchyLoadoutStudio
 
             _lblSelectedCatalogInfo = new Label
             {
-                Location = new Point(388, btnY + 3),
-                Size = new Size(390, 24),
+                Location = new Point(catX, slotBtnY + 3),
+                Size = new Size(250, 24),
                 ForeColor = Color.FromArgb(148, 163, 184),
-                Font = new Font("Consolas", 8.3f),
-                Text = "Выберите предмет для просмотра 3D-меша и статов..."
+                Font = new Font("Consolas", 7.8f),
+                Text = "Кликните предмет для 3D-превью..."
             };
             topSlotsPanel.Controls.Add(_lblSelectedCatalogInfo);
 
@@ -754,41 +880,33 @@ namespace DuchyLoadoutStudio
         private void BuildRightPanel(Panel parent)
         {
             int y = 6;
-            parent.Controls.Add(CreateSectionHeader("5. АВТО-ПРИМЕНЕНИЕ В МОД И ГЕНЕРАТОР КОДА", ref y));
+            parent.Controls.Add(CreateSectionHeader("5. СОХРАНЕНИЕ XML, ВАЛИДАЦИЯ И БЭКАПЫ", ref y));
 
             var infoLbl = new Label
             {
-                Text = "Кнопка ниже автоматически обновляет все 3 файла мода\n(DWDN_DuchyManager.cs, mpclassdivisions.xml, mpcharacters.xml)\nи компилирует DWDN_Script.dll:",
+                Text = "Все слоты, категории и предметы хранятся в ModuleData/dwdn_loadouts.xml.\nПересборка DLL не требуется! Перед каждым сохранением создаётся бэкап.",
                 Location = new Point(10, y),
-                Size = new Size(425, 48),
+                Size = new Size(428, 36),
                 ForeColor = Color.FromArgb(148, 163, 184),
                 Font = new Font("Segoe UI", 8.3f)
             };
             parent.Controls.Add(infoLbl);
-            y += 50;
+            y += 40;
 
-            var btnApplyRight = CreateFlatButton("⚡ АВТО-ПРИМЕНИТЬ В МОД DWDN_TRY (C# + XML + СБОРКА DLL)", Color.FromArgb(217, 119, 6), new Point(10, y), new Size(428, 34));
-            btnApplyRight.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-            btnApplyRight.Click += (s, e) => ApplyDirectlyToMod();
-            parent.Controls.Add(btnApplyRight);
+            var btnSaveXmlRight = CreateFlatButton("💾 СОХРАНИТЬ dwdn_loadouts.xml (Мгновенно, с бэкапом)", Color.FromArgb(22, 101, 52), new Point(10, y), new Size(428, 34));
+            btnSaveXmlRight.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
+            btnSaveXmlRight.Click += (s, e) => SaveLoadoutsXmlToMod();
+            parent.Controls.Add(btnSaveXmlRight);
             y += 39;
 
-            var btnCopyCode = CreateFlatButton("📋 Скопировать активную вкладку", Color.FromArgb(37, 99, 235), new Point(10, y), new Size(225, 27));
-            btnCopyCode.Click += (s, e) =>
-            {
-                var rtb = _tabCode.SelectedIndex == 0 ? _rtbCSharp : _rtbXml;
-                if (!string.IsNullOrEmpty(rtb.Text))
-                {
-                    Clipboard.SetText(rtb.Text);
-                    _lblStatus.Text = "✅ Код скопирован в буфер обмена!";
-                }
-            };
-            parent.Controls.Add(btnCopyCode);
+            var btnRollbackRight = CreateFlatButton("↩️ Откатить бэкап", Color.FromArgb(180, 83, 9), new Point(10, y), new Size(155, 27));
+            btnRollbackRight.Click += (s, e) => RollbackLoadoutsFromBackup();
+            parent.Controls.Add(btnRollbackRight);
 
-            var btnExportNow = CreateFlatButton("💾 Экспорт в output/", Color.FromArgb(22, 101, 52), new Point(242, y), new Size(196, 27));
-            btnExportNow.Click += (s, e) => SaveGeneratedFilesToOutput();
-            parent.Controls.Add(btnExportNow);
-            y += 32;
+            var btnSyncStats = CreateFlatButton("⚙️ Обновить статы (mpcharacters/divisions)", Color.FromArgb(37, 99, 235), new Point(170, y), new Size(268, 27));
+            btnSyncStats.Click += (s, e) => SyncStatsToGameXmls();
+            parent.Controls.Add(btnSyncStats);
+            y += 33;
 
             _tabCode = new TabControl
             {
@@ -797,31 +915,31 @@ namespace DuchyLoadoutStudio
                 Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right
             };
 
-            var tabCs = new TabPage("1. C# (DWDN_DuchyManager.cs)");
-            _rtbCSharp = new RichTextBox
+            var tabLoadouts = new TabPage("1. dwdn_loadouts.xml");
+            _rtbLoadoutsXml = new RichTextBox
             {
                 Dock = DockStyle.Fill,
                 BackColor = Color.FromArgb(12, 14, 20),
                 ForeColor = Color.FromArgb(134, 239, 172),
-                Font = new Font("Consolas", 8.5f),
+                Font = new Font("Consolas", 8.4f),
                 ReadOnly = true,
                 WordWrap = false
             };
-            tabCs.Controls.Add(_rtbCSharp);
+            tabLoadouts.Controls.Add(_rtbLoadoutsXml);
 
-            var tabXml = new TabPage("2. XML (Divisions + Characters)");
+            var tabXml = new TabPage("2. Валидация + XML статов");
             _rtbXml = new RichTextBox
             {
                 Dock = DockStyle.Fill,
                 BackColor = Color.FromArgb(12, 14, 20),
                 ForeColor = Color.FromArgb(125, 211, 252),
-                Font = new Font("Consolas", 8.5f),
+                Font = new Font("Consolas", 8.4f),
                 ReadOnly = true,
                 WordWrap = false
             };
             tabXml.Controls.Add(_rtbXml);
 
-            _tabCode.TabPages.Add(tabCs);
+            _tabCode.TabPages.Add(tabLoadouts);
             _tabCode.TabPages.Add(tabXml);
             parent.Controls.Add(_tabCode);
         }
@@ -848,8 +966,8 @@ namespace DuchyLoadoutStudio
                     SelectDuchy(_duchies[0]);
                 }
 
-                SelectSlotCategory(SlotCategory.HeadArmor);
-                _lblStatus.Text = $"✅ Загружено герцогств: {_duchies.Count} | Классов: {_duchies.Sum(d => d.Classes.Count)} | Предметов в каталоге: {_catalog.Count} | 3D-мешей DWDN: {_meshIndex.Count}";
+                RefreshCategoryDropdown();
+                _lblStatus.Text = $"✅ Загружено из XML: герцогств {_duchies.Count} | классов {_duchies.Sum(d => d.Classes.Count)} | каталог {_catalog.Count} | 3D-мешей {_meshIndex.Count}";
             }
             catch (Exception ex)
             {
@@ -899,7 +1017,8 @@ namespace DuchyLoadoutStudio
                     "HorseArcher" => "🏇",
                     _ => "⚔️"
                 };
-                _lstClasses.Items.Add($"{iconShort} {c.Name,-18} [{c.Id}] (Armor:{c.Armor} Cost:{c.Cost})");
+                string stateTag = c.IsEnabled ? "" : "[ВЫКЛ] ";
+                _lstClasses.Items.Add($"{iconShort} {stateTag}{c.Name,-18} [{c.Id}] ({c.Slots.Count} сл.)");
             }
             if (prevIdx >= 0 && prevIdx < _lstClasses.Items.Count)
                 _lstClasses.SelectedIndex = prevIdx;
@@ -914,6 +1033,7 @@ namespace DuchyLoadoutStudio
             _txtClassId.Text = cls.Id;
             _txtTroopId.Text = cls.TroopId;
             _txtClassName.Text = cls.Name;
+            _chkClassEnabled.Checked = cls.IsEnabled;
             _txtClassDesc.Text = cls.Description;
 
             if (_cmbGroup.Items.Contains(cls.Group))
@@ -951,30 +1071,150 @@ namespace DuchyLoadoutStudio
 
             _suppressEvents = false;
 
-            RefreshSlotTabCounts();
-            RefreshAllowedPoolList();
+            cls.SyncPoolsFromSlots();
+            RefreshClassSlotsList(keepSelection: false);
+            if (cls.Slots.Count > 0)
+            {
+                _lstClassSlots.SelectedIndex = 0;
+                SelectClassSlot(cls.Slots[0]);
+            }
+            else
+            {
+                _selectedSlot = null;
+                RefreshAllowedPoolList();
+                RefreshCatalogList();
+            }
             RefreshCodePreview();
             _viewport?.Invalidate();
         }
 
-        private void SelectSlotCategory(SlotCategory cat)
+        private void RefreshCategoryDropdown()
         {
-            _activeSlotCategory = cat;
-            RefreshSlotTabCounts();
+            string current = _cmbSlotCategory.Text;
+            var cats = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "Броня", "Вооружение", "Артиллерия", "Спецсредства", "Верховая езда"
+            };
+            foreach (var d in _duchies)
+                foreach (var c in d.Classes)
+                    foreach (var s in c.Slots)
+                        if (!string.IsNullOrWhiteSpace(s.Category))
+                            cats.Add(s.Category.Trim());
+
+            bool prevSuppress = _suppressEvents;
+            _suppressEvents = true;
+            _cmbSlotCategory.Items.Clear();
+            foreach (var cat in cats) _cmbSlotCategory.Items.Add(cat);
+            _cmbSlotCategory.Text = current;
+            _suppressEvents = prevSuppress;
+        }
+
+        private void RefreshClassSlotsList(bool keepSelection)
+        {
+            int prevIdx = _lstClassSlots.SelectedIndex;
+            bool prevSuppress = _suppressEvents;
+            _suppressEvents = true;
+            _lstClassSlots.Items.Clear();
+            if (_selectedClass != null)
+            {
+                foreach (var s in _selectedClass.Slots)
+                {
+                    string vis = s.Visible ? "" : "[скрыт] ";
+                    string targetShort = SlotModel.TargetToXmlName(s.Target);
+                    _lstClassSlots.Items.Add($"{vis}[{s.Category}] {s.Label} ({targetShort}) • {s.Items.Count}");
+                }
+            }
+            if (keepSelection && prevIdx >= 0 && prevIdx < _lstClassSlots.Items.Count)
+                _lstClassSlots.SelectedIndex = prevIdx;
+            _suppressEvents = prevSuppress;
+        }
+
+        private void SelectClassSlot(SlotModel slot)
+        {
+            _selectedSlot = slot;
+            _activeSlotCategory = slot.Target;
+
+            _suppressEvents = true;
+            int targetIdx = Array.FindIndex(SlotTabs, t => t.Cat == slot.Target);
+            if (targetIdx >= 0) _cmbSlotTarget.SelectedIndex = targetIdx;
+            RefreshCategoryDropdown();
+            _cmbSlotCategory.Text = slot.Category;
+            _txtSlotLabel.Text = slot.Label;
+            _chkSlotVisible.Checked = slot.Visible;
+            _chkSlotAllowEmpty.Checked = slot.AllowEmpty || slot.Items.Contains("");
+            _suppressEvents = false;
+
             RefreshAllowedPoolList();
             RefreshCatalogList();
         }
 
-        private void RefreshSlotTabCounts()
+        private void AddNewSlotToClass()
         {
-            for (int i = 0; i < SlotTabs.Length; i++)
+            if (_selectedClass == null) return;
+
+            // Pick first unused physical target if available
+            var used = new HashSet<SlotCategory>(_selectedClass.Slots.Select(s => s.Target));
+            SlotCategory nextTarget = SlotCategory.Weapon0;
+            foreach (SlotCategory cat in Enum.GetValues(typeof(SlotCategory)))
             {
-                var tab = SlotTabs[i];
-                int count = _selectedClass?.Pools[tab.Cat].Count ?? 0;
-                bool active = tab.Cat == _activeSlotCategory;
-                _slotTabButtons[i].Text = $"{tab.Label} ({count})";
-                _slotTabButtons[i].BackColor = active ? tab.Accent : Color.FromArgb(28, 34, 46);
-                _slotTabButtons[i].ForeColor = active ? Color.FromArgb(10, 12, 18) : Color.White;
+                if (!used.Contains(cat)) { nextTarget = cat; break; }
+            }
+
+            var newSlot = new SlotModel
+            {
+                Target = nextTarget,
+                Category = SlotModel.DefaultCategoryFor(nextTarget),
+                Label = SlotModel.DefaultLabelFor(nextTarget),
+                Visible = true,
+                AllowEmpty = true
+            };
+            _selectedClass.Slots.Add(newSlot);
+            _selectedClass.SyncPoolsFromSlots();
+            RefreshClassSlotsList(keepSelection: false);
+            _lstClassSlots.SelectedIndex = _selectedClass.Slots.Count - 1;
+            SelectClassSlot(newSlot);
+            UpdateClassListDisplay();
+            RefreshCodePreview();
+        }
+
+        private void RemoveSelectedSlotFromClass()
+        {
+            if (_selectedClass == null || _selectedSlot == null) return;
+            int idx = _selectedClass.Slots.IndexOf(_selectedSlot);
+            if (idx < 0) return;
+
+            _selectedClass.Slots.RemoveAt(idx);
+            _selectedClass.SyncPoolsFromSlots();
+            RefreshClassSlotsList(keepSelection: false);
+            if (_selectedClass.Slots.Count > 0)
+            {
+                int nextIdx = Math.Clamp(idx, 0, _selectedClass.Slots.Count - 1);
+                _lstClassSlots.SelectedIndex = nextIdx;
+                SelectClassSlot(_selectedClass.Slots[nextIdx]);
+            }
+            else
+            {
+                _selectedSlot = null;
+                RefreshAllowedPoolList();
+            }
+            UpdateClassListDisplay();
+            RefreshCodePreview();
+            _viewport?.Invalidate();
+        }
+
+        private void MoveSelectedSlot(int delta)
+        {
+            if (_selectedClass == null || _selectedSlot == null) return;
+            int idx = _selectedClass.Slots.IndexOf(_selectedSlot);
+            int target = idx + delta;
+            if (idx >= 0 && target >= 0 && target < _selectedClass.Slots.Count)
+            {
+                var s = _selectedClass.Slots[idx];
+                _selectedClass.Slots.RemoveAt(idx);
+                _selectedClass.Slots.Insert(target, s);
+                RefreshClassSlotsList(keepSelection: false);
+                _lstClassSlots.SelectedIndex = target;
+                RefreshCodePreview();
             }
         }
 
@@ -982,16 +1222,16 @@ namespace DuchyLoadoutStudio
         {
             _suppressEvents = true;
             _lstAllowedPool.Items.Clear();
-            if (_selectedClass != null)
+            if (_selectedClass != null && _selectedSlot != null)
             {
-                var pool = _selectedClass.Pools[_activeSlotCategory];
+                var pool = _selectedSlot.Items;
                 for (int i = 0; i < pool.Count; i++)
                 {
                     string id = pool[i];
-                    string prefix = i == 0 ? "⭐ [ДЕФОЛТ] " : $"   [{i + 1}] ";
+                    string prefix = i == 0 ? "⭐ " : $"[{i + 1}] ";
                     if (string.IsNullOrEmpty(id))
                     {
-                        _lstAllowedPool.Items.Add($"{prefix}\"\" (Пустой слот / Без предмета)");
+                        _lstAllowedPool.Items.Add($"{prefix}\"\" (Пустой слот)");
                     }
                     else if (_catalog.TryGetValue(id, out var item))
                     {
@@ -1005,7 +1245,7 @@ namespace DuchyLoadoutStudio
                 }
             }
             _suppressEvents = false;
-            RefreshSlotTabCounts();
+            RefreshClassSlotsList(keepSelection: true);
         }
 
         private class CatalogListEntry
@@ -1023,13 +1263,14 @@ namespace DuchyLoadoutStudio
         {
             string query = _txtCatalogSearch.Text.Trim();
             bool onlyDwdn = _chkOnlyCustomDwdn.Checked;
+            bool filterType = _chkFilterBySlotType.Checked;
 
             _lstCatalog.BeginUpdate();
             _lstCatalog.Items.Clear();
 
             var matches = _catalog.Values
                 .Where(it => !string.IsNullOrEmpty(it.Id))
-                .Where(it => MatchesCategory(it, _activeSlotCategory))
+                .Where(it => !filterType || MatchesCategory(it, _activeSlotCategory))
                 .Where(it => !onlyDwdn || it.IsCustomModItem)
                 .Where(it => string.IsNullOrEmpty(query) ||
                              it.Id.Contains(query, StringComparison.OrdinalIgnoreCase) ||
@@ -1097,13 +1338,23 @@ namespace DuchyLoadoutStudio
 
         private void AddItemToClassPool(string itemId)
         {
-            if (_selectedClass == null) return;
-            var pool = _selectedClass.Pools[_activeSlotCategory];
+            if (_selectedClass == null || _selectedSlot == null) return;
+            var pool = _selectedSlot.Items;
             if (!pool.Contains(itemId))
             {
                 pool.Add(itemId);
-                if (!string.IsNullOrEmpty(itemId))
-                    _previewSelectedItems[_activeSlotCategory] = itemId;
+                if (string.IsNullOrEmpty(itemId))
+                {
+                    _selectedSlot.AllowEmpty = true;
+                    _suppressEvents = true;
+                    _chkSlotAllowEmpty.Checked = true;
+                    _suppressEvents = false;
+                }
+                else
+                {
+                    _previewSelectedItems[_selectedSlot.Target] = itemId;
+                }
+                _selectedClass.SyncPoolsFromSlots();
                 RefreshAllowedPoolList();
                 RefreshCodePreview();
                 _viewport.Invalidate();
@@ -1112,13 +1363,22 @@ namespace DuchyLoadoutStudio
 
         private void RemoveSelectedFromClassPool()
         {
-            if (_selectedClass == null) return;
-            var pool = _selectedClass.Pools[_activeSlotCategory];
+            if (_selectedClass == null || _selectedSlot == null) return;
+            var pool = _selectedSlot.Items;
             int idx = _lstAllowedPool.SelectedIndex;
             if (idx >= 0 && idx < pool.Count)
             {
+                string removed = pool[idx];
                 pool.RemoveAt(idx);
-                _previewSelectedItems[_activeSlotCategory] = pool.FirstOrDefault(x => !string.IsNullOrEmpty(x)) ?? "";
+                if (string.IsNullOrEmpty(removed))
+                {
+                    _selectedSlot.AllowEmpty = false;
+                    _suppressEvents = true;
+                    _chkSlotAllowEmpty.Checked = false;
+                    _suppressEvents = false;
+                }
+                _selectedClass.SyncPoolsFromSlots();
+                _previewSelectedItems[_selectedSlot.Target] = pool.FirstOrDefault(x => !string.IsNullOrEmpty(x)) ?? "";
                 RefreshAllowedPoolList();
                 RefreshCodePreview();
                 _viewport.Invalidate();
@@ -1127,16 +1387,17 @@ namespace DuchyLoadoutStudio
 
         private void MakeAllowedItemDefault()
         {
-            if (_selectedClass == null) return;
-            var pool = _selectedClass.Pools[_activeSlotCategory];
+            if (_selectedClass == null || _selectedSlot == null) return;
+            var pool = _selectedSlot.Items;
             int idx = _lstAllowedPool.SelectedIndex;
             if (idx > 0 && idx < pool.Count)
             {
                 string item = pool[idx];
                 pool.RemoveAt(idx);
                 pool.Insert(0, item);
+                _selectedClass.SyncPoolsFromSlots();
                 if (!string.IsNullOrEmpty(item))
-                    _previewSelectedItems[_activeSlotCategory] = item;
+                    _previewSelectedItems[_selectedSlot.Target] = item;
                 RefreshAllowedPoolList();
                 _lstAllowedPool.SelectedIndex = 0;
                 RefreshCodePreview();
@@ -1180,14 +1441,13 @@ namespace DuchyLoadoutStudio
                 Armor = 30,
                 Hitpoints = 100
             };
-            // Pre-populate with default Bergen armor so the 3D mannequin immediately renders a knight
-            cls.Pools[SlotCategory.HeadArmor].Add("bergen_inf_t2_helmet");
-            cls.Pools[SlotCategory.Cape].Add("bergen_leather_shoulders");
-            cls.Pools[SlotCategory.BodyArmor].Add("bergen_chainmail");
-            cls.Pools[SlotCategory.Gloves].Add("bergen_leather_gloves");
-            cls.Pools[SlotCategory.Legs].Add("bergen_boots");
-            cls.Pools[SlotCategory.Weapon0].Add("baldur_sword");
-            cls.Pools[SlotCategory.Weapon1].Add("mp_bergen_shield");
+            cls.Slots.Add(new SlotModel { Target = SlotCategory.HeadArmor, Category = "Броня", Label = "Шлем", AllowEmpty = true, Items = new() { "Banobranny_helmet", "" } });
+            cls.Slots.Add(new SlotModel { Target = SlotCategory.BodyArmor, Category = "Броня", Label = "Доспех", Items = new() { "Banobranny_surcoat" } });
+            cls.Slots.Add(new SlotModel { Target = SlotCategory.Legs, Category = "Броня", Label = "Обувь", Items = new() { "banobranyi_leg" } });
+            cls.Slots.Add(new SlotModel { Target = SlotCategory.Gloves, Category = "Броня", Label = "Перчатки", AllowEmpty = true, Items = new() { "crossbowman_mailgoves", "" } });
+            cls.Slots.Add(new SlotModel { Target = SlotCategory.Weapon0, Category = "Вооружение", Label = "Оружие", Items = new() { "dwdn_falchion" } });
+            cls.Slots.Add(new SlotModel { Target = SlotCategory.Weapon1, Category = "Вооружение", Label = "Щит", AllowEmpty = true, Items = new() { "bannpbran_shield1", "" } });
+            cls.SyncPoolsFromSlots();
 
             _selectedDuchy.Classes.Add(cls);
             UpdateClassListDisplay();
@@ -1247,55 +1507,95 @@ namespace DuchyLoadoutStudio
 
         private void RefreshCodePreview()
         {
-            _rtbCSharp.Text = StudioDataLoader.GenerateDuchyManagerCSharp(_duchies);
-            if (_selectedClass != null)
+            _rtbLoadoutsXml.Text = StudioDataLoader.GenerateLoadoutsXml(_duchies);
+
+            var issues = StudioDataLoader.ValidateLoadouts(_duchies, _catalog);
+            var sb = new System.Text.StringBuilder();
+            if (issues.Count == 0)
             {
-                _rtbXml.Text = StudioDataLoader.GenerateClassXmlSnippets(_selectedClass);
+                sb.AppendLine("<!-- ✅ ВАЛИДАЦИЯ ПРОЙДЕНА: 0 ошибок, 0 предупреждений -->");
             }
             else
             {
-                _rtbXml.Text = "<!-- Выберите класс слева для генерации его XML-блоков -->";
+                int errs = issues.Count(i => i.IsError);
+                int warns = issues.Count - errs;
+                sb.AppendLine($"<!-- Валидация: {errs} ошибок, {warns} предупреждений -->");
+                foreach (var iss in issues)
+                {
+                    sb.AppendLine($"<!-- {(iss.IsError ? "[ОШИБКА]" : "[ПРЕДУПР.]")} {iss.Message} -->");
+                }
             }
+            sb.AppendLine();
+
+            if (_selectedClass != null)
+            {
+                _selectedClass.SyncPoolsFromSlots();
+                sb.Append(StudioDataLoader.GenerateClassXmlSnippets(_selectedClass));
+            }
+            _rtbXml.Text = sb.ToString();
         }
 
-        private void SaveGeneratedFilesToOutput()
+        private void SaveLoadoutsXmlToMod()
         {
+            var issues = StudioDataLoader.ValidateLoadouts(_duchies, _catalog);
+            var errors = issues.Where(i => i.IsError).ToList();
+            if (errors.Count > 0)
+            {
+                string errText = string.Join("\n• ", errors.Select(e => e.Message));
+                MessageBox.Show(
+                    $"Сохранение заблокировано из-за критических ошибок:\n\n• {errText}\n\nИсправьте их и повторите попытку.",
+                    "❌ Ошибка валидации",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                _tabCode.SelectedIndex = 1;
+                RefreshCodePreview();
+                return;
+            }
+
             try
             {
-                Directory.CreateDirectory(_outDir);
-                string csPath = Path.Combine(_outDir, "DWDN_DuchyManager.cs");
-                string xmlSnippetsPath = Path.Combine(_outDir, "generated_classes_xml_snippets.xml");
+                string xmlPath = Path.Combine(_modRoot, "ModuleData", "dwdn_loadouts.xml");
+                string backupFile = StudioDataLoader.SaveLoadoutsXmlAtomic(xmlPath, _backupDir, _duchies);
 
-                File.WriteAllText(csPath, StudioDataLoader.GenerateDuchyManagerCSharp(_duchies));
+                string serverSyncNote = "";
+                string? srvModRoot = StudioDataLoader.ResolveDedicatedServerModRoot(_modRoot);
+                if (!string.IsNullOrEmpty(srvModRoot))
+                {
+                    string srvXml = Path.Combine(srvModRoot, "ModuleData", "dwdn_loadouts.xml");
+                    Directory.CreateDirectory(Path.GetDirectoryName(srvXml)!);
+                    File.Copy(xmlPath, srvXml, overwrite: true);
+                    serverSyncNote = $"\n• Синхронизировано на сервер: {srvXml}";
+                }
 
-                var allXml = string.Join("\n\n", _duchies.SelectMany(d => d.Classes).Select(StudioDataLoader.GenerateClassXmlSnippets));
-                File.WriteAllText(xmlSnippetsPath, allXml);
-
-                _lblStatus.Text = $"💾 Сохранено в {_outDir}: DWDN_DuchyManager.cs и generated_classes_xml_snippets.xml";
+                RefreshCodePreview();
+                _lblStatus.Text = $"✅ Сохранено в dwdn_loadouts.xml (без пересборки DLL)! Бэкап: {backupFile}";
                 MessageBox.Show(
-                    $"Сгенерированные файлы успешно сохранены в:\n\n" +
-                    $"1. {csPath}\n2. {xmlSnippetsPath}",
-                    "Файлы сохранены",
+                    $"Конфигурация слотов, категорий и снаряжения сохранена!\n\n" +
+                    $"• Файл: {xmlPath}{serverSyncNote}\n" +
+                    $"• Бэкап: {(string.IsNullOrEmpty(backupFile) ? "(первое сохранение)" : backupFile)}\n\n" +
+                    $"Перекомпиляция DLL не требуется — изменения заработают при следующем запуске игры/сервера.",
+                    "💾 Сохранено (dwdn_loadouts.xml)",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка сохранения: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Ошибка сохранения XML: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void ApplyDirectlyToMod()
+        private void RollbackLoadoutsFromBackup()
         {
+            string? latestBackup = StudioDataLoader.GetLatestBackupPath(_backupDir);
+            if (string.IsNullOrEmpty(latestBackup))
+            {
+                MessageBox.Show($"Резервные копии в '{_backupDir}' пока не найдены.", "Откат бэкапа", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
             var confirm = MessageBox.Show(
-                "Автоматически применить все изменения напрямую в мод DWDN_TRY и пересобрать DLL?\n\n" +
-                "Будут автоматически обновлены:\n" +
-                "1. ModuleData/scripts/DWDN_Script/Common/Duchies/DWDN_DuchyManager.cs\n" +
-                "2. ModuleData/mpclassdivisions.xml\n" +
-                "3. ModuleData/mpcharacters.xml\n" +
-                "4. bin/Win64_Shipping_Client/DWDN_Script.dll (+ Server.dll)\n\n" +
-                "(Резервная копия .bak всех файлов сохраняется автоматически в output/backup_*)",
-                "⚡ Автоматическое применение в мод DWDN_TRY",
+                $"Восстановить ModuleData/dwdn_loadouts.xml из последней резервной копии?\n\n{latestBackup}",
+                "↩️ Откат из резервной копии",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question);
 
@@ -1303,78 +1603,60 @@ namespace DuchyLoadoutStudio
 
             try
             {
-                _lblStatus.Text = "⏳ Создание резервной копии и обновление C# / XML файлов мода...";
-                Application.DoEvents();
+                string xmlPath = Path.Combine(_modRoot, "ModuleData", "dwdn_loadouts.xml");
+                File.Copy(latestBackup, xmlPath, overwrite: true);
 
-                string backupDir = Path.Combine(_outDir, "backup_" + DateTime.Now.ToString("yyyyMMdd_HHmmss"));
-                Directory.CreateDirectory(backupDir);
-
-                string csTarget = Path.Combine(_modRoot, "ModuleData", "scripts", "DWDN_Script", "Common", "Duchies", "DWDN_DuchyManager.cs");
-                string divTarget = Path.Combine(_modRoot, "ModuleData", "mpclassdivisions.xml");
-                string charTarget = Path.Combine(_modRoot, "ModuleData", "mpcharacters.xml");
-                string csprojPath = Path.Combine(_modRoot, "ModuleData", "scripts", "DWDN_Script", "DWDN_Script.csproj");
-
-                if (File.Exists(csTarget)) File.Copy(csTarget, Path.Combine(backupDir, "DWDN_DuchyManager.cs.bak"), true);
-                if (File.Exists(divTarget)) File.Copy(divTarget, Path.Combine(backupDir, "mpclassdivisions.xml.bak"), true);
-                if (File.Exists(charTarget)) File.Copy(charTarget, Path.Combine(backupDir, "mpcharacters.xml.bak"), true);
-
-                // 1. Write DWDN_DuchyManager.cs
-                File.WriteAllText(csTarget, StudioDataLoader.GenerateDuchyManagerCSharp(_duchies));
-
-                // 2. Patch mpclassdivisions.xml
-                StudioDataLoader.PatchAndSaveMpClassDivisionsXml(divTarget, _duchies);
-
-                // 3. Patch mpcharacters.xml
-                StudioDataLoader.PatchAndSaveMpCharactersXml(charTarget, _duchies);
-
-                // 4. Automatically compile DWDN_Script.csproj into DWDN_Script.dll & DWDN_Script.Server.dll
-                string buildResultMsg = "DLL не пересобиралась (не найден DWDN_Script.csproj).";
-                if (File.Exists(csprojPath))
+                string? srvModRoot = StudioDataLoader.ResolveDedicatedServerModRoot(_modRoot);
+                if (!string.IsNullOrEmpty(srvModRoot))
                 {
-                    _lblStatus.Text = "🔨 Компиляция DWDN_Script.dll (dotnet build)...";
-                    Application.DoEvents();
-
-                    var psi = new ProcessStartInfo
-                    {
-                        FileName = "dotnet",
-                        Arguments = $"build \"{csprojPath}\" -c Debug",
-                        UseShellExecute = false,
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        CreateNoWindow = true
-                    };
-                    using var proc = Process.Start(psi);
-                    if (proc != null)
-                    {
-                        string stdout = proc.StandardOutput.ReadToEnd();
-                        string stderr = proc.StandardError.ReadToEnd();
-                        proc.WaitForExit(20000);
-                        if (proc.ExitCode == 0)
-                        {
-                            buildResultMsg = "✅ DWDN_Script.dll и DWDN_Script.Server.dll успешно пересобраны!";
-                        }
-                        else
-                        {
-                            buildResultMsg = $"⚠️ Код обновлён, но сборка DLL вернула код {proc.ExitCode}:\n{stderr}\n{stdout}";
-                        }
-                    }
+                    string srvXml = Path.Combine(srvModRoot, "ModuleData", "dwdn_loadouts.xml");
+                    if (Directory.Exists(Path.GetDirectoryName(srvXml)))
+                        File.Copy(xmlPath, srvXml, overwrite: true);
                 }
 
-                _lblStatus.Text = $"⚡ Успешно применено в DWDN_TRY (C# + XML + DLL)! Бэкап: {backupDir}";
-                MessageBox.Show(
-                    $"Все изменения автоматически применены в мод DWDN_TRY!\n\n" +
-                    $"• Обновлён: DWDN_DuchyManager.cs\n" +
-                    $"• Обновлён: ModuleData/mpclassdivisions.xml\n" +
-                    $"• Обновлён: ModuleData/mpcharacters.xml\n" +
-                    $"• Сборка: {buildResultMsg}\n\n" +
-                    $"Резервная копия сохранена в:\n{backupDir}",
-                    "⚡ Успешно применено в мод",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
+                LoadModData();
+                _lblStatus.Text = $"↩️ Восстановлено из бэкапа: {Path.GetFileName(latestBackup)}";
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка применения в мод: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Ошибка отката: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void SyncStatsToGameXmls()
+        {
+            var confirm = MessageBox.Show(
+                "Обновить характеристики классов (цена, HP, скорость, навыки) в:\n" +
+                "1. ModuleData/mpclassdivisions.xml\n" +
+                "2. ModuleData/mpcharacters.xml\n\n" +
+                "Перед записью будут созданы резервные копии .bak.",
+                "⚙️ Синхронизация статов в XML",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (confirm != DialogResult.Yes) return;
+
+            try
+            {
+                string backupSub = Path.Combine(_backupDir, "stats_backup_" + DateTime.Now.ToString("yyyyMMdd_HHmmss"));
+                Directory.CreateDirectory(backupSub);
+
+                string divTarget = Path.Combine(_modRoot, "ModuleData", "mpclassdivisions.xml");
+                string charTarget = Path.Combine(_modRoot, "ModuleData", "mpcharacters.xml");
+
+                if (File.Exists(divTarget)) File.Copy(divTarget, Path.Combine(backupSub, "mpclassdivisions.xml.bak"), true);
+                if (File.Exists(charTarget)) File.Copy(charTarget, Path.Combine(backupSub, "mpcharacters.xml.bak"), true);
+
+                foreach (var c in _duchies.SelectMany(d => d.Classes)) c.SyncPoolsFromSlots();
+                StudioDataLoader.PatchAndSaveMpClassDivisionsXml(divTarget, _duchies);
+                StudioDataLoader.PatchAndSaveMpCharactersXml(charTarget, _duchies);
+
+                _lblStatus.Text = $"⚙️ Обновлены mpclassdivisions.xml и mpcharacters.xml. Бэкап: {backupSub}";
+                MessageBox.Show($"Готово!\nБэкап сохранён в:\n{backupSub}", "Статы обновлены", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка обновления XML статов: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

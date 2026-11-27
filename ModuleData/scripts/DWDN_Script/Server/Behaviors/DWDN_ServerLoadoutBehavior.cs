@@ -106,6 +106,33 @@ namespace DWDN_Script.Server.Behaviors
             try
             {
                 DWDN_LoadoutSelection selection = msg.ToSelection();
+
+                // Серверная whitelist-валидация: запрещаем клиенту подставлять предметы не из пула выбранного класса
+                var requestedDuchy = DWDN_DuchyManager.GetDuchy(selection.DuchyId);
+                var requestedClass = requestedDuchy?.GetClass(selection.ClassId);
+                if (requestedClass != null)
+                {
+                    selection.DuchyId = requestedDuchy.Id;
+                    selection.ClassId = requestedClass.Id;
+
+                    bool rejHead, rejCape, rejBody, rejGloves, rejLegs, rejW0, rejW1, rejW2, rejW3, rejHorse;
+                    selection.HeadId    = requestedClass.SanitizeSlotItem(DWDN_SlotTarget.Head,    selection.HeadId,    out rejHead);
+                    selection.CapeId    = requestedClass.SanitizeSlotItem(DWDN_SlotTarget.Cape,    selection.CapeId,    out rejCape);
+                    selection.BodyId    = requestedClass.SanitizeSlotItem(DWDN_SlotTarget.Body,    selection.BodyId,    out rejBody);
+                    selection.GlovesId  = requestedClass.SanitizeSlotItem(DWDN_SlotTarget.Gloves,  selection.GlovesId,  out rejGloves);
+                    selection.LegsId    = requestedClass.SanitizeSlotItem(DWDN_SlotTarget.Legs,    selection.LegsId,    out rejLegs);
+                    selection.Weapon0Id = requestedClass.SanitizeSlotItem(DWDN_SlotTarget.Weapon0, selection.Weapon0Id, out rejW0);
+                    selection.Weapon1Id = requestedClass.SanitizeSlotItem(DWDN_SlotTarget.Weapon1, selection.Weapon1Id, out rejW1);
+                    selection.Weapon2Id = requestedClass.SanitizeSlotItem(DWDN_SlotTarget.Weapon2, selection.Weapon2Id, out rejW2);
+                    selection.Weapon3Id = requestedClass.SanitizeSlotItem(DWDN_SlotTarget.Weapon3, selection.Weapon3Id, out rejW3);
+                    selection.HorseId   = requestedClass.SanitizeSlotItem(DWDN_SlotTarget.Horse,   selection.HorseId,   out rejHorse);
+
+                    if (rejHead || rejCape || rejBody || rejGloves || rejLegs || rejW0 || rejW1 || rejW2 || rejW3 || rejHorse)
+                    {
+                        Debug.Print($"[DWDN Server ANTI-CHEAT] Игрок {peer.UserName} прислал неразрешённый предмет для класса {requestedClass.Id} — слоты приведены к whitelist.");
+                    }
+                }
+
                 int peerKey = peer.Index;
                 _peerSelections[peerKey] = selection;
                 if (peer.VirtualPlayer != null)
