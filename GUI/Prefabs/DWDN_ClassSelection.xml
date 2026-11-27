@@ -210,10 +210,26 @@
                                    WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
                                    StackLayout.LayoutMethod="VerticalTopToBottom">
                           <ItemTemplate>
-                            <!-- Строка слота: видна только если для класса есть опции выбора -->
-                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
-                                    MarginBottom="6" IsVisible="@HasOptions">
+                            <!-- Строка слота (с опциональным заголовком категории): видна только если для класса есть опции выбора -->
+                            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                       MarginBottom="6" IsVisible="@HasOptions"
+                                       StackLayout.LayoutMethod="VerticalTopToBottom">
                               <Children>
+
+                                <!-- Заголовок категории (отображается при переходе к новой категории слотов) -->
+                                <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                           MarginTop="4" MarginBottom="4" IsVisible="@ShowCategoryHeader"
+                                           StackLayout.LayoutMethod="VerticalTopToBottom" DoNotAcceptEvents="true">
+                                  <Children>
+                                    <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                                                Brush="MPClassLoadout.TroopBanner.SubClassText" Brush.FontSize="13" Brush.FontColor="#E5B95CFF"
+                                                Brush.TextOutlineColor="#000000FF" Brush.TextOutlineAmount="1"
+                                                Brush.TextHorizontalAlignment="Left" Text="@CategoryName" DoNotAcceptEvents="true" />
+                                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1"
+                                            MarginTop="2" Sprite="BlankWhiteSquare_9" Color="#C8963E55" DoNotAcceptEvents="true" />
+                                  </Children>
+                                </ListPanel>
+
                                 <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
                                            StackLayout.LayoutMethod="HorizontalLeftToRight">
                                   <Children>
@@ -285,7 +301,7 @@
                                   </Children>
                                 </ListPanel>
                               </Children>
-                            </Widget>
+                            </ListPanel>
                           </ItemTemplate>
                         </ListPanel>
                       </Children>

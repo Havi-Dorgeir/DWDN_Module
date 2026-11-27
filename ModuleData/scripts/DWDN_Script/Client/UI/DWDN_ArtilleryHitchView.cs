@@ -40,14 +40,22 @@ namespace DWDN_Script.Client.UI
                 MissionScreen.RemoveLayer(_layer);
                 _layer = null;
             }
-            _viewModel = null;
+            if (_viewModel != null)
+            {
+                _viewModel.OnFinalize();
+                _viewModel = null;
+            }
             base.OnMissionScreenFinalize();
         }
 
         public override void OnMissionScreenTick(float dt)
         {
             base.OnMissionScreenTick(dt);
-            if (_viewModel == null || Mission == null) return;
+            if (_viewModel == null || Mission == null || Mission.CurrentState != Mission.State.Continuing)
+            {
+                ResetInteraction();
+                return;
+            }
 
             Agent mainAgent = Agent.Main;
             if (mainAgent == null || !mainAgent.IsActive())
