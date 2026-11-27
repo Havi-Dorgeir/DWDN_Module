@@ -1,0 +1,545 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DWDNLoadouts version="1">
+  <Duchies>
+    <Duchy id="banreich" name="Баннрайх" description="Северное герцогство с сильными рыцарскими традициями, тяжелой пехотой и передовым вооружением." banner_code="11.14.14.1536.1536.768.768.1.0.0.160.0.0.512.512.768.768.1.0.0" enabled="true">
+      <Class id="mp_Ratay" name="Ратай" description="Легкая пехота ополчения, вооруженная копьями, топорами и щитами." troop_id="mp_Ratay_hero" icon="" enabled="true">
+        <Slot target="Head" category="Броня" label="Шлем" visible="true" allow_empty="true">
+          <Item id="ratay_kettle_bare" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Body" category="Броня" label="Доспех" visible="true" allow_empty="false">
+          <Item id="ratay_overcoat" />
+        </Slot>
+        <Slot target="Gloves" category="Броня" label="Перчатки" visible="true" allow_empty="true">
+          <Item id="arch_banreich_leatherglove" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Legs" category="Броня" label="Обувь" visible="true" allow_empty="false">
+          <Item id="ratay_hose" />
+        </Slot>
+        <Slot target="Weapon0" category="Вооружение" label="Оружие" visible="true" allow_empty="false">
+          <Item id="dwdn_ratay_falchion" />
+          <Item id="mp_sturgia_axe" />
+          <Item id="mp_vlandian_hammer" />
+        </Slot>
+        <Slot target="Weapon1" category="Вооружение" label="Щит" visible="true" allow_empty="true">
+          <Item id="ratay_1_shield" />
+          <Item id="ratay_2_shield" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Weapon2" category="Вооружение" label="Копьё" visible="true" allow_empty="true">
+          <Item id="" />
+          <Item id="mp_western_short_spear" />
+        </Slot>
+      </Class>
+      <Class id="mp_Banobranny" name="Банобранный" description="Регулярная пехота герцогства в сюрко и шапелях с надежными щитами." troop_id="mp_Banobranny_hero" icon="" enabled="true">
+        <Slot target="Head" category="Броня" label="Шлем" visible="true" allow_empty="true">
+          <Item id="Banobranny_helmet" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Body" category="Броня" label="Доспех" visible="true" allow_empty="false">
+          <Item id="Banobranny_surcoat" />
+        </Slot>
+        <Slot target="Gloves" category="Броня" label="Перчатки" visible="true" allow_empty="true">
+          <Item id="crossbowman_mailgoves" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Legs" category="Броня" label="Обувь" visible="true" allow_empty="false">
+          <Item id="banobranyi_leg" />
+        </Slot>
+        <Slot target="Weapon0" category="Вооружение" label="Оружие" visible="true" allow_empty="false">
+          <Item id="dwdn_cleaver" />
+          <Item id="dwdn_falchion" />
+          <Item id="mp_sturgia_axe" />
+          <Item id="mp_vlandian_mace" />
+        </Slot>
+        <Slot target="Weapon1" category="Вооружение" label="Щит" visible="true" allow_empty="true">
+          <Item id="bannpbran_shield1" />
+          <Item id="bannpbran_shield2" />
+          <Item id="bannpbran_shield3" />
+          <Item id="bannpbran_shield4" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Weapon2" category="Вооружение" label="Копьё" visible="true" allow_empty="true">
+          <Item id="" />
+          <Item id="mp_western_spear" />
+        </Slot>
+      </Class>
+      <Class id="mp_Pikeman" name="Пикинёр" description="Элитные пехотинцы с длинными пиками, способные остановить любой натиск кавалерии." troop_id="mp_Pikeman_hero" icon="" enabled="true">
+        <Slot target="Head" category="Броня" label="Шлем" visible="true" allow_empty="true">
+          <Item id="dwdn_pikeman_kettlehad" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Body" category="Броня" label="Доспех" visible="true" allow_empty="false">
+          <Item id="dwdn_pikeman_cuirass_v1" />
+        </Slot>
+        <Slot target="Gloves" category="Броня" label="Перчатки" visible="true" allow_empty="true">
+          <Item id="plate_gauntlet" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Legs" category="Броня" label="Обувь" visible="true" allow_empty="false">
+          <Item id="pikemen_dwdn_plate_leg" />
+        </Slot>
+        <Slot target="Weapon0" category="Вооружение" label="Пика" visible="true" allow_empty="false">
+          <Item id="pike1" />
+        </Slot>
+        <Slot target="Weapon1" category="Вооружение" label="Запасное оружие" visible="true" allow_empty="false">
+          <Item id="dwdn_cleaver" />
+          <Item id="mp_vlandian_arming_sword" />
+          <Item id="mp_sturgia_axe" />
+          <Item id="mp_vlandian_mace" />
+        </Slot>
+      </Class>
+      <Class id="mp_Zbroyniy" name="Збройный" description="Тяжелобронированные латники передового строя с бацинетами и тяжелыми клинками." troop_id="mp_Zbroyniy_hero" icon="" enabled="true">
+        <Slot target="Head" category="Броня" label="Шлем" visible="true" allow_empty="true">
+          <Item id="armeds_bacinet_with_facemask" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Body" category="Броня" label="Доспех" visible="true" allow_empty="false">
+          <Item id="armeds_striped_cuirass" />
+        </Slot>
+        <Slot target="Gloves" category="Броня" label="Перчатки" visible="true" allow_empty="true">
+          <Item id="plate_gauntlet" />
+          <Item id="plate_round_gauntlet" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Legs" category="Броня" label="Обувь" visible="true" allow_empty="false">
+          <Item id="plate_legs_dwdn" />
+        </Slot>
+        <Slot target="Weapon0" category="Вооружение" label="Оружие" visible="true" allow_empty="false">
+          <Item id="mp_battania_noble_sword" />
+          <Item id="dwdn_falchion" />
+          <Item id="mp_sturgia_heavy_axe" />
+          <Item id="mp_battnia_heavy_mace" />
+        </Slot>
+        <Slot target="Weapon1" category="Вооружение" label="Щит" visible="true" allow_empty="true">
+          <Item id="zbroyniy_shield1" />
+          <Item id="zbroyniy_shield_empty1" />
+          <Item id="zbroyniy_shield_silver1" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Weapon2" category="Вооружение" label="Копьё" visible="true" allow_empty="true">
+          <Item id="" />
+          <Item id="mp_western_long_spear" />
+        </Slot>
+      </Class>
+      <Class id="mp_Officer" name="Десятник" description="Младший командир пехоты в бригантине с офицерским бацинетом." troop_id="mp_Officer_hero" icon="" enabled="true">
+        <Slot target="Head" category="Броня" label="Шлем" visible="true" allow_empty="true">
+          <Item id="officer_dwdn_bacinet" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Body" category="Броня" label="Доспех" visible="true" allow_empty="false">
+          <Item id="officer_brigantine" />
+        </Slot>
+        <Slot target="Gloves" category="Броня" label="Перчатки" visible="true" allow_empty="true">
+          <Item id="plate_gauntlet" />
+          <Item id="plate_round_gauntlet" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Legs" category="Броня" label="Обувь" visible="true" allow_empty="false">
+          <Item id="officer_legs" />
+        </Slot>
+        <Slot target="Weapon0" category="Вооружение" label="Оружие" visible="true" allow_empty="false">
+          <Item id="mp_vlandian_arming_sword" />
+          <Item id="dwdn_falchion" />
+          <Item id="dwdn_cleaver" />
+          <Item id="mp_sturgia_heavy_axe" />
+          <Item id="mp_vlandian_mace" />
+        </Slot>
+        <Slot target="Weapon1" category="Вооружение" label="Щит" visible="true" allow_empty="true">
+          <Item id="zbroyniy_shield1" />
+          <Item id="zbroyniy_shield_silver1" />
+          <Item id="zbroyniy_shield_empty1" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Weapon2" category="Вооружение" label="Копьё" visible="true" allow_empty="true">
+          <Item id="" />
+          <Item id="mp_western_long_spear" />
+        </Slot>
+      </Class>
+      <Class id="mp_Sotnik" name="Сотник" description="Старший офицер в тяжелой латной кирасе, командующий сотней воинов." troop_id="mp_Sotnik_hero" icon="" enabled="true">
+        <Slot target="Head" category="Броня" label="Шлем" visible="true" allow_empty="true">
+          <Item id="armeds_bacinet_with_facemask" />
+          <Item id="officer_dwdn_bacinet" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Cape" category="Броня" label="Плащ" visible="true" allow_empty="true">
+          <Item id="Baron_rundal_cape" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Body" category="Броня" label="Доспех" visible="true" allow_empty="false">
+          <Item id="dwdn_pikeman_cuirass_v1" />
+          <Item id="officer_brigantine" />
+        </Slot>
+        <Slot target="Gloves" category="Броня" label="Перчатки" visible="true" allow_empty="true">
+          <Item id="gothic_gloves" />
+          <Item id="plate_gauntlet" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Legs" category="Броня" label="Обувь" visible="true" allow_empty="false">
+          <Item id="plate_legs_dwdn" />
+          <Item id="officer_legs" />
+        </Slot>
+        <Slot target="Weapon0" category="Вооружение" label="Оружие" visible="true" allow_empty="false">
+          <Item id="mp_battania_noble_sword" />
+          <Item id="mp_vlandia_cavalry_sword" />
+          <Item id="mp_sturgia_heavy_axe" />
+          <Item id="mp_battnia_heavy_mace" />
+        </Slot>
+        <Slot target="Weapon1" category="Вооружение" label="Щит" visible="true" allow_empty="true">
+          <Item id="zbroyniy_shield_silver1" />
+          <Item id="zbroyniy_shield1" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Weapon2" category="Вооружение" label="Копьё" visible="true" allow_empty="true">
+          <Item id="mp_western_long_spear" />
+          <Item id="" />
+        </Slot>
+      </Class>
+      <Class id="mp_Khorunzhiy" name="Хорунжий" description="Элитный пехотинец в доспехах Рюндаля." troop_id="mp_Khorunzhiy_hero" icon="" enabled="false">
+        <Slot target="Head" category="Броня" label="Шлем" visible="true" allow_empty="true">
+          <Item id="baron_roondalt_vendelhelmet_1" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Cape" category="Броня" label="Плащ" visible="true" allow_empty="true">
+          <Item id="Baron_rundal_cape" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Body" category="Броня" label="Доспех" visible="true" allow_empty="false">
+          <Item id="run_body1" />
+        </Slot>
+        <Slot target="Gloves" category="Броня" label="Перчатки" visible="true" allow_empty="true">
+          <Item id="rundal_gloves_second" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Legs" category="Броня" label="Обувь" visible="true" allow_empty="false">
+          <Item id="rundal_leg" />
+        </Slot>
+        <Slot target="Weapon0" category="Вооружение" label="Оружие" visible="true" allow_empty="false">
+          <Item id="baldur_warpick" />
+        </Slot>
+        <Slot target="Weapon1" category="Вооружение" label="Щит" visible="true" allow_empty="true">
+          <Item id="rundal_shield" />
+          <Item id="" />
+        </Slot>
+      </Class>
+      <Class id="mp_Bannerman" name="Знаменосец" description="Носитель боевого знамени (Аура 12м со знаменем в руках: +4 брони, +5% скорости, +4% атаки, реген до 75% HP вне боя)." troop_id="mp_Bannerman_hero" icon="" enabled="true">
+        <Slot target="Head" category="Броня" label="Шлем" visible="true" allow_empty="true">
+          <Item id="banerman_bascinet" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Body" category="Броня" label="Доспех" visible="true" allow_empty="false">
+          <Item id="bannerman_cuirass" />
+        </Slot>
+        <Slot target="Gloves" category="Броня" label="Перчатки" visible="true" allow_empty="true">
+          <Item id="plate_round_gauntlet" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Legs" category="Броня" label="Обувь" visible="true" allow_empty="false">
+          <Item id="bannerman_legs" />
+        </Slot>
+        <Slot target="Weapon0" category="Вооружение" label="Оружие" visible="true" allow_empty="false">
+          <Item id="mp_vlandian_arming_sword" />
+          <Item id="dwdn_cleaver" />
+          <Item id="dwdn_falchion" />
+          <Item id="mp_sturgia_heavy_axe" />
+        </Slot>
+        <Slot target="Weapon1" category="Вооружение" label="Знамя" visible="true" allow_empty="false">
+          <Item id="dwdn_banner1" />
+        </Slot>
+      </Class>
+      <Class id="mp_DWDN_Archer" name="Стрелок" description="Опытные стрелки герцогства, использующие как тяжелые арбалеты, так и дальнобойные луки." troop_id="mp_DWDN_Archer_hero" icon="" enabled="true">
+        <Slot target="Head" category="Броня" label="Шлем" visible="true" allow_empty="true">
+          <Item id="crossbowman_kettle_1" />
+          <Item id="archer_kettle_1_bare" />
+          <Item id="Banobranny_helmet" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Cape" category="Броня" label="Шарф / Плащ" visible="true" allow_empty="true">
+          <Item id="archer_scarf" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Body" category="Броня" label="Доспех" visible="true" allow_empty="false">
+          <Item id="crossbowman_surcoat_gambeson" />
+          <Item id="arch_bannreich_gambeson" />
+          <Item id="Banobranny_surcoat" />
+        </Slot>
+        <Slot target="Gloves" category="Броня" label="Перчатки" visible="true" allow_empty="true">
+          <Item id="crossbowman_mailgoves" />
+          <Item id="arch_banreich_leatherglove" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Legs" category="Броня" label="Обувь" visible="true" allow_empty="false">
+          <Item id="crossbowman_leggings" />
+          <Item id="archer_leatherboots" />
+          <Item id="banobranyi_leg" />
+        </Slot>
+        <Slot target="Weapon0" category="Вооружение" label="Стрелковое оружие" visible="true" allow_empty="false">
+          <Item id="mp_heavier_crossbow" />
+          <Item id="mp_heavier_crossbow_faster_draw" />
+          <Item id="mp_woodland_long_bow" />
+          <Item id="mp_steppe_superior_bow" />
+        </Slot>
+        <Slot target="Weapon1" category="Вооружение" label="Боеприпасы" visible="true" allow_empty="false">
+          <Item id="mp_bolts_strong" />
+          <Item id="mp_bolts_western_extra" />
+          <Item id="mp_arrows_steppe_extra" />
+        </Slot>
+        <Slot target="Weapon2" category="Вооружение" label="Ближний бой" visible="true" allow_empty="false">
+          <Item id="dwdn_peasant_knife" />
+          <Item id="dwdn_cleaver" />
+          <Item id="mp_vlandian_short_sword" />
+          <Item id="mp_sturgia_axe" />
+        </Slot>
+        <Slot target="Weapon3" category="Вооружение" label="Щит" visible="true" allow_empty="true">
+          <Item id="" />
+          <Item id="ratay_1_shield" />
+        </Slot>
+      </Class>
+      <Class id="mp_DWDN_Crossbowman" name="Стрелок с ручницей" description="Стрелок, вооруженный ручной бомбардой со свинцовыми пулями для пробития тяжелой брони." troop_id="mp_DWDN_Crossbowman_hero" icon="" enabled="true">
+        <Slot target="Head" category="Броня" label="Шлем" visible="true" allow_empty="true">
+          <Item id="crossbowman_kettle_1" />
+          <Item id="archer_kettle_1_bare" />
+          <Item id="Banobranny_helmet" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Cape" category="Броня" label="Шарф / Плащ" visible="true" allow_empty="true">
+          <Item id="archer_scarf" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Body" category="Броня" label="Доспех" visible="true" allow_empty="false">
+          <Item id="crossbowman_surcoat_gambeson" />
+          <Item id="arch_bannreich_gambeson" />
+          <Item id="Banobranny_surcoat" />
+        </Slot>
+        <Slot target="Gloves" category="Броня" label="Перчатки" visible="true" allow_empty="true">
+          <Item id="crossbowman_mailgoves" />
+          <Item id="arch_banreich_leatherglove" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Legs" category="Броня" label="Обувь" visible="true" allow_empty="false">
+          <Item id="crossbowman_leggings" />
+          <Item id="archer_leatherboots" />
+          <Item id="banobranyi_leg" />
+        </Slot>
+        <Slot target="Weapon0" category="Вооружение" label="Огнестрел" visible="true" allow_empty="false">
+          <Item id="hand_cannon" />
+        </Slot>
+        <Slot target="Weapon1" category="Вооружение" label="Боеприпасы" visible="true" allow_empty="false">
+          <Item id="mp_bullets" />
+        </Slot>
+        <Slot target="Weapon2" category="Вооружение" label="Ближний бой" visible="true" allow_empty="false">
+          <Item id="dwdn_cleaver" />
+          <Item id="mp_vlandian_short_sword" />
+          <Item id="mp_sturgia_axe" />
+          <Item id="baldur_warpick" />
+        </Slot>
+        <Slot target="Weapon3" category="Вооружение" label="Гранаты" visible="true" allow_empty="true">
+          <Item id="dwdn_grenade" />
+          <Item id="" />
+        </Slot>
+      </Class>
+      <Class id="mp_Artillerist" name="Артиллерист (Осадный мастер)" description="Мастер осадных орудий (Лимит: 2 орудия на команду). Развертывает на базе передвижной онагр или баллисту на колёсах. Снаряды спавнятся рядом с орудием на грунте и сворачиваются при движении тележки." troop_id="mp_Artillerist_hero" icon="" enabled="true">
+        <Slot target="Head" category="Броня" label="Шлем" visible="true" allow_empty="true">
+          <Item id="dwdn_pikeman_kettlehad" />
+          <Item id="crossbowman_kettle_1" />
+          <Item id="Banobranny_helmet" />
+          <Item id="officer_dwdn_bacinet" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Cape" category="Броня" label="Наплечники" visible="true" allow_empty="true">
+          <Item id="archer_scarf" />
+          <Item id="ratay_chain_shoulder" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Body" category="Броня" label="Доспех" visible="true" allow_empty="false">
+          <Item id="Banobranny_surcoat" />
+          <Item id="crossbowman_surcoat_gambeson" />
+        </Slot>
+        <Slot target="Gloves" category="Броня" label="Перчатки" visible="true" allow_empty="true">
+          <Item id="crossbowman_mailgoves" />
+          <Item id="arch_banreich_leatherglove" />
+          <Item id="plate_round_gauntlet" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Legs" category="Броня" label="Обувь" visible="true" allow_empty="false">
+          <Item id="banobranyi_leg" />
+          <Item id="crossbowman_leggings" />
+          <Item id="officer_legs" />
+        </Slot>
+        <Slot target="Weapon0" category="Вооружение" label="Оружие" visible="true" allow_empty="false">
+          <Item id="dwdn_cleaver" />
+          <Item id="dwdn_falchion" />
+          <Item id="mp_vlandian_hammer" />
+          <Item id="mp_vlandian_short_sword" />
+        </Slot>
+        <Slot target="Weapon1" category="Артиллерия" label="Осадное орудие" visible="true" allow_empty="true">
+          <Item id="dwdn_order_mangonel" />
+          <Item id="dwdn_order_ballista" />
+          <Item id="" />
+        </Slot>
+      </Class>
+      <Class id="mp_DWDN_Cav" name="Кавалерия" description="Быстрая ударная конница с тяжелыми кавалерийскими копьями и надежными щитами." troop_id="mp_DWDN_Cav_hero" icon="" enabled="true">
+        <Slot target="Head" category="Броня" label="Шлем" visible="true" allow_empty="true">
+          <Item id="bannreich_cav_helmet_visor" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Body" category="Броня" label="Доспех" visible="true" allow_empty="false">
+          <Item id="plate_cav_cuirass" />
+        </Slot>
+        <Slot target="Gloves" category="Броня" label="Перчатки" visible="true" allow_empty="true">
+          <Item id="plate_gauntlet" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Legs" category="Броня" label="Обувь" visible="true" allow_empty="false">
+          <Item id="cav_bannreich_plate_legs" />
+        </Slot>
+        <Slot target="Weapon0" category="Вооружение" label="Копьё" visible="true" allow_empty="false">
+          <Item id="mp_vlandian_heavy_lance" />
+          <Item id="mp_battania_cavalry_spear" />
+        </Slot>
+        <Slot target="Weapon1" category="Вооружение" label="Щит" visible="true" allow_empty="true">
+          <Item id="bann_reich_cav_shield1" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Weapon2" category="Вооружение" label="Клинок / Топор" visible="true" allow_empty="false">
+          <Item id="mp_vlandia_cavalry_sword" />
+          <Item id="mp_sturgia_cavalry_axe" />
+          <Item id="mp_vlandian_cavalry_mace" />
+        </Slot>
+        <Slot target="Horse" category="Верховая езда" label="Скакун" visible="true" allow_empty="true">
+          <Item id="mp_vlandia_horse" />
+          <Item id="" />
+        </Slot>
+      </Class>
+      <Class id="mp_Knight" name="Рыцарь" description="Благородный рыцарь в полных латах с клапвизором, сокрушающий врагов мощным натиском." troop_id="mp_Knight_hero" icon="" enabled="true">
+        <Slot target="Head" category="Броня" label="Шлем" visible="true" allow_empty="true">
+          <Item id="knight_klappvisor" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Body" category="Броня" label="Доспех" visible="true" allow_empty="false">
+          <Item id="knight_cuirass" />
+        </Slot>
+        <Slot target="Gloves" category="Броня" label="Перчатки" visible="true" allow_empty="true">
+          <Item id="plate_round_gauntlet" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Legs" category="Броня" label="Обувь" visible="true" allow_empty="false">
+          <Item id="knight_legs" />
+        </Slot>
+        <Slot target="Weapon0" category="Вооружение" label="Копьё" visible="true" allow_empty="false">
+          <Item id="mp_vlandian_heavy_lance" />
+          <Item id="mp_battania_cavalry_spear" />
+        </Slot>
+        <Slot target="Weapon1" category="Вооружение" label="Щит" visible="true" allow_empty="true">
+          <Item id="zbroyniy_shield1" />
+          <Item id="zbroyniy_shield_empty1" />
+          <Item id="zbroyniy_shield_silver1" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Weapon2" category="Вооружение" label="Оружие" visible="true" allow_empty="false">
+          <Item id="mp_battania_noble_sword" />
+          <Item id="mp_vlandia_cavalry_sword" />
+          <Item id="mp_sturgia_cavalry_axe" />
+          <Item id="mp_vlandian_cavalry_mace" />
+        </Slot>
+        <Slot target="Horse" category="Верховая езда" label="Скакун" visible="true" allow_empty="true">
+          <Item id="mp_vlandia_horse" />
+          <Item id="" />
+        </Slot>
+      </Class>
+      <Class id="mp_Bergen_Klaus" name="Барон Берген" description="Барон Клаус Берген в хундсгугеле, вооруженный своим именным полуторным мечом." troop_id="mp_Bergen_Klaus_hero" icon="" enabled="true">
+        <Slot target="Head" category="Броня" label="Шлем" visible="true" allow_empty="false">
+          <Item id="bergen_bascinet_hounskull" />
+        </Slot>
+        <Slot target="Cape" category="Броня" label="Капюшон / Плащ" visible="true" allow_empty="true">
+          <Item id="bergen_hood" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Body" category="Броня" label="Доспех" visible="true" allow_empty="false">
+          <Item id="bergen_cuirass" />
+        </Slot>
+        <Slot target="Gloves" category="Броня" label="Перчатки" visible="true" allow_empty="false">
+          <Item id="gothic_gloves" />
+        </Slot>
+        <Slot target="Legs" category="Броня" label="Обувь" visible="true" allow_empty="false">
+          <Item id="bergen_legs" />
+        </Slot>
+        <Slot target="Weapon0" category="Вооружение" label="Копьё" visible="true" allow_empty="false">
+          <Item id="mp_vlandian_heavy_lance" />
+        </Slot>
+        <Slot target="Weapon1" category="Вооружение" label="Именной меч" visible="true" allow_empty="false">
+          <Item id="bergens_bastard_sword" />
+        </Slot>
+        <Slot target="Weapon2" category="Вооружение" label="Щит" visible="true" allow_empty="false">
+          <Item id="bergen_shield" />
+        </Slot>
+        <Slot target="Horse" category="Верховая езда" label="Скакун" visible="true" allow_empty="true">
+          <Item id="mp_vlandia_horse" />
+          <Item id="" />
+        </Slot>
+      </Class>
+      <Class id="mp_Finnard_Valerian" name="Барон Финнард" description="Барон Валериан Финнард с фамильным копьем и готическими латами." troop_id="mp_Finnard_Valerian_hero" icon="" enabled="true">
+        <Slot target="Head" category="Броня" label="Шлем" visible="true" allow_empty="false">
+          <Item id="finnard_helmet" />
+        </Slot>
+        <Slot target="Cape" category="Броня" label="Плащ" visible="true" allow_empty="true">
+          <Item id="finard_cape" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Body" category="Броня" label="Доспех" visible="true" allow_empty="false">
+          <Item id="Baron_Finnard_body" />
+        </Slot>
+        <Slot target="Gloves" category="Броня" label="Перчатки" visible="true" allow_empty="false">
+          <Item id="Baron_Finard_gauntlet" />
+        </Slot>
+        <Slot target="Legs" category="Броня" label="Обувь" visible="true" allow_empty="false">
+          <Item id="Baron_Finard_gothiclegs" />
+        </Slot>
+        <Slot target="Weapon0" category="Вооружение" label="Меч" visible="true" allow_empty="false">
+          <Item id="mp_vlandia_cavalry_sword" />
+        </Slot>
+        <Slot target="Weapon1" category="Вооружение" label="Именное копьё" visible="true" allow_empty="false">
+          <Item id="finnard_spear" />
+        </Slot>
+        <Slot target="Weapon2" category="Вооружение" label="Щит" visible="true" allow_empty="false">
+          <Item id="finnard_shield" />
+        </Slot>
+        <Slot target="Horse" category="Верховая езда" label="Скакун" visible="true" allow_empty="true">
+          <Item id="mp_vlandia_horse" />
+          <Item id="" />
+        </Slot>
+      </Class>
+      <Class id="mp_ALberic_Devald_hero" name="Король Альберик Девальд" description="Повелитель Даевдена в королевских латах, вооруженный легендарным клинком Девальда." troop_id="mp_ALberic_Devald_hero" icon="" enabled="true">
+        <Slot target="Head" category="Броня" label="Шлем" visible="true" allow_empty="true">
+          <Item id="armeds_bacinet_with_facemask" />
+          <Item id="" />
+        </Slot>
+        <Slot target="Body" category="Броня" label="Доспех" visible="true" allow_empty="false">
+          <Item id="king_daewden_covered_cuirass" />
+        </Slot>
+        <Slot target="Gloves" category="Броня" label="Перчатки" visible="true" allow_empty="false">
+          <Item id="king_plate_gauntlet" />
+        </Slot>
+        <Slot target="Legs" category="Броня" label="Обувь" visible="true" allow_empty="false">
+          <Item id="king_plate_legs" />
+        </Slot>
+        <Slot target="Weapon0" category="Вооружение" label="Копьё" visible="true" allow_empty="false">
+          <Item id="mp_vlandian_heavy_lance" />
+        </Slot>
+        <Slot target="Weapon1" category="Вооружение" label="Клинок Девальда" visible="true" allow_empty="false">
+          <Item id="devalds_bastard_sword" />
+        </Slot>
+        <Slot target="Weapon2" category="Вооружение" label="Щит" visible="true" allow_empty="false">
+          <Item id="zbroyniy_shield_silver1" />
+        </Slot>
+        <Slot target="Horse" category="Верховая езда" label="Скакун" visible="true" allow_empty="true">
+          <Item id="mp_battania_horse_war" />
+          <Item id="" />
+        </Slot>
+      </Class>
+    </Duchy>
+    <Duchy id="rezia" name="Рецезия" description="Южное торговое герцогство со своими уникальными оружейными традициями." banner_code="11.12.12.1536.1536.768.768.1.0.0.160.0.0.512.512.768.768.1.0.0" enabled="false" />
+    <Duchy id="creamor" name="Креамор" description="Восточные земли горных крепостей и суровых наёмников." banner_code="11.10.10.1536.1536.768.768.1.0.0.160.0.0.512.512.768.768.1.0.0" enabled="false" />
+  </Duchies>
+</DWDNLoadouts>

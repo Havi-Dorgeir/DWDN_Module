@@ -192,21 +192,55 @@ namespace DWDN_Script.Client.UI
             }
         }
 
+        private static DWDN_SlotCategory MapTargetToCategory(DWDN_SlotTarget target)
+        {
+            switch (target)
+            {
+                case DWDN_SlotTarget.Head: return DWDN_SlotCategory.Head;
+                case DWDN_SlotTarget.Cape: return DWDN_SlotCategory.Cape;
+                case DWDN_SlotTarget.Body: return DWDN_SlotCategory.Body;
+                case DWDN_SlotTarget.Gloves: return DWDN_SlotCategory.Gloves;
+                case DWDN_SlotTarget.Legs: return DWDN_SlotCategory.Legs;
+                case DWDN_SlotTarget.Weapon0: return DWDN_SlotCategory.Weapon0;
+                case DWDN_SlotTarget.Weapon1: return DWDN_SlotCategory.Weapon1;
+                case DWDN_SlotTarget.Weapon2: return DWDN_SlotCategory.Weapon2;
+                case DWDN_SlotTarget.Weapon3: return DWDN_SlotCategory.Weapon3;
+                case DWDN_SlotTarget.Horse: return DWDN_SlotCategory.Horse;
+                default: return DWDN_SlotCategory.Weapon0;
+            }
+        }
+
+        private static EquipmentIndex MapTargetToEquipmentIndex(DWDN_SlotTarget target)
+        {
+            switch (target)
+            {
+                case DWDN_SlotTarget.Head: return EquipmentIndex.Head;
+                case DWDN_SlotTarget.Cape: return EquipmentIndex.Cape;
+                case DWDN_SlotTarget.Body: return EquipmentIndex.Body;
+                case DWDN_SlotTarget.Gloves: return EquipmentIndex.Gloves;
+                case DWDN_SlotTarget.Legs: return EquipmentIndex.Leg;
+                case DWDN_SlotTarget.Weapon0: return EquipmentIndex.WeaponItemBeginSlot + 0;
+                case DWDN_SlotTarget.Weapon1: return EquipmentIndex.WeaponItemBeginSlot + 1;
+                case DWDN_SlotTarget.Weapon2: return EquipmentIndex.WeaponItemBeginSlot + 2;
+                case DWDN_SlotTarget.Weapon3: return EquipmentIndex.WeaponItemBeginSlot + 3;
+                case DWDN_SlotTarget.Horse: return EquipmentIndex.Horse;
+                default: return EquipmentIndex.WeaponItemBeginSlot;
+            }
+        }
+
         private void InitializeSlots()
         {
+            // Динамические слоты перестраиваются в RefreshAllSlotRows() под каждый выбранный класс.
+            ClearEquipmentSlots();
+        }
+
+        private void ClearEquipmentSlots()
+        {
+            foreach (var s in EquipmentSlots)
+            {
+                s.OnFinalize();
+            }
             EquipmentSlots.Clear();
-            EquipmentSlots.Add(new DWDN_EquipmentSlotVM(DWDN_SlotCategory.Head, "Шлем", EquipmentIndex.Head, OnSlotItemSelected));
-            EquipmentSlots.Add(new DWDN_EquipmentSlotVM(DWDN_SlotCategory.Cape, "Наплечники", EquipmentIndex.Cape, OnSlotItemSelected));
-            EquipmentSlots.Add(new DWDN_EquipmentSlotVM(DWDN_SlotCategory.Body, "Доспех", EquipmentIndex.Body, OnSlotItemSelected));
-            EquipmentSlots.Add(new DWDN_EquipmentSlotVM(DWDN_SlotCategory.Gloves, "Перчатки", EquipmentIndex.Gloves, OnSlotItemSelected));
-            EquipmentSlots.Add(new DWDN_EquipmentSlotVM(DWDN_SlotCategory.Legs, "Обувь", EquipmentIndex.Leg, OnSlotItemSelected));
-
-            EquipmentSlots.Add(new DWDN_EquipmentSlotVM(DWDN_SlotCategory.Weapon0, "Оружие I", EquipmentIndex.WeaponItemBeginSlot + 0, OnSlotItemSelected));
-            EquipmentSlots.Add(new DWDN_EquipmentSlotVM(DWDN_SlotCategory.Weapon1, "Оружие II", EquipmentIndex.WeaponItemBeginSlot + 1, OnSlotItemSelected));
-            EquipmentSlots.Add(new DWDN_EquipmentSlotVM(DWDN_SlotCategory.Weapon2, "Оружие III", EquipmentIndex.WeaponItemBeginSlot + 2, OnSlotItemSelected));
-            EquipmentSlots.Add(new DWDN_EquipmentSlotVM(DWDN_SlotCategory.Weapon3, "Оружие IV", EquipmentIndex.WeaponItemBeginSlot + 3, OnSlotItemSelected));
-
-            EquipmentSlots.Add(new DWDN_EquipmentSlotVM(DWDN_SlotCategory.Horse, "Скакун", EquipmentIndex.Horse, OnSlotItemSelected));
         }
 
         private void SelectInitialState()
@@ -319,29 +353,67 @@ namespace DWDN_Script.Client.UI
 
         private void RefreshAllSlotRows()
         {
-            foreach (var slot in EquipmentSlots)
-            {
-                List<string> pool = GetItemPoolForSlot(slot.SlotCategory);
-                string currentId = GetSelectedIdForSlot(slot.SlotCategory);
-                slot.PopulateOptions(pool, currentId);
+            ClearEquipmentSlots();
 
-                // Если текущий ID слота не был в пуле или был пуст, фиксируем первый доступный предмет
-                if (slot.Options.Count > 0)
+            var def = _currentClass?.ClassDefinition;
+            if (def == null) return;
+
+            def.EnsureSlotsFromLegacyPools();
+
+            string lastVisibleCategory = null;
+            foreach (var slotDef in def.Slots)
+            {
+                if (slotDef == null || !slotDef.Visible) continue;
+
+                var uiCat = MapTargetToCategory(slotDef.Target);
+                var eqIdx = MapTargetToEquipmentIndex(slotDef.Target);
+                string label = string.IsNullOrEmpty(slotDef.Label)
+                    ? DWDN_SlotDefinition.GetDefaultLabel(slotDef.Target)
+                    : slotDef.Label;
+                bool useExplicitLabel = !string.IsNullOrEmpty(slotDef.Label);
+                string category = slotDef.Category ?? "";
+
+                var slotVm = new DWDN_EquipmentSlotVM(
+                    uiCat,
+                    label,
+                    eqIdx,
+                    OnSlotItemSelected,
+                    categoryName: category,
+                    showCategoryHeader: false,
+                    useExplicitLabel: useExplicitLabel
+                );
+
+                string currentId = GetSelectedIdForSlot(uiCat);
+                slotVm.PopulateOptions(slotDef.AllowedItems, currentId);
+
+                if (slotVm.HasOptions)
                 {
+                    bool showHeader = !string.IsNullOrWhiteSpace(category) &&
+                                      !string.Equals(category, lastVisibleCategory, StringComparison.OrdinalIgnoreCase);
+                    slotVm.ShowCategoryHeader = showHeader;
+                    lastVisibleCategory = category;
+
+                    // Если текущий ID слота не был в пуле или был пуст, фиксируем первый доступный предмет
                     bool found = false;
-                    foreach (var opt in slot.Options)
+                    foreach (var opt in slotVm.Options)
                     {
                         if (opt.IsSelected)
                         {
-                            SetSelectedIdForSlot(slot.SlotCategory, opt.ItemId);
+                            SetSelectedIdForSlot(uiCat, opt.ItemId);
                             found = true;
                             break;
                         }
                     }
-                    if (!found)
+                    if (!found && slotVm.Options.Count > 0)
                     {
-                        SetSelectedIdForSlot(slot.SlotCategory, slot.Options[0].ItemId);
+                        SetSelectedIdForSlot(uiCat, slotVm.Options[0].ItemId);
                     }
+
+                    EquipmentSlots.Add(slotVm);
+                }
+                else
+                {
+                    slotVm.OnFinalize();
                 }
             }
         }

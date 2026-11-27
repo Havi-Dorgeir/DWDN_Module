@@ -275,20 +275,21 @@ namespace DWDN_Script
         public override void OnRemoveBehavior()
         {
             UnregisterNetworkHandlers();
-            CleanupAllCannons();
+            ResetArtilleryStateOnly();
             base.OnRemoveBehavior();
         }
 
         protected override void OnEndMission()
         {
             base.OnEndMission();
-            CleanupAllCannons();
+            UnregisterNetworkHandlers();
+            ResetArtilleryStateOnly();
         }
 
         public override void OnClearScene()
         {
             base.OnClearScene();
-            CleanupAllCannons();
+            ResetArtilleryStateOnly();
         }
 
         // =========================================================================
@@ -1072,6 +1073,8 @@ namespace DWDN_Script
         {
             base.OnMissionTick(dt);
 
+            if (Mission == null || Mission.CurrentState != Mission.State.Continuing) return;
+
             _tickTimer += dt;
             if (_tickTimer < 0.033f) return;
             float stepDt = _tickTimer;
@@ -1399,6 +1402,7 @@ namespace DWDN_Script
                                 {
                                     existingEngine.HorseAgent.FadeOut(false, true);
                                 }
+                                existingEngine.HorseAgent = null;
                                 if (existingEngine.RootEntity != null)
                                 {
                                     existingEngine.RootEntity.FadeOut(0.5f, false);
@@ -1630,15 +1634,61 @@ namespace DWDN_Script
             catch { }
         }
 
+        /// <summary>
+        /// Безопасная очистка только управляемых структур при OnClearScene / OnEndMission / OnRemoveBehavior.
+        /// Не вызывает Remove(0) и FadeOut() во время сброса миссии, так как движок уже разослал ClearMission
+        /// и сам уничтожает все MissionObject и Agent — повторные нативные вызовы шлют MPSGE_agent_routed
+        /// после ClearMission и роняют клиентов с 0xC0000005.
+        /// </summary>
+        public static void ResetArtilleryStateOnly()
+        {
+            lock (_lockObject)
+            {
+                _activeEngines.Clear();
+                _playerLastEngineDestroyed.Clear();
+                _spawnedAgentIndices.Clear();
+            }
+        }
+
+        /// <summary>
+        /// Принудительная очистка орудий посреди активной миссии (например, админ-командой !clearcannons).
+        /// </summary>
         public static void CleanupAllCannons()
         {
             lock (_lockObject)
             {
-                foreach (var e in _activeEngines)
+                bool canModifyScene = Mission.Current != null && Mission.Current.CurrentState == Mission.State.Continuing;
+                if (canModifyScene)
                 {
-                    try { e.RootEntity?.Remove(0); } catch { }
-                    try { e.CartEntity?.Remove(0); } catch { }
-                    try { e.HorseAgent?.FadeOut(true, true); } catch { }
+                    foreach (var e in _activeEngines)
+                    {
+                        if (e == null) continue;
+                        try
+                        {
+                            if (e.RootEntity != null && e.RootEntity.Pointer != UIntPtr.Zero && e.RootEntity.Scene != null)
+                            {
+                                e.RootEntity.Remove(0);
+                            }
+                        }
+                        catch { }
+                        try
+                        {
+                            if (e.CartEntity != null && e.CartEntity.Pointer != UIntPtr.Zero && e.CartEntity.Scene != null)
+                            {
+                                e.CartEntity.Remove(0);
+                            }
+                        }
+                        catch { }
+                        try
+                        {
+                            if (GameNetwork.IsServer && e.HorseAgent != null && e.HorseAgent.IsActive())
+                            {
+                                e.HorseAgent.FadeOut(true, true);
+                            }
+                        }
+                        catch { }
+                        e.HorseAgent = null;
+                    }
                 }
                 _activeEngines.Clear();
                 _playerLastEngineDestroyed.Clear();

@@ -28,12 +28,43 @@ namespace DWDN_Script.Client.UI
     {
         private readonly Action<DWDN_EquipmentSlotVM, DWDN_ItemOptionVM> _onItemSelected;
         private string _slotName;
+        private string _categoryName = "";
+        private bool _showCategoryHeader;
         private string _selectedItemName;
         private bool _hasOptions;
         private readonly string _initialSlotName;
+        private readonly bool _useExplicitLabel;
 
         public DWDN_SlotCategory SlotCategory { get; }
         public EquipmentIndex EquipmentIndex { get; }
+
+        [DataSourceProperty]
+        public string CategoryName
+        {
+            get => _categoryName;
+            set
+            {
+                if (_categoryName != value)
+                {
+                    _categoryName = value;
+                    OnPropertyChangedWithValue(value, nameof(CategoryName));
+                }
+            }
+        }
+
+        [DataSourceProperty]
+        public bool ShowCategoryHeader
+        {
+            get => _showCategoryHeader;
+            set
+            {
+                if (_showCategoryHeader != value)
+                {
+                    _showCategoryHeader = value;
+                    OnPropertyChangedWithValue(value, nameof(ShowCategoryHeader));
+                }
+            }
+        }
 
         [DataSourceProperty]
         public string SlotName
@@ -84,11 +115,17 @@ namespace DWDN_Script.Client.UI
             DWDN_SlotCategory category,
             string slotName,
             EquipmentIndex index,
-            Action<DWDN_EquipmentSlotVM, DWDN_ItemOptionVM> onItemSelected)
+            Action<DWDN_EquipmentSlotVM, DWDN_ItemOptionVM> onItemSelected,
+            string categoryName = "",
+            bool showCategoryHeader = false,
+            bool useExplicitLabel = false)
         {
             SlotCategory = category;
             _slotName = slotName;
             _initialSlotName = slotName;
+            _categoryName = categoryName ?? "";
+            _showCategoryHeader = showCategoryHeader;
+            _useExplicitLabel = useExplicitLabel;
             EquipmentIndex = index;
             _onItemSelected = onItemSelected;
             _selectedItemName = "Нет";
@@ -143,9 +180,13 @@ namespace DWDN_Script.Client.UI
             }
             Options.Clear();
 
-            if (SlotCategory >= DWDN_SlotCategory.Weapon0 && SlotCategory <= DWDN_SlotCategory.Weapon3)
+            if (!_useExplicitLabel && SlotCategory >= DWDN_SlotCategory.Weapon0 && SlotCategory <= DWDN_SlotCategory.Weapon3)
             {
                 SlotName = DetermineWeaponSlotName(allowedItemIds, _initialSlotName);
+            }
+            else
+            {
+                SlotName = _initialSlotName;
             }
 
             if (allowedItemIds == null || allowedItemIds.Count == 0 || (allowedItemIds.Count == 1 && string.IsNullOrEmpty(allowedItemIds[0])))

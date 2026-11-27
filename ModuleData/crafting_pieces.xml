@@ -359,7 +359,7 @@
 		length="240"
 		weight="3.900" >
 		<BuildData
-			piece_offset="16"
+			piece_offset="115"
 			previous_piece_offset="0"
 			next_piece_offset="0" />
 	</CraftingPiece>
@@ -404,5 +404,18 @@
 	
 	
 	
+	<!-- DWDN Ratay Militia Falchion Blade (Короткий ополченский фальшион Ратая на базе vlandian_blade_9) -->
+	<CraftingPiece id="dwdn_ratay_falchion_blade" name="{=*}Ополченский тесак" tier="1" piece_type="Blade" mesh="vlandian_blade_9" length="62.5" weight="1.25">
+		<BladeData stack_amount="3" physics_material="metal_weapon" body_name="bo_sword_one_handed" holster_mesh="vlandian_blade_9_scabbard_9">
+			<Thrust damage_type="Pierce" damage_factor="1.5" />
+			<Swing damage_type="Cut" damage_factor="2.95" />
+		</BladeData>
+		<Flags>
+			<Flag name="Civilian" type="ItemFlags" />
+		</Flags>
+		<Materials>
+			<Material id="Iron1" count="2" />
+		</Materials>
+	</CraftingPiece>
 </CraftingPieces>
 

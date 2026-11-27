@@ -1,21 +1,192 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Xml.Linq;
+using TaleWorlds.Library;
 
 namespace DWDN_Script.Common.Duchies
 {
     /// <summary>
     /// Центральный менеджер герцогств и классов мода Daewden.
-    /// Содержит полный каноничный список классов DWDN с правильным распределением снаряжения.
+    /// Основной источник данных: ModuleData/dwdn_loadouts.xml (редактируется без перекомпиляции DLL).
+    /// При отсутствии или повреждении XML используется встроенный резервный реестр (InitializeFallback).
     /// </summary>
     public static class DWDN_DuchyManager
     {
         public static List<DWDN_Duchy> Duchies { get; } = new List<DWDN_Duchy>();
+        public static string LoadedConfigPath { get; private set; } = "";
         private static bool _initialized = false;
+
+        public static void Reload()
+        {
+            _initialized = false;
+            Initialize();
+        }
 
         public static void Initialize()
         {
             if (_initialized) return;
 
+            Duchies.Clear();
+            LoadedConfigPath = "";
+
+            if (TryLoadFromXml())
+            {
+                _initialized = true;
+                return;
+            }
+
+            Debug.Print("[DWDN] ModuleData/dwdn_loadouts.xml не найден или повреждён — загрузка встроенного fallback-реестра.");
+            InitializeFallback();
+            _initialized = true;
+        }
+
+        private static string ResolveLoadoutsXmlPath()
+        {
+            var candidates = new List<string>();
+
+            try
+            {
+                string asmPath = Assembly.GetExecutingAssembly().Location;
+                if (!string.IsNullOrEmpty(asmPath))
+                {
+                    // bin/Win64_Shipping_Client/DWDN_Script.dll -> ../../ModuleData/dwdn_loadouts.xml
+                    string binDir = System.IO.Path.GetDirectoryName(asmPath);
+                    string binParent = binDir != null ? System.IO.Path.GetDirectoryName(binDir) : null;
+                    string moduleRoot = binParent != null ? System.IO.Path.GetDirectoryName(binParent) : null;
+                    if (!string.IsNullOrEmpty(moduleRoot))
+                    {
+                        candidates.Add(System.IO.Path.Combine(moduleRoot, "ModuleData", "dwdn_loadouts.xml"));
+                    }
+                }
+            }
+            catch { }
+
+            try
+            {
+                string basePath = BasePath.Name;
+                if (!string.IsNullOrEmpty(basePath))
+                {
+                    candidates.Add(System.IO.Path.Combine(basePath, "Modules", "DWDN_TRY", "ModuleData", "dwdn_loadouts.xml"));
+                    candidates.Add(System.IO.Path.Combine(basePath, "Modules", "DaewdenM", "ModuleData", "dwdn_loadouts.xml"));
+                    candidates.Add(System.IO.Path.Combine(basePath, "Modules", "DWDN_TRYM", "ModuleData", "dwdn_loadouts.xml"));
+                    candidates.Add(System.IO.Path.Combine(basePath, "Modules", "Daewden", "ModuleData", "dwdn_loadouts.xml"));
+                }
+            }
+            catch { }
+
+            for (int i = 0; i < candidates.Count; i++)
+            {
+                if (File.Exists(candidates[i]))
+                    return candidates[i];
+            }
+            return null;
+        }
+
+        private static bool TryLoadFromXml()
+        {
+            try
+            {
+                string xmlPath = ResolveLoadoutsXmlPath();
+                if (string.IsNullOrEmpty(xmlPath) || !File.Exists(xmlPath))
+                    return false;
+
+                var doc = XDocument.Load(xmlPath);
+                var root = doc.Root;
+                if (root == null) return false;
+
+                var duchiesNode = root.Element("Duchies") ?? root;
+                var loadedDuchies = new List<DWDN_Duchy>();
+
+                foreach (var dEl in duchiesNode.Elements("Duchy"))
+                {
+                    string dId = (string)dEl.Attribute("id") ?? "";
+                    if (string.IsNullOrWhiteSpace(dId)) continue;
+
+                    string dName = (string)dEl.Attribute("name") ?? dId;
+                    string dDesc = (string)dEl.Attribute("description") ?? "";
+                    string dBanner = (string)dEl.Attribute("banner_code") ?? "";
+                    bool dEnabled = !string.Equals((string)dEl.Attribute("enabled"), "false", StringComparison.OrdinalIgnoreCase);
+
+                    var duchy = new DWDN_Duchy(dId, dName, dDesc, dBanner, dEnabled);
+
+                    foreach (var cEl in dEl.Elements("Class"))
+                    {
+                        bool cEnabled = !string.Equals((string)cEl.Attribute("enabled"), "false", StringComparison.OrdinalIgnoreCase);
+                        if (!cEnabled) continue;
+
+                        string cId = (string)cEl.Attribute("id") ?? "";
+                        if (string.IsNullOrWhiteSpace(cId)) continue;
+
+                        string cName = (string)cEl.Attribute("name") ?? cId;
+                        string cDesc = (string)cEl.Attribute("description") ?? "";
+                        string cTroop = (string)cEl.Attribute("troop_id") ?? (cId + "_hero");
+                        string cIcon = (string)cEl.Attribute("icon") ?? "";
+
+                        var cls = new DWDN_ClassDefinition(cId, cName, cDesc, cTroop, cIcon)
+                        {
+                            IsEnabled = true
+                        };
+
+                        foreach (var sEl in cEl.Elements("Slot"))
+                        {
+                            string targetStr = (string)sEl.Attribute("target") ?? "";
+                            if (!DWDN_SlotDefinition.TryParseTarget(targetStr, out var target))
+                                continue;
+
+                            string category = (string)sEl.Attribute("category") ?? DWDN_SlotDefinition.GetDefaultCategory(target);
+                            string label = (string)sEl.Attribute("label") ?? DWDN_SlotDefinition.GetDefaultLabel(target);
+                            bool visible = !string.Equals((string)sEl.Attribute("visible"), "false", StringComparison.OrdinalIgnoreCase);
+                            bool allowEmpty = string.Equals((string)sEl.Attribute("allow_empty"), "true", StringComparison.OrdinalIgnoreCase);
+
+                            var slotDef = new DWDN_SlotDefinition(target, category, label, visible, allowEmpty);
+                            foreach (var iEl in sEl.Elements("Item"))
+                            {
+                                string itemId = (string)iEl.Attribute("id") ?? "";
+                                // Защита от случайного префикса Item + '.'
+                                const string itemPrefix = "Item" + ".";
+                                if (itemId.StartsWith(itemPrefix, StringComparison.OrdinalIgnoreCase))
+                                    itemId = itemId.Substring(itemPrefix.Length);
+                                slotDef.AllowedItems.Add(itemId);
+                                if (string.IsNullOrEmpty(itemId))
+                                    slotDef.AllowEmpty = true;
+                            }
+
+                            if (slotDef.AllowEmpty && !slotDef.AllowedItems.Contains(""))
+                            {
+                                slotDef.AllowedItems.Add("");
+                            }
+
+                            cls.Slots.Add(slotDef);
+                        }
+
+                        cls.SyncLegacyPoolsFromSlots();
+                        cls.DefaultLoadout = cls.CreateDefaultLoadout(duchy.Id);
+                        duchy.Classes.Add(cls);
+                    }
+
+                    loadedDuchies.Add(duchy);
+                }
+
+                if (loadedDuchies.Count == 0)
+                    return false;
+
+                Duchies.Clear();
+                Duchies.AddRange(loadedDuchies);
+                LoadedConfigPath = xmlPath;
+                Debug.Print($"[DWDN] Загружены лодауты из XML: {xmlPath} (герцогств: {Duchies.Count})");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.Print($"[DWDN ERROR] Ошибка загрузки dwdn_loadouts.xml: {ex}");
+                return false;
+            }
+        }
+
+        private static void InitializeFallback()
+        {
             Duchies.Clear();
 
             // =========================================================================
