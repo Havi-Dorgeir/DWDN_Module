@@ -2870,3 +2870,13 @@ if (this._isInWeaponCameraMode)
   2. В упряжке (SpawnEngine, HandleServerSyncDescendants, SetCombatState(false), OnMissionTick) снимаются флаги блуждания/бегства; без всадника удерживается стоп  .0001f, при посадке в седло включается шаг 2.2f. При расцепке и уничтожении орудия возвращаются CanWander | RunsAwayWhenHit и -1f.
   3. Дистанции упряжки выровнены до 4.0f, убран нерабочий вызов gent.Mount(engine.HorseAgent) на спавне; подтянуты защитные правки (SpawnMonster(..., -1), проверки NaN/Infinity, 	ry/catch и строгий поиск коня по индексу в сетевых хендлерах).
 - **Верификация:** DWDN_Script.csproj (0 ошибок), DWDN_Script.Server.csproj (0 ошибок), MechanicsTester --cli (30/30 PASSED).
+
+---
+
+## [fix/intermission-giant-shield] Исправление гигантского гербового щита на экране смены карты (MultiplayerIntermission)
+- **Опровержение старой гипотезы:** прямая инспекция всех 559 ассетов AssetPackages\pack0.tpac показала, что в pack0.tpac нет UI-спрайтов (dwdn_loading / dwdn_faction отсутствуют).
+- **Истинная причина (подтверждена дампом [DWDN_DIAG], декомпиляцией TwoDimensionEnginePlatform и живым запуском):** TaleWorlds.Engine.Texture.CreateFromMemory(bytes) создаёт нативную текстуру с пустым именем Texture.Name == "". В TwoDimensionView.GetOrCreateMaterial материалы кэшируются по имени текстуры. На экране MultiplayerIntermission на одном GauntletLayer (Layer[0]) одновременно рисуются фон Standard_Background (dwdn_screen_load_1, Name="") и малый щит Icon (dwdn_faction_1, Name=""), из-за чего второй вызов перетирал DiffuseMap общего материала на dwdn_faction_1.png и растягивал щит на весь экран 2560x1440.
+- **Решение (ModuleData/scripts/DWDN_Script/SubModule.cs):**
+  1. После Texture.CreateFromMemory(bytes) задаётся уникальное имя engineTex.Name = "dwdn_mem_" + Path.GetFileNameWithoutExtension(fullPath);.
+  2. В UpdateSpriteGenericInPlace добавлена поддержка <SpritePart>k__BackingField (auto-property в TaleWorlds.TwoDimension.SpriteGeneric).
+  3. В CleanIntermissionWidgets для ScreenBackgroundBrushWidget обновляются все Brush.Styles, Brush.Sprite и Brush.DefaultLayer.Sprite.

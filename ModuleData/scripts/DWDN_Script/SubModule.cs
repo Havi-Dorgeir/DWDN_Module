@@ -512,7 +512,12 @@ namespace DWDN_Script
                         engineTex = TaleWorlds.Engine.Texture.CreateFromMemory(bytes);
                         if (engineTex != null)
                         {
-                            Debug.Print("[DWDN] Loaded via CreateFromMemory: " + Path.GetFileName(fullPath));
+                            // КРИТИЧНО: CreateFromMemory оставляет Texture.Name == "".
+                            // TwoDimensionView.GetOrCreateMaterial кэширует материалы по имени текстуры —
+                            // без уникального имени разные текстуры на одном GauntletLayer (например, фон
+                            // интермиссии и иконка фракции) перетирают DiffuseMap друг друга!
+                            engineTex.Name = "dwdn_mem_" + Path.GetFileNameWithoutExtension(fullPath);
+                            Debug.Print("[DWDN] Loaded via CreateFromMemory: " + Path.GetFileName(fullPath) + " (Name=" + engineTex.Name + ")");
                             return engineTex;
                         }
                     }
@@ -567,7 +572,8 @@ namespace DWDN_Script
             {
                 if (spriteData.Sprites.TryGetValue(spriteName, out var existing) && existing is SpriteGeneric sg)
                 {
-                    var field = typeof(SpriteGeneric).GetField("_spritePart", BindingFlags.Instance | BindingFlags.NonPublic);
+                    var field = typeof(SpriteGeneric).GetField("<SpritePart>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)
+                             ?? typeof(SpriteGeneric).GetField("_spritePart", BindingFlags.Instance | BindingFlags.NonPublic);
                     if (field != null)
                     {
                         field.SetValue(sg, part);
@@ -779,9 +785,34 @@ namespace DWDN_Script
                 if (bgWidget.Context?.SpriteData != null)
                 {
                     var cleanBg = bgWidget.Context.SpriteData.GetSprite("dwdn_screen_load_1");
-                    if (cleanBg != null && bgWidget.Sprite != cleanBg)
+                    if (cleanBg != null)
                     {
-                        bgWidget.Sprite = cleanBg;
+                        if (bgWidget.Sprite != cleanBg)
+                        {
+                            bgWidget.Sprite = cleanBg;
+                        }
+                        if (bgWidget.Brush != null)
+                        {
+                            bgWidget.Brush.Sprite = cleanBg;
+                            if (bgWidget.Brush.DefaultLayer != null)
+                            {
+                                bgWidget.Brush.DefaultLayer.Sprite = cleanBg;
+                            }
+                            if (bgWidget.Brush.Styles != null)
+                            {
+                                foreach (var style in bgWidget.Brush.Styles)
+                                {
+                                    var layers = style.GetLayers();
+                                    if (layers != null)
+                                    {
+                                        for (int li = 0; li < layers.Length; li++)
+                                        {
+                                            layers[li].Sprite = cleanBg;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
