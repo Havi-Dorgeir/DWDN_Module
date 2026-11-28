@@ -60,6 +60,7 @@ feature/* или fix/*  ──(PR)──▶  development  ──(PR, тольк�
 | [`docs/ENGINE.md`](docs/ENGINE.md) | Энциклопедия реверс-инжиниринга ядра Bannerlord (`DotNetObject`, `.tpac`/`.rdc`, XML-пайплайн, сетевой протокол). |
 | [`docs/CHRONICLE.md`](docs/CHRONICLE.md) | Хроника разработки, архитектурных решений, багфиксов и баланса. |
 | [`docs/GITHUB_WORKFLOW.md`](docs/GITHUB_WORKFLOW.md) | Регламент веток `development` / `main`, настройки Branch Protection / Rulesets и авторелизов. |
+| [`docs/UNIVERSAL_MODDER_GUIDE.md`](docs/UNIVERSAL_MODDER_GUIDE.md) | Как, зачем и когда использовать плагин `universal-modder` (скиллы, субагенты, CLI `um`, сценарии для DWDN). |
 | [`docs/PLAN.md`](docs/PLAN.md) | Куда идёт мод: цели, этапы и решения автора. |
 | [`docs/STATUS.md`](docs/STATUS.md) | Что сделано и проверено сейчас, что сломано. |
 | [`docs/BACKLOG.md`](docs/BACKLOG.md) | Задачи без срока и ссылки на [Issues](https://github.com/Havi-Dorgeir/DWDN_Module/issues). |

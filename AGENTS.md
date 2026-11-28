@@ -50,6 +50,8 @@ dotnet run --project Tools/MechanicsTester/MechanicsTester.csproj -c Release -- 
 Before complex tasks involving the engine, native code, assets or decompilation, always rely on these proven skills and repositories:
 
 **Universal Modder (`rehan-remade/universal-modder`)**
+> A detailed guide for the locally installed plugin (when, why and how to use each skill, the `mod-orchestrator` / `mod-offline-worker` / `mod-game-worker` subagents, the `um` CLI and typical DWDN scenarios) lives in **[`docs/UNIVERSAL_MODDER_GUIDE.md`](docs/UNIVERSAL_MODDER_GUIDE.md)**.
+
 - **Bannerlord Engine Reference** — TaleWorlds engine specifics, modules and the XML/C# pipeline: [engines/bannerlord.md](https://github.com/rehan-remade/universal-modder/blob/main/.agents/skills/mod-any-game/references/engines/bannerlord.md)
 - **Mod Any Game (Core Skill)** — base research and mod development protocol: [mod-any-game/SKILL.md](https://github.com/rehan-remade/universal-modder/blob/main/.agents/skills/mod-any-game/SKILL.md)
 - **Safety & Stability Rules** — protection against crashes, broken saves and degradation: [mod-any-game/references/safety.md](https://github.com/rehan-remade/universal-modder/blob/main/.agents/skills/mod-any-game/references/safety.md)
@@ -64,11 +66,12 @@ Before complex tasks involving the engine, native code, assets or decompilation,
 
 ### 0.3. Mandatory working rules
 
-1. **Plan before action:** describe the change plan first, then start editing.
-2. **Minimal changes:** do not touch working code outside the task scope; do not create temporary XML/SubModule copies in the repository.
-3. **Check before committing:** after code edits, build both DLLs (`Client` + `Server`) and run `Tools/MechanicsTester`.
-4. **Synopsis for other AIs:** read the latest entries in [`docs/CHRONICLE.md`](docs/CHRONICLE.md) before starting, and briefly record your significant findings/decisions there.
-5. **Branch flow:** all development goes `feature/*` / `fix/*` → PR into `development` → merge into `main` (owner only, `@Havi-Dorgeir`), which automatically creates a release.
+1. **Session start and GitHub:** before starting a task, check `git status` and run `git fetch origin`, make sure the branch is up to date relative to `development`; for GitHub API calls use the token from `$env:GITHUB_TOKEN` (or `[Environment]::GetEnvironmentVariable("GITHUB_TOKEN", "User")`), while `git` authenticates through the Windows Credential Manager.
+2. **Plan before action:** describe the change plan first, then start editing.
+3. **Minimal changes:** do not touch working code outside the task scope; do not create temporary XML/SubModule copies in the repository.
+4. **Check before committing:** after code edits, build both DLLs (`Client` + `Server`) and run `Tools/MechanicsTester`.
+5. **Synopsis for other AIs:** read the latest entries in [`docs/CHRONICLE.md`](docs/CHRONICLE.md) before starting, and briefly record your significant findings/decisions there.
+6. **Branch flow:** all development goes `feature/*` / `fix/*` → PR into `development` → merge into `main` (owner only, `@Havi-Dorgeir`), which automatically creates a release.
 
 ### 0.4. Documentation map (`docs/`)
 
@@ -79,6 +82,7 @@ Before complex tasks involving the engine, native code, assets or decompilation,
 | [`docs/ENGINE.md`](docs/ENGINE.md) | Bannerlord core reverse-engineering encyclopedia: `DotNetObject`, `project.mbproj` vs `MBObjectManager`, `.tpac`/`.rdc` formats, skeleton, network protocol. |
 | [`docs/CHRONICLE.md`](docs/CHRONICLE.md) | Full development chronicle: solved bugs, balance edits and the synopsis of previous AI sessions. |
 | [`docs/GITHUB_WORKFLOW.md`](docs/GITHUB_WORKFLOW.md) | Branch model (`development` / `main`), PR rules, Branch Protection / Rulesets setup and the automatic release pipeline. |
+| [`docs/UNIVERSAL_MODDER_GUIDE.md`](docs/UNIVERSAL_MODDER_GUIDE.md) | Detailed guide to the `universal-modder` plugin: skills, subagents (`mod-orchestrator`, `mod-offline-worker`, `mod-game-worker`), the `um` CLI and DWDN scenarios. |
 | [`docs/agents/`](docs/agents/) | Specialized AI deep dives per subsystem (see the topic index in section 3). |
 
 ---
@@ -157,4 +161,3 @@ dotnet build ModuleData/scripts/DWDN_Script.Server/DWDN_Script.Server.csproj -c 
 | [`docs/agents/game-systems.md`](docs/agents/game-systems.md) | GUI studios in `Tools/`, Bannerman tactical aura, field artillery & crew, mobile siege engines on carts, Admin Tools, admin panel GUI, horse-drawn artillery | 9, 47 |
 | [`docs/agents/troubleshooting.md`](docs/agents/troubleshooting.md) | Symptom → cause → fix cases: endless loading screen on join (TaleWorlds patch breakage), spawn crash in `Equipment.GetInitialWeaponIndicesToEquip` | diagnostics in 9 |
 | [`docs/agents/network-scrapcode.md`](docs/agents/network-scrapcode.md) | Anti-scrapcode working rules, `CraftedItem` mp_ pieces trap, `WeaponUsageIndexChangeMessage` / network compression decode crashes | 7, 46 |
-

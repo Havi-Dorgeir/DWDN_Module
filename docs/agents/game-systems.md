@@ -139,10 +139,10 @@ The repository ships three specialized GUI studios (WinForms .NET 8.0) under `To
   * To display dynamic lists (for example the player list `PlayerRows`), the `<ListPanel Id="PlayerList">` widget with a nested `<ItemTemplate>` **must** have the `DataSource="{PlayerRows}"` attribute. Without this attribute the engine ignores `ItemTemplate` and the list stays empty.
 * **Universal Administrator Authentication**:
   * The custom admin tool must be granted to the player regardless of how they authenticated:
-	1. **Through the native console**: `adminpassword 25`. In `DWDN_AdminService.TickMission` the server checks `peer.IsAdmin && !_authenticatedPeers.Contains(peer)`, automatically promotes the player into `_authenticatedPeers` and sends the client `SyncAdminStateMessage(true)`.
-	2. **Through chat**: `!login 25`.
+	1. **Through the native console**: `adminpassword <server_password>`. In `DWDN_AdminService.TickMission` the server checks `peer.IsAdmin && !_authenticatedPeers.Contains(peer)`, automatically promotes the player into `_authenticatedPeers` and sends the client `SyncAdminStateMessage(true)`.
+	2. **Through chat**: `!login <server_password>`.
 	3. **Through the GUI password-entry dialog**: when `[F10]` or `[Insert]` is pressed by an unauthenticated player, the client opens the native dialog `InformationManager.ShowTextInquiry` ("Enter the administrator password:"). Input validator: `(text) => new Tuple<bool, string>(!string.IsNullOrWhiteSpace(text), "")`. On confirmation, `RequestAdminActionMessage("login", "", password)` is sent.
-	4. The server handles `Action == "login"` in `HandleClientEventRequestAdminAction` **before the admin-rights check**, verifies the password (`_adminPassword` or `"25"`), calls `SetPeerAdmin(peer, true)` and sends `SyncAdminStateMessage(true)`.
+	4. The server handles `Action == "login"` in `HandleClientEventRequestAdminAction` **before the admin-rights check**, verifies the password strictly against `_adminPassword` loaded from `MultiplayerOptions.OptionType.AdminPassword` or `DWDN_config.txt`, calls `SetPeerAdmin(peer, true)` and sends `SyncAdminStateMessage(true)`.
 	5. On receiving `SyncAdminStateMessage(true)` the client automatically opens the graphical admin panel.
 
 ---

@@ -103,6 +103,10 @@
 		</StatsData>
 		<UsablePieces>
 			<UsablePiece
+				piece_id="dwdn_ratay_falchion_blade"
+				mp_piece="true"
+				/>
+			<UsablePiece
 				piece_id="DevaldBlade_LP"
 				mp_piece="true"
 				/>
