@@ -55,13 +55,16 @@ feature/* или fix/*  ──(PR)──▶  development  ──(PR, тольк�
 
 | Файл | Назначение |
 |---|---|
-| [`AGENTS.md`](AGENTS.md) | Точка входа для ИИ-агентов: базовая архитектура, ссылки на скиллы `universal-modder` / `NativeHook` и правила работы. |
+| [`AGENTS.md`](AGENTS.md) | Точка входа для ИИ-агентов: базовая архитектура, скиллы `universal-modder` / `NativeHook`, правила работы — и полный кодекс архитектора по внутренним системам DWDN (огнестрел, Gauntlet UI, Z-оффсеты, артиллерия, Admin Tools, защита от крашей), англ. |
 | [`docs/DOCUMENTATION.md`](docs/DOCUMENTATION.md) | Практическое руководство: добавление классов, экипировки, герцогств, сетевая синхронизация, аура знаменосца. |
-| [`docs/AI_MODDING_GUIDE.md`](docs/AI_MODDING_GUIDE.md) | Глубокий технический справочник по внутренним системам DWDN (огнестрел, Gauntlet UI, Z-оффсеты, артиллерия, Admin Tools, защита от крашей). |
 | [`docs/ENGINE.md`](docs/ENGINE.md) | Энциклопедия реверс-инжиниринга ядра Bannerlord (`DotNetObject`, `.tpac`/`.rdc`, XML-пайплайн, сетевой протокол). |
 | [`docs/CHRONICLE.md`](docs/CHRONICLE.md) | Хроника разработки, архитектурных решений, багфиксов и баланса. |
 | [`docs/GITHUB_WORKFLOW.md`](docs/GITHUB_WORKFLOW.md) | Регламент веток `development` / `main`, настройки Branch Protection / Rulesets и авторелизов. |
 | [`docs/UNIVERSAL_MODDER_GUIDE.md`](docs/UNIVERSAL_MODDER_GUIDE.md) | Как, зачем и когда использовать плагин `universal-modder` (скиллы, субагенты, CLI `um`, сценарии для DWDN). |
+| [`docs/PLAN.md`](docs/PLAN.md) | Куда идёт мод: цели, этапы и решения автора. |
+| [`docs/STATUS.md`](docs/STATUS.md) | Что сделано и проверено сейчас, что сломано. |
+| [`docs/BACKLOG.md`](docs/BACKLOG.md) | Задачи без срока и ссылки на [Issues](https://github.com/Havi-Dorgeir/DWDN_Module/issues). |
+| [`docs/agents/`](docs/agents/) | Специализированные глубокие разборы подсистем для ИИ-агентов (огнестрел, Gauntlet UI и 3D-превью, лодауты и спавн, крафтовое оружие, реверс-инжиниринг, игровые системы и тулзы, траблшутинг, анти-скрапкод и сеть) — индекс в `AGENTS.md`. |
 
 ---
 

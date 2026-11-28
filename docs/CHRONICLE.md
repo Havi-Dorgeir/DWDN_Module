@@ -2072,11 +2072,11 @@ if (this._isInWeaponCameraMode)
      У `hand_cannon` отсутствовали `value="1" is_merchandise="false"` и `HasString="true"` в `WeaponFlags`. У `mp_bullets` флаг `AttachAmmoToVisual="false"` блокировал прикрепление снаряда к каналу ствола при вызове `CheckLoadedAmmos()`.
 
 #### 2. Внесенные исправления
-1. **[mpclassdivisions.xml](file:///e:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpclassdivisions.xml)**:
+1. **[mpclassdivisions.xml](../ModuleData/mpclassdivisions.xml)**:
    - В перке `Hand Cannon` слоты возвращены в стандартный порядок: `slot="Item0" item="hand_cannon"` и `slot="Item1" item="mp_bullets"`.
-2. **[DWDN_FieldArtilleryBehavior.cs](file:///e:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/DWDN_FieldArtilleryBehavior.cs)**:
+2. **[DWDN_FieldArtilleryBehavior.cs](../ModuleData/scripts/DWDN_Script/DWDN_FieldArtilleryBehavior.cs)**:
    - Добавлено строгое условие `if (isArtillerist && !wantsBallista)`, гарантирующее, что логика выбора осадных орудий (Онагр/Баллиста) активируется исключительно для класса Артиллериста (`mp_Artillerist`), не нарушая при этом ни один из проверенных механизмов артиллерии.
-3. **[dwdn_weapon.xml](file:///e:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpitems/dwdn_weapon.xml)**:
+3. **[dwdn_weapon.xml](../ModuleData/mpitems/dwdn_weapon.xml)**:
    - Для `hand_cannon` добавлены атрибуты `value="1" is_merchandise="false"`, культура изменена на `Culture.neutral_culture`, в `WeaponFlags` добавлен `HasString="true"`.
    - Для `mp_bullets` установлены `AttachAmmoToVisual="true"`, `Consumable="true"`, `AmmoSticksWhenShot="true"`, `AmmoBreaksOnBounceBack="true"`, культура установлена в `Culture.neutral_culture`.
 
@@ -2102,11 +2102,11 @@ if (this._isInWeaponCameraMode)
      У Короля (`mp_ALberic_Devald_hero`), баронов и рыцарей были прописаны исключительно `hero_mount_idle_anim` и `troop_mount_idle_anim`. На пьедестале кастомного селектора (где конь по архитектуре скрывается, а боец осматривается пешим) и при выборе спешенного боя движок искал `hero_idle_anim` и `troop_idle_anim` и падал по незаданному указателю.
 
 #### 2. Внесенные исправления
-1. **[dwdn_armor.xml](file:///e:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpitems/dwdn_armor.xml)**:
+1. **[dwdn_armor.xml](../ModuleData/mpitems/dwdn_armor.xml)**:
    - Всем 10 парам перчаток (включая `plate_round_gauntlet` Знаменосца и `king_plate_gauntlet` Короля) возвращен священный атрибут `multiplayer_item="true"`.
-2. **[dwdn_banners.xml](file:///e:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpitems/dwdn_banners.xml)**:
+2. **[dwdn_banners.xml](../ModuleData/mpitems/dwdn_banners.xml)**:
    - Для знамени `dwdn_banner1` установлен каноничный поясной подвес `item_holsters="abdomen_left"`, а культура нормализована до `culture="Culture.neutral_culture"`.
-3. **[mpclassdivisions.xml](file:///e:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpclassdivisions.xml)**:
+3. **[mpclassdivisions.xml](../ModuleData/mpclassdivisions.xml)**:
    - Для `mp_ALberic_Devald_hero`, `mp_Finnard_Valerian`, `mp_Bergen_Klaus`, `mp_Knight` и `mp_DWDN_Cav` внедрены пешие анимации покоя: `hero_idle_anim="act_sturgia_mp_huskarl_idle"` и `troop_idle_anim="act_idle_unarmed_1"`.
 
 #### 3. Верификация и синхронизация
