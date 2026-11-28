@@ -1,3 +1,4 @@
+using System.Reflection;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.MountAndBlade.Multiplayer.GauntletUI.Mission;
@@ -37,9 +38,17 @@ namespace DWDN_Script.Client.Behaviors
                 {
                     try
                     {
+                        // Сбрасываем _tryToInitialize и закрываем до UnregisterView (пока MissionScreen != null),
+                        // иначе OnMissionTick на следующем кадре вызовет OnToggled(true) при MissionScreen == null (NullReferenceException).
+                        vanillaLoadout.OnTryToggle(false);
+                        typeof(MissionGauntletClassLoadout)
+                            .GetField("_tryToInitialize", BindingFlags.Instance | BindingFlags.NonPublic)
+                            ?.SetValue(vanillaLoadout, false);
+
                         ((MissionView)vanillaLoadout).OnMissionScreenFinalize();
                         screen.UnregisterView((MissionView)vanillaLoadout);
-                        Debug.Print("[DWDN] Ванильный MissionGauntletClassLoadout успешно подавлен (UnregisterView).");
+                        Mission.RemoveMissionBehavior(vanillaLoadout);
+                        Debug.Print("[DWDN] Ванильный MissionGauntletClassLoadout успешно подавлен (UnregisterView + RemoveMissionBehavior).");
                     }
                     catch (System.Exception ex)
                     {
