@@ -63,6 +63,7 @@ feature/* или fix/*  ──(PR)──▶  development  ──(PR, тольк�
 | [`docs/PLAN.md`](docs/PLAN.md) | Куда идёт мод: цели, этапы и решения автора. |
 | [`docs/STATUS.md`](docs/STATUS.md) | Что сделано и проверено сейчас, что сломано. |
 | [`docs/BACKLOG.md`](docs/BACKLOG.md) | Задачи без срока и ссылки на [Issues](https://github.com/Havi-Dorgeir/DWDN_Module/issues). |
+| [`docs/agents/`](docs/agents/) | Специализированные глубокие разборы подсистем для ИИ-агентов (огнестрел, Gauntlet UI и 3D-превью, лодауты и спавн, крафтовое оружие, реверс-инжиниринг, игровые системы и тулзы, траблшутинг, анти-скрапкод и сеть) — индекс в `AGENTS.md`. |
 
 ---
 
