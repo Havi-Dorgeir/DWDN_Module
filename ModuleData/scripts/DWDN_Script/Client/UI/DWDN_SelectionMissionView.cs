@@ -470,6 +470,11 @@ namespace DWDN_Script.Client.UI
                 {
                     offHandWeaponIndex = EquipmentIndex.None;
                 }
+                // Защита манекена на пьедестале: знамя в левой руке не имеет валидной MP-анимации покоя (idle) и крашит C++ рендерер
+                if (offHandWeaponIndex != EquipmentIndex.None && customEquip[offHandWeaponIndex].Item?.ItemType == ItemObject.ItemTypeEnum.Banner)
+                {
+                    offHandWeaponIndex = EquipmentIndex.None;
+                }
                 data.RightWieldedItemIndex((int)mainHandWeaponIndex);
                 data.LeftWieldedItemIndex((int)offHandWeaponIndex);
 
@@ -498,34 +503,29 @@ namespace DWDN_Script.Client.UI
                 var cls = duchy?.GetClass(selection.ClassId);
                 if (cls == null) return;
 
-                var allHeroClasses = MultiplayerClassDivisions.GetMPHeroClasses();
-                if (allHeroClasses == null) return;
-
-                MultiplayerClassDivisions.MPHeroClass targetHeroClass = null;
-                foreach (var hc in allHeroClasses)
+                BasicCultureObject peerCulture = myPeer.Culture;
+                if (peerCulture == null && myPeer.Team != null)
                 {
-                    if (hc == null) continue;
-
-                    if (string.Equals(hc.StringId, cls.Id, StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(hc.StringId, cls.TroopId, StringComparison.OrdinalIgnoreCase) ||
-                        (hc.HeroCharacter != null && string.Equals(hc.HeroCharacter.StringId, cls.TroopId, StringComparison.OrdinalIgnoreCase)) ||
-                        (hc.TroopCharacter != null && string.Equals(hc.TroopCharacter.StringId, cls.TroopId, StringComparison.OrdinalIgnoreCase)))
-                    {
-                        targetHeroClass = hc;
-                        break;
-                    }
+                    string cultStr = myPeer.Team.Side == BattleSideEnum.Attacker
+                        ? MultiplayerOptions.OptionType.CultureTeam1.GetStrValue()
+                        : MultiplayerOptions.OptionType.CultureTeam2.GetStrValue();
+                    peerCulture = MBObjectManager.Instance?.GetObject<BasicCultureObject>(cultStr);
                 }
-
-                if (targetHeroClass != null && targetHeroClass.Culture != null)
+                if (peerCulture != null)
                 {
-                    var cultureClasses = MultiplayerClassDivisions.GetMPHeroClasses(targetHeroClass.Culture).ToList();
-                    int foundIndex = cultureClasses.IndexOf(targetHeroClass);
-                    if (foundIndex >= 0)
+                    var peerClasses = MultiplayerClassDivisions.GetMPHeroClasses(peerCulture)?.ToList();
+                    if (peerClasses != null && peerClasses.Count > 0)
                     {
-                        // Если игрок выбрал пеший бой (HorseId пустой), выставляем индекс пехоты 0, чтобы спавн был без коня
-                        int finalIndex = string.IsNullOrEmpty(selection.HorseId) ? 0 : foundIndex;
-                        myPeer.SelectedTroopIndex = finalIndex;
-                        myPeer.NextSelectedTroopIndex = finalIndex;
+                        // Если игрок выбрал пеший бой (HorseId пустой), выставляем безопасный индекс пехоты 0
+                        int safeIndex = 0;
+                        if (!string.IsNullOrEmpty(selection.HorseId))
+                        {
+                            int cavIdx = peerClasses.FindIndex(c => c != null && c.HeroCharacter != null && c.HeroCharacter.IsMounted);
+                            if (cavIdx >= 0) safeIndex = cavIdx;
+                        }
+                        safeIndex = Math.Min(Math.Max(0, safeIndex), peerClasses.Count - 1);
+                        myPeer.SelectedTroopIndex = safeIndex;
+                        myPeer.NextSelectedTroopIndex = safeIndex;
                     }
                 }
             }

@@ -1,0 +1,100 @@
+name: Auto Release from main
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      overwrite_existing:
+        description: "Обновить ассет, если релиз для этой версии SubModule.xml уже существует"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Package & Publish GitHub Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: false
+
+      - name: Extract version from SubModule.xml
+        id: meta
+        run: |
+          VERSION=$(python3 -c "import xml.etree.ElementTree as ET; root = ET.parse('SubModule.xml').getroot(); print(root.find('Version').attrib['value'].strip())")
+          if [ -z "$VERSION" ]; then
+            echo "::error::Не удалось прочитать <Version value='...'/> из SubModule.xml"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "archive=DWDN_TRY_${VERSION}.zip" >> "$GITHUB_OUTPUT"
+          echo "Detected module version: $VERSION"
+
+      - name: Check if release already exists
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "${{ steps.meta.outputs.version }}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Release ${{ steps.meta.outputs.version }} already exists."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Skip duplicate release
+        if: steps.check.outputs.exists == 'true' && inputs.overwrite_existing != true
+        run: |
+          echo "::notice::Релиз ${{ steps.meta.outputs.version }} уже существует. Чтобы выпустить новый релиз, поднимите <Version value='vX.Y.Z'/> в SubModule.xml перед слиянием в main."
+
+      - name: Package DWDN_TRY release archive
+        if: steps.check.outputs.exists == 'false' || inputs.overwrite_existing == true
+        run: |
+          STAGE="release_dist/DWDN_TRY"
+          mkdir -p "$STAGE"
+
+          cp SubModule.xml "$STAGE/"
+          [ -d Assets ] && cp -r Assets "$STAGE/"
+          [ -d GUI ] && cp -r GUI "$STAGE/"
+          [ -d Shaders ] && cp -r Shaders "$STAGE/"
+
+          if [ -d bin ]; then
+            cp -r bin "$STAGE/"
+            find "$STAGE/bin" -name "*.pdb" -type f -delete
+          fi
+
+          if [ -d ModuleData ]; then
+            cp -r ModuleData "$STAGE/"
+            rm -rf "$STAGE/ModuleData/scripts"
+          fi
+
+          (cd release_dist && zip -r "../${{ steps.meta.outputs.archive }}" DWDN_TRY)
+          ls -lh "${{ steps.meta.outputs.archive }}"
+
+      - name: Create new GitHub Release
+        if: steps.check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ steps.meta.outputs.version }}" \
+            "${{ steps.meta.outputs.archive }}" \
+            --target "${{ github.sha }}" \
+            --title "Release ${{ steps.meta.outputs.version }}" \
+            --generate-notes
+
+      - name: Update existing GitHub Release asset (manual overwrite)
+        if: steps.check.outputs.exists == 'true' && inputs.overwrite_existing == true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ steps.meta.outputs.version }}" \
+            "${{ steps.meta.outputs.archive }}" \
+            --clobber

@@ -2340,3 +2340,369 @@ if (this._isInWeaponCameraMode)
 - `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
 - `MechanicsTester.exe --cli`: 28 из 28 тестов пройдены успешно (100% pass).
 - `sync_all.ps1`: Модули `DaewdenM` и `DWDN_TRY` обновлены.
+
+
+---
+
+### Глава 75: Устранение фатального сбоя 0xc0000005 (CreateAgentVisuals + CultureTeam) и внедрение элитного пехотного класса Хорунжий (mp_Khorunzhiy) (15.11.2026)
+
+#### 1. Симптом и первопричина фатального вылета при входе на сервер
+- **Симптом**: При попытке зайти на выделенный сервер клиент Bannerlord мгновенно аварийно завершал работу с кодом `0xc0000005: Access Violation` по смещению `0x00007ffe062ea29d` в `TaleWorlds.Native.dll`. В журнале `rgl_log_26476.txt` последней выполненной операцией было:
+  ```text
+  Reading message: CreateAgentVisuals
+  Processing message: CreateAgentVisuals: Create AgentVisuals for peer: [DWDN] Havi, and with Index: 0
+  ```
+- **Первопричина**:
+  1. В `ModuleData/mpcultures.xml` культура `dwdn` была определена с атрибутом `is_main_culture="true"`.
+  2. Во время завершения предыдущего матча компонент автопереключения карт / админ-панели (`MultiplayerAdminComponent`) зафиксировал:
+     `[Admin] Both cultures were valid. Setting dwdn vs dwdn for next game.`
+     в результате чего для нового матча были выставлены параметры `CultureTeam1 = dwdn` и `CultureTeam2 = dwdn`.
+  3. При входе игрока на сервер вызывается `MissionNetworkComponent.HandleServerEventCreateAgentVisuals` -> `MultiplayerBattleColors.CreateWith(CultureTeam1, CultureTeam2)`. Нативный C++ движок (`TaleWorlds.Native.dll`) попытался загрузить предустановленные таблицы FaceGen, FaceCache и цветовые пресеты геральдики для командных фракций. Поскольку для кастомной культуры `dwdn` нативные C++ таблицы отсутствуют, обращение к нулевому указателю вызвало фатальный сбой памяти `0xc0000005`.
+  4. В референсном мастер-моде Властелин Колец (3774022783) задокументировано идентичное архитектурное требование: у кастомных культур (`mee_races`, `lastalliance`) атрибут `is_main_culture="true"` строго удаляется. Командные фракции всегда должны быть стабильными нативными культурами (`empire`, `vlandia`), тогда как персонажи и классы бойцов сохраняют культуру Дэвдена (`hero culture="Culture.dwdn"`).
+
+#### 2. Внесенные исправления и защитные барьеры
+1. **[mpcultures.xml](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpcultures.xml)**:
+   - Удален атрибут `is_main_culture="true"` у `<Culture id="dwdn" ... />`. Это исключило культуру `dwdn` из пула командных фракций в админ-панели и при голосовании, навсегда заблокировав передачу ненативной культуры в C++ рендерер командных визуалов.
+2. **[DWDN_config.txt](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Dedicated%20Server/Modules/Native/DWDN_config.txt)**:
+   - Подтверждены нативные фракции команд: `CultureTeam1 empire`, `CultureTeam2 empire`.
+3. **[DWDN_ServerLoadoutBehavior.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Server/Behaviors/DWDN_ServerLoadoutBehavior.cs)** и **[DWDN_SelectionMissionView.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Client/UI/DWDN_SelectionMissionView.cs)**:
+   - Внедрена жесткая изоляция диапазонов `SelectedTroopIndex`. Вместо передачи сквозного индекса класса из культуры `dwdn` (где теперь 16 классов), индекс нативного спавна строго берется из диапазона классов командной культуры (`peerCulture`): 0 для пехоты, либо индекс кавалериста при выборе коня (`c.HeroCharacter.IsMounted`). Это исключает падение нативного движка с `ArgumentOutOfRangeException` при обращении к `GetMPHeroClasses(peerCulture)[index]`.
+4. **[dwdn_armor.xml](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpitems/dwdn_armor.xml)**:
+   - Устранено обнаруженное дублирование записи предмета `archer_leatherboots`.
+
+#### 3. Внедрение нового класса Хорунжий (`mp_Khorunzhiy`)
+По приказу Магоса в иерархию пехоты добавлен новый элитный класс:
+- **Позиция**: расположен строго после Сотника (`mp_Sotnik`) и перед Знаменосцем (`mp_Bannerman`).
+- **Идентификаторы**: `mp_Khorunzhiy`, персонажи `mp_Khorunzhiy_hero` и `mp_Khorunzhiy_troop` в [mpcharacters.xml](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpcharacters.xml).
+- **Стоимость и роль**: 170 золота, иконка `Infantry_Heavy`, множитель очков `0.50`, броня `45`, здоровье `100`.
+- **Полный сет Рюндаля**:
+  - Шлем: `baron_roondalt_vendelhelmet_1`
+  - Доспех: `run_body1`
+  - Наплечники/Плащ: `Baron_rundal_cape`
+  - Поножи: `rundal_leg`
+  - Перчатки: `rundal_gloves_second`
+  - Оружие 0: боевой клевец `baldur_warpick`
+  - Оружие 1: родовое знамя `dwdn_banner1` (тактическая Аура Знамени 12м включается автоматически: +4 брони, +5% скорости, регенерация до 75% HP)
+  - Оружие 2: щит `rundal_shield`
+- **Регистрация в коде**: в [DWDN_DuchyManager.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Common/Duchies/DWDN_DuchyManager.cs) добавлен объект `khorunzhiy` в `banreich.Classes` строго без префикса `"Item."`.
+
+#### 4. Непрерывный автоматический аудит целостности классов и предметов
+В [DuchyLoadoutTestSuite.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/Tools/MechanicsTester/Suites/DuchyLoadoutTestSuite.cs) добавлены автоматические тесты:
+- `Test_Khorunzhiy_Class_Definition_Structure`: проверка корректности регистрации Хорунжего, его позиционирования после Сотника и наличия всех 8 предметов сета Рюндаля.
+- `Test_All_Module_Classes_And_Items_Integrity`: сквозной рекурсивный аудит всех классов и предметов модуля, проверяющий отсутствие `is_main_culture="true"`, валидность всех ID предметов, персонажей, слотов и отсутствие дубликатов. Тест выполняется при каждом запуске тестового стенда.
+
+#### 5. Верификация
+- `dotnet build DWDN_Script.csproj` (Client Release): 0 ошибок.
+- `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
+- `MechanicsTester.exe --cli`: 30 из 30 тестов пройдены успешно (100% pass).
+- `sync_all.ps1`: Все бинарники, скрипты и XML синхронизированы в `DaewdenM` и `DWDN_TRY`.
+
+
+---
+
+### Глава 76: Окончательное укрощение тяглового коня артиллерии: FrameLocked и ликвидация Havok-коллизионного выталкивания
+
+#### 1. Симптоматика и скрытая физико-архитектурная первопричина
+Несмотря на попытки ограничения скорости и вызовы `SetScriptedPositionAndDirection`, тягловый конь в упряжи продолжал самопроизвольно двигаться вперед сразу после спавна:
+1. **Неэффективность `SetScriptedPosition` для ненаездных коней (`Mounts`)**:
+   В TaleWorlds `Agent.CanBeAssignedForScriptedMovement()` проверяет `Formation != null && !IsDetachedFromFormation`. Спавнящиеся монстры/лошади (`SpawnMonster`) имеют `Formation = null` и лишены гуманоидного контроллера навигации. Вследствие этого вызовы `SetScriptedPosition` нативным движком молча игнорируются.
+2. **Петля физического выталкивания Havok (Collision Push Feedback Loop)**:
+   При спавне орудия конь размещался на расстоянии `3.8m` впереди (`heading * 3.8f`). Однако в цикле `OnMissionTick` дистанция сцепки `hitchDistance` была жестко прописана как `3.6m`. 
+   Главное: `engine.RootEntity.SetFrame` сдвигал массивное осадное орудие (`mangonel_a` длиной более 4 метров) вперед **на каждом тике, даже если на коне не было всадника (`RiderAgent == null`)**!
+   Коллизионная геометрия лафета врезалась в физическую капсулу лошади сзади. Движок физики Havok выталкивал коня вперед для разрешения взаимопроникновения коллизий. На следующем кадре скрипт считывал новую смещенную позицию коня, снова подтягивал орудие вперед на дистанцию 3.6m и снова толкал коня. Возникал бесконечный автокаталитический цикл выталкивания.
+
+#### 2. Реализованное нативное решение (Native FrameLocked State)
+1. **Перевод коня в `AgentMovementLockedState.FrameLocked`**:
+   - При спавне и при спешивании (`RiderAgent == null`) вызывается нативный метод движка `horseAgent.SetTargetPositionAndDirection(p, d)`.
+   - Для синхронизации по мультиплееру вызывается `horseAgent.SetTargetPositionAndDirectionSynched(ref p, ref d)`.
+   - Это переводит агента в состояние `FrameLocked` (используемое в нативном Bannerlord для операторов осадных машин и стационарных постов). В этом состоянии координаты агента жестко зафиксированы в нативном C++ коде, а любые блуждания или паника полностью блокируются.
+2. **Разблокировка при посадке артиллериста (`RiderAgent != null`)**:
+   - При посадке всадника вызывается `horseAgent.ClearTargetFrame()`, возвращающий состояние в `AgentMovementLockedState.None`.
+   - Включается ограничение походной скорости `SetMaximumSpeedLimit(2.2f, false)`.
+3. **Изоляция движения орудия в `OnMissionTick`**:
+   - Когда `engine.HorseAgent.RiderAgent == null`, перемещение повозки и лафета орудия **полностью прекращается** (`continue;`). Орудие ни при каких обстоятельствах не может сдвинуться само по себе и ударить коня сзади.
+   - Дистанция сцепки `hitchDistance` увеличена до безопасных `4.0f`, предотвращая наложение коллизий даже на крутых склонах.
+4. **Снятие лока при распряжке / уничтожении**:
+   - В `DeployEngineToCombat`, а также при гибели орудия вызывается `ClearTargetFrame()`, `DisableScriptedMovement()` и сброс лимита скорости `-1f`, возвращая коню полную свободу действий.
+
+#### 3. Верификация
+- `dotnet build DWDN_Script.csproj` (Client Release): 0 ошибок, 0 предупреждений по коду.
+- `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
+- `MechanicsTester.exe --cli`: 30 из 30 тестов пройдены успешно (100% pass).
+- `sync_all.ps1`: Модули `DaewdenM` и `DWDN_TRY` синхронизированы.
+
+
+---
+
+### Глава 77: Ликвидация краша 0xc0000005: Искоренение FrameLocked у четвероногих и переход на нативный лимит покоя
+
+#### 1. Симптоматика и вскрытая варп-скверна (C++ Access Violation)
+- **Симптом**: При входе на сервер / спавне происходил мгновенный вылет клиента на рабочий стол с кодом исключения `0xc0000005` (Access Violation).
+- **Первопричина**:
+  1. **Нативная несовместимость `FrameLocked` с лошадьми**: В нативном коде C++ движка (`TaleWorlds.MountAndBlade.Native.dll`) методы целевого фрейма (`SetTargetPositionAndDirection`, `ClearTargetFrame`) жестко рассчитывают на гуманоидный скелет и компоненты контроллера человека (`HumanAgentController`). У четвероногих монстров/лошадей (`AgentFlag.Mountable`) эти структуры в памяти отсутствуют. Вызов `MBAPI.IMBAgent.SetTargetPositionAndDirection` приводил к разыменованию невалидного адреса памяти в нативном коде (краш `0xc0000005`).
+  2. **Сетевой краш клиента**: Метод `SetTargetPositionAndDirectionSynched` рассылал пакет `SetAgentTargetPositionAndDirection`. На клиенте в `MissionNetworkComponent.HandleServerEventSetAgentTargetPositionAndDirection` производился вызов `Mission.MissionNetworkHelper.GetAgentFromIndex(index).SetTargetPositionAndDirectionSynched(...)` без проверки на `null` и с багом нативного движка (где `_lastSynchedTargetPosition` не инициализировался, сбрасывая позицию в 0).
+
+#### 2. Проведенные исправления в DWDN_FieldArtilleryBehavior.cs
+1. **Полное удаление опасных нативных вызовов фрейма**:
+   - Полностью вырезаны все вызовы `SetTargetPositionAndDirection`, `SetTargetPositionAndDirectionSynched`, `ClearTargetFrame` и проверки `MovementLockedState` из всех методов (`UpdateVisualAndPhysicsState`, `SpawnEngine`, `HandleServerSyncDescendants`, `DeployEngineToCombat`, `OnMissionTick`).
+2. **Фиксация коня проверенными свойствами животных**:
+   - При спавне и при отсутствии всадника (`RiderAgent == null`):
+     * `horseAgent.SetMaximumSpeedLimit(0.0001f, false)` — аппаратный лимит покоя (скорость заблокирована на уровне 0.0001 м/с);
+     * `horseAgent.MovementInputVector = Vec2.Zero` и `horseAgent.DisableScriptedMovement()`;
+     * `horseAgent.StopRetreating()` и `horseAgent.SetAlarmState(Agent.AIStateFlag.None)` — отключение инстинкта паники.
+3. **Разрыв петли выталкивания Havok в `OnMissionTick`**:
+   - Когда `RiderAgent == null`, цикл движения орудия немедленно завершается (`continue;`), исключая любое продвижение орудия на коне и Havok-выталкивание коллизией сзади.
+   - При посадке артиллериста в седло (`RiderAgent != null`) восстанавливается скорость шага `2.2f` и безопасная дистанция сцепки `4.0f`.
+   - При распряжке в боевое положение (`DeployEngineToCombat`) лимит скорости коня сбрасывается на `-1f` (полная свобода передвижения).
+
+#### 3. Верификация
+- `dotnet build DWDN_Script.csproj` (Client Release): 0 ошибок.
+- `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
+- `MechanicsTester.exe --cli`: 30 из 30 тестов пройдены успешно (100% pass).
+- `sync_all.ps1`: Модули `DaewdenM` и `DWDN_TRY` обновлены.
+
+
+---
+
+### Глава 78: Устранение краха 0xe0434352 при спавне Осадных дел мастера и разделение пешего/конного режима артиллерии (16.11.2026)
+
+#### 1. Симптом и первопричина управляемого исключения (0xe0434352)
+- **Симптом**: При выборе и спавне класса Осадных дел мастер (`mp_Artillerist`) клиент игры мгновенно аварийно завершался с кодом `0xe0434352` (Managed .NET CLR Exception) сразу после получения `SyncArtilleryDescendantsMessage` и зеркалирования онагра (`mangonel_a`). Выделенный сервер при этом продолжал функционировать в штатном режиме.
+- **Первопричина**:
+  1. **Коллизия сетевых индексов агентов при поиске тяглового коня**:
+     В `DWDN_FieldArtilleryBehavior.cs` в методе `HandleServerSyncDescendants` (и `HandleServerCombatState`) конь для сцепки извлекался строкой:
+     ```csharp
+     horseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.Index == message.HorseAgentIndex);
+     ```
+     Когда сервер спавнил тяглового коня как первого монстра на сервере, ему присваивался `Index = 0`. В то же время на клиенте агент игрока-человека также имел сетевой `agent-index: 0`. Из-за отсутствия проверки флага `a.IsMount` метод `FirstOrDefault` находил агента игрока вместо коня и устанавливал `instance.HorseAgent = playerAgent`!
+     В результате в первом же кадре `OnMissionTick` орудие позиционировалось непосредственно за спиной пешего игрока и вызывало фатальное наложение коллизий/исключение.
+  2. **Отсутствие опции спавна пешим без орудия**:
+     В `CheckAndSpawnArtilleryForAgent` стояла проверка:
+     `if (!isArtillerist && !hasArtilleryBlueprint) return;`
+     Если игрок играл за артиллериста, но не хотел брать осадное орудие, машина все равно принудительно спавнилась, не позволяя артиллеристу сражаться обычной пехотой.
+
+#### 2. Внесенные минимально необходимые исправления
+1. **[DWDN_FieldArtilleryBehavior.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/DWDN_FieldArtilleryBehavior.cs)**:
+   - В `HandleServerSyncDescendants` (строка 810) и `HandleServerCombatState` (строка 1016) поиск коня строго изолирован проверкой `a.IsMount`:
+     ```csharp
+     horseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.IsMount && a.Index == message.HorseAgentIndex)
+                  ?? Mission.Current?.Agents?.FirstOrDefault(a => a.IsMount);
+     ```
+   - В `CheckAndSpawnArtilleryForAgent`:
+     Строгое условие: `if (!hasArtilleryBlueprint) return;` — если в лодауте слот орудия пуст, спавн отменяется, и артиллерист идет в бой пешим.
+     Если же орудие выбрано: артиллерист сразу сажается верхом на запряженного тяглового коня `agent.Mount(engine.HorseAgent)`.
+2. **[DWDN_DuchyManager.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Common/Duchies/DWDN_DuchyManager.cs)**:
+   - В `AllowedWeaponsSlot1` добавлена пустая строка `""`:
+     `artillerist.AllowedWeaponsSlot1.AddRange(new[] { "dwdn_order_mangonel", "dwdn_order_ballista", "" });`
+     Это дает игроку возможность в UI кастомизации выбрать пустой слот и спавниться пешим бойцом.
+
+#### 3. Верификация
+- `dotnet build DWDN_Script.csproj` (Client Release): 0 ошибок.
+- `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
+- `MechanicsTester.exe --cli`: 30 из 30 тестов пройдены успешно (100% pass).
+- `sync_all.ps1`: Все бинарники, скрипты и XML синхронизированы в `DaewdenM` и `DWDN_TRY`.
+
+
+---
+
+### Глава 79: Восстановление интерфейса сцепки/расцепки для конного артиллериста (Driver-Aware Artillery Hitch HUD) (16.11.2026)
+
+#### 1. Симптоматика и анализ блокировки интерфейса
+- **Симптом**: При спавне артиллериста в седле запряженной тягловой лошади подсказка и шкала удержания `[F]` для расцепки орудия (`DWDN_ArtilleryHitchHUD`) не появлялись на экране, даже если игрок нажимал или удерживал `[F]`.
+- **Первопричина**:
+  1. **Векторная блокировка угла прицеливания (`dot < 0.88f`)**:
+     В `DWDN_ArtilleryHitchView.cs` проверка направления прицела требовала `Vec3.DotProduct(camDir, toHitch) >= 0.88f`. Когда артиллерист находится в седле, он смотрит вперед по ходу коня (`camDir` направлен вперед), а дышло сцепки находится позади него (`toHitch` направлен назад). Скалярное произведение составляло `~ -1.0f`, из-за чего строка `if (dot < 0.88f) { ResetPromptOnly(); return; }` гасила интерфейс на каждом тике.
+  2. **Сетевая потеря прав на клиенте**:
+     `SyncArtilleryDescendantsMessage` не передавал строку `OwnerPlayerId`. Агент игрока в движке Bannerlord порождается под базовым ID культуры (`mp_vlandia_...`), поэтому `mainAgent.Character.StringId` не содержал подстроку `"artillerist"`. После исключения флага `isFriendly` клиент считал игрока посторонним и блокировал управление сцепкой.
+
+#### 2. Внесенные хирургические исправления
+1. **[DWDN_ArtilleryHitchView.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Client/UI/DWDN_ArtilleryHitchView.cs)**:
+   - В поиск орудий внедрено мгновенное связывание по запряженному коню:
+     `if (mainAgent.MountAgent != null && eng.HorseAgent == mainAgent.MountAgent) { closestEngine = eng; break; }`
+   - Введено распознавание верхового возницы:
+     `bool isDriver = (mainAgent.MountAgent != null && closestEngine.HorseAgent == mainAgent.MountAgent);`
+   - Для возницы (`isDriver`):
+     * Отключены геометрические проверки окклюзии орудия и проверка взгляда назад (`dot < 0.88f`), так как вознице в седле не требуется целиться назад в дышло.
+     * Отключен 3D-маркер на спине собственного коня, чтобы не загромождать обзор.
+     * Гарантировано отображение `_viewModel.PromptText = "[F] Удерживайте, чтобы отцепить орудие (Боевой режим)"` и доступность взаимодействия `canInteract = true`.
+   - Восстановлена проверка `isFriendly` (`mainAgent.Team.Side == closestEngine.TeamSide`) и `isDriver` в фильтре авторизации.
+2. **[DWDN_FieldArtilleryBehavior.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/DWDN_FieldArtilleryBehavior.cs)**:
+   - В серверном валидаторе `HandleClientToggleHitchRequest` добавлена проверка `isDriver` (`agent.MountAgent == engine.HorseAgent`) и `isFriendly` (`agent.Team.Side == engine.TeamSide`).
+   - Для возницы (`isDriver`) снято ложное отсечение по дистанции пешего бойца (`dist > 3.4f`).
+   - В поиске коня по индексу добавлена изоляция `a.IsMount` во избежание коллизий индексов.
+
+#### 3. Верификация
+- `dotnet build DWDN_Script.csproj` (Client Release): 0 ошибок.
+- `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
+- `MechanicsTester.exe --cli`: 30 из 30 тестов пройдены успешно (100% pass).
+- `sync_all.ps1`: Модули `DaewdenM` и `DWDN_TRY` полностью обновлены и синхронизированы.
+
+
+---
+
+### Глава 80: Временная консервация класса Хорунжий (mp_Khorunzhiy) (16.11.2026)
+
+#### 1. Задача и цель вмешательства
+- **Цель**: По распоряжению Создателя временно законсервировать (закомментировать) класс Хорунжий (`mp_Khorunzhiy`) в доступном ростере классов герцогства Banreich, не затрагивая при этом остальные классы и наработанную стабильность артиллерии.
+
+#### 2. Внесенные изменения
+- **[DWDN_DuchyManager.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Common/Duchies/DWDN_DuchyManager.cs)**:
+  Блок регистрации класса `mp_Khorunzhiy` и вызов `banreich.Classes.Add(khorunzhiy)` временно обернуты в блочный комментарий `/* ... */`. Класс исключен из списка выбора классов в UI (`DWDN_SelectionMissionView`).
+
+#### 3. Верификация
+- `dotnet build DWDN_Script.csproj` (Client Release): 0 ошибок.
+- `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок.
+- `MechanicsTester.exe --cli`: 30 из 30 тестов пройдены успешно (100% pass).
+- `sync_all.ps1`: Обновленные библиотеки развернуты на `DaewdenM` и `DWDN_TRY`.
+
+
+---
+
+### Глава 81: Релиз v1.1.0: Публикация модуля и актуализация версии для лаунчера (17.11.2026)
+
+#### 1. Цель
+- **Цель**: Актуализировать отображение версии модуля в официальном лаунчере Bannerlord до `v1.1.0`, зафиксировать стабильное состояние в истории Git с тегом `v1.1.0`, отправить изменения в удаленный репозиторий GitHub и опубликовать релиз.
+
+#### 2. Внесенные изменения
+- **[SubModule.xml](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/SubModule.xml)**:
+  Параметр `<Version value="v1.0.0.0"/>` обновлен на `<Version value="v1.1.0"/>`. Теперь в лаунчере игры модуль отображается с версией **v1.1.0**.
+- **Синхронизация**: Скрипт `sync_all.ps1` обновил `SubModule.xml` и бинарники в модулях `DaewdenM` (Dedicated Server) и локальных каталогах.
+
+#### 3. Верификация
+- `MechanicsTester.exe --cli`: 30 из 30 тестов пройдены успешно (100% pass rate).
+- `git tag -a v1.1.0 -m "Release v1.1.0"`: создан релизный тег.
+- `git push origin main --tags`: отправлено на GitHub.
+- GitHub Release `v1.1.0`: сформирован и опубликован через REST API с прикрепленным архивом модуля.
+
+
+---
+
+### Глава 82: Священная калибровка баланса классов: скорость, ускорение, броня и оружейное мастерство (18.11.2026)
+
+#### 1. Задача и тактический замысел
+- **Цель**: Гармонизация физических и боевых характеристик всех 16 классов модуля в строгом соответствии с формулой боевого баланса Создателя:
+  * **Легкая пехота (Ратай)**: Самая высокая скорость передвижения и ускорение (маневренность), минимальная броня, низкие боевые навыки и слабое обращение с оружием (медленные замахи, низкий урон).
+  * **Средняя пехота (Банобранные, Пикинеры)**: Сбалансированные средние показатели скорости, бронирования и владения оружием. Пикинеры обладают узкой специализацией на древковом оружии.
+  * **Стрелки (Лучники, Арбалетчики, Артиллеристы)**: Немного медленнее средней пехоты, но ощутимо быстрее тяжелой пехоты. Умеренная/легкая броня, высокие стрелковые навыки, базовые навыки ближнего боя.
+  * **Тяжелая пехота (Знаменосец, Збройный, Хорунжий, Офицер, Сотник)**: Медленнее стрелков, высокое бронирование, отточенное оружейное мастерство (высокая скорость ударов в ближнем бою и сокрушительный урон).
+  * **Спешенная кавалерия (Рыцари, Кавалерия, Бароны, Король)**: Минимальная скорость пешего боя (тяжелое снаряжение сковывает спешенного всадника), максимальная скорость на коне.
+
+#### 2. Внесенные изменения
+1. **[mpclassdivisions.xml](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpclassdivisions.xml)**:
+   - **Легкая пехота**:
+     * mp_Ratay: movement_speed="0.88" | combat_movement_speed="0.90" | cceleration="2.5" | rmor="10"
+   - **Средняя пехота**:
+     * mp_Banobranny: movement_speed="0.81" | combat_movement_speed="0.82" | cceleration="2.1" | rmor="25"
+     * mp_Pikeman: movement_speed="0.81" | combat_movement_speed="0.80" | cceleration="2.1" | rmor="20"
+   - **Стрелки**:
+     * mp_DWDN_Archer: movement_speed="0.78" | combat_movement_speed="0.75" | cceleration="2.2" | rmor="10"
+     * mp_DWDN_Crossbowman: movement_speed="0.76" | combat_movement_speed="0.73" | cceleration="2.1" | rmor="20"
+     * mp_Artillerist: movement_speed="0.75" | combat_movement_speed="0.72" | cceleration="2.1" | rmor="26"
+   - **Тяжелая пехота**:
+     * mp_Bannerman: movement_speed="0.74" | combat_movement_speed="0.71" | cceleration="2.0" | rmor="35"
+     * mp_Zbroyniy: movement_speed="0.73" | combat_movement_speed="0.69" | cceleration="1.8" | rmor="40"
+     * mp_Khorunzhiy: movement_speed="0.73" | combat_movement_speed="0.69" | cceleration="1.8" | rmor="45"
+     * mp_Officer: movement_speed="0.72" | combat_movement_speed="0.68" | cceleration="1.8" | rmor="44"
+     * mp_Sotnik: movement_speed="0.72" | combat_movement_speed="0.68" | cceleration="1.8" | rmor="48"
+   - **Спешенная кавалерия**:
+     * mp_DWDN_Cav: movement_speed="0.72" | combat_movement_speed="0.64" | cceleration="2.6" | rmor="32"
+     * mp_Knight: movement_speed="0.70" | combat_movement_speed="0.62" | cceleration="2.4" | rmor="38"
+     * mp_Bergen_Klaus: movement_speed="0.70" | combat_movement_speed="0.62" | cceleration="2.4" | rmor="38"
+     * mp_Finnard_Valerian: movement_speed="0.70" | combat_movement_speed="0.62" | cceleration="2.4" | rmor="38"
+     * mp_ALberic_Devald_hero: movement_speed="0.71" | combat_movement_speed="0.63" | cceleration="2.4" | rmor="40"
+
+2. **[mpcharacters.xml](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpcharacters.xml)**:
+   - Обновлены боевые навыки (skills) для всех 32 персонажей (_hero и _troop):
+     * mp_Ratay: OneHanded="50", TwoHanded="40", Polearm="50", Throwing="40" (ополченцы, низкий урон, медленный взмах).
+     * mp_Banobranny: OneHanded="85", TwoHanded="65", Polearm="80", Throwing="50".
+     * mp_Pikeman: OneHanded="60", TwoHanded="50", Polearm="130", Throwing="20".
+     * mp_Zbroyniy: OneHanded="125", TwoHanded="110", Polearm="100", Throwing="60".
+     * mp_Officer: OneHanded="140", TwoHanded="120", Polearm="120", Throwing="70".
+     * mp_Sotnik: OneHanded="150", TwoHanded="130", Polearm="130", Throwing="80".
+     * mp_DWDN_Archer: OneHanded="60", TwoHanded="30", Polearm="40", Bow="120", Crossbow="70", Throwing="40".
+     * mp_DWDN_Crossbowman: OneHanded="65", TwoHanded="30", Polearm="40", Crossbow="125", Bow="30", Throwing="40".
+     * mp_Artillerist: OneHanded="70", TwoHanded="60", Polearm="40", Crossbow="120", Bow="30", Throwing="50".
+     * mp_Knight: OneHanded="135", TwoHanded="120", Polearm="135", Riding="140", Throwing="60".
+     * mp_DWDN_Cav: OneHanded="110", TwoHanded="80", Polearm="125", Riding="130", Throwing="50".
+
+#### 3. Верификация
+- MechanicsTester.exe --cli: 30 из 30 тестов пройдены успешно (100% pass rate).
+- sync_all.ps1: Все XML матрицы перенесены на Dedicated Server DaewdenM.
+
+---
+
+### Глава 83: Балансировка кавалерии: пешая скорость тяжелой пехоты, кони и бронирование (18.11.2026)
+
+#### 1. Тактический замысел
+- **Пеший строй кавалерии**: По указанию Создателя все спешенные всадники приравнены по скорости и ускорению к тяжелой пехоте (combat_movement_speed="0.68 - 0.69", movement_speed="0.72 - 0.73", cceleration="1.8 - 2.0").
+- **Скорость на коне**: Обычный всадник (mp_DWDN_Cav) снаряжен более легким и быстроходным конем охотничьей породы (mp_vlandia_horse_faster, базовая скорость 42), повышенным навыком верховой езды (Riding="140") и более легкой полукольчужной попоной (mp_halfchain_barding, вес 65 кг, броня 20). В результате всадник превосходит в скорости тяжелых рыцарей, баронов и короля.
+- **Бронирование всадника и коня**: 
+  * Рыцари, бароны и король защищены сверхтяжелой броней (всадник 38-42, боевой конь mp_vlandia_horse_war / mp_battania_horse_war с полным доспехом mp_chain_barding брони 25 и запасом здоровья 60-70 HP).
+  * Обычный всадник (mp_DWDN_Cav) имеет облегченное бронирование (всадник 28, конь mp_halfchain_barding брони 20 и запасом здоровья 15 HP).
+
+#### 2. Внесенные изменения
+1. **[mpclassdivisions.xml](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpclassdivisions.xml)**:
+   - mp_DWDN_Cav: rmor="28", movement_speed="0.73", combat_movement_speed="0.69", cceleration="2.0".
+   - mp_Knight: rmor="38", movement_speed="0.72", combat_movement_speed="0.68", cceleration="1.8". В перке "Warhorse" конь заменен на mp_vlandia_horse_war.
+   - mp_Bergen_Klaus: rmor="40", movement_speed="0.72", combat_movement_speed="0.68", cceleration="1.8".
+   - mp_Finnard_Valerian: rmor="40", movement_speed="0.72", combat_movement_speed="0.68", cceleration="1.8".
+   - mp_ALberic_Devald_hero: rmor="42", movement_speed="0.72", combat_movement_speed="0.68", cceleration="1.8".
+
+2. **[mpcharacters.xml](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpcharacters.xml)**:
+   - mp_DWDN_Cav (_hero & _troop): Конь заменен на Item.mp_vlandia_horse_faster (Hunter, скорость 42), попона на Item.mp_halfchain_barding (броня 20, вес 65 кг), навык Riding="140".
+   - mp_Knight (_hero & _troop): Навык Riding="130".
+   - mp_Bergen_Klaus (_hero & _troop): Конь заменен на Item.mp_vlandia_horse_war (Charger, скорость 35, здоровье 60), навык Riding="135".
+   - mp_Finnard_Valerian (_hero & _troop): Конь заменен на Item.mp_vlandia_horse_war (Charger, скорость 35, здоровье 60), навык Riding="135".
+   - mp_ALberic_Devald (_hero & _troop): Навык Riding="140".
+
+#### 3. Верификация
+- MechanicsTester.exe --cli: 30 из 30 тестов пройдены успешно (100% pass rate).
+- sync_all.ps1: Все XML матрицы развернуты на Dedicated Server DaewdenM.
+
+
+---
+
+### Глава 84: Ликвидация OOM-аварии 34.2 ГБ Артиллериста и стабилизация Знаменосца в меню и сети (22.11.2026)
+
+#### 1. Диагностика и анализ проявлений скрапкода
+1. **Катастрофическая аллокация памяти Артиллериста (`mp_Artillerist`)**:
+   - *Журнал сбоя*: В `rgl_log_24940.txt` зафиксирован отказ ОС: `Application crashed because it could not get new memory from the operating system. Requested memory size is 34225520640 bytes` (34.2 ГБ).
+   - *Первопричина*: В `DWDN_ServerLoadoutBehavior.cs` блок анти-чит спешивания пеших классов (`string.IsNullOrEmpty(targetSelection.HorseId) && agent.MountAgent != null`) при спавне Артиллериста ошибочно идентифицировал тяглового коня артиллерии (`Draft Horse`) как нелегального маунта и вызывал `mount.FadeOut(hideInstantly: true)`. Деспавненный конь терял ориентацию, физические координаты его трансформации обращались в `+Infinity` (`0x7F800000`). В методе `DWDN_FieldArtilleryBehavior.OnMissionTick` орудие позиционировалось за конем без проверки всадника (`RiderAgent == null`) и без верификации чисел на `float.IsNaN` / `float.IsInfinity`. Передача бесконечной матрицы в `engine.RootEntity.SetFrame` заставляла нативный физический движок Havok вычислять размерность пространственного дерева: `+inf / cell_size`, что при сдвиге на 4 бита давало шестнадцатеричный размер `0x7F8000000` (ровно 34 225 520 640 байт). Windows отклоняла аллокацию и роняла сервер.
+   - *Дефект сбруи*: В методе `SpawnEngine` коню передавался `harnessItem = saddle_horse` (предмет коня вместо сбруи из-за отсутствия `mp_vlandia_horse_harness` в мультиплеере).
+
+2. **Сбой Знаменосца (`mp_Bannerman`) на пьедестале UI и в мультиплеере**:
+   - *Первопричина на клиенте*: В `DWDN_SelectionMissionView.cs` при выборе класса знамя `dwdn_banner1` в слоте 1 определялось методом `GetInitialWeaponIndicesToEquip` как предмет для левой руки (`offHandWeaponIndex = 1`). Вызов `data.LeftWieldedItemIndex((int)offHandWeaponIndex)` на манекене `agentVisual` приводил к C++ assertion failure, так как у манекена в анимации `act_walk_idle_unarmed` отсутствует валидный слот оффхенд-знамени.
+   - *Первопричина на сервере*: В `DWDN_ServerLoadoutBehavior.cs` выполнялась широковещательная рассылка `SetWieldedItemIndex(isLeftHand: true)` для оффхенда знамени, что вызывало сетевой ассерт у клиентов, ожидающих в левой руке только щит или факел.
+   - *Синтаксический мусор*: В `mpclassdivisions.xml` на строке 208 находился оторванный комментарий `<!--item="mp_sturgia_heavy_axe" /> -->`.
+
+#### 2. Внесенные исправления
+1. **[DWDN_ServerLoadoutBehavior.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Server/Behaviors/DWDN_ServerLoadoutBehavior.cs)**:
+   - В логику спешивания добавлен защитный фильтр: `&& !string.Equals(targetSelection.ClassId, "mp_Artillerist", StringComparison.OrdinalIgnoreCase)`. Тягловый конь артиллериста защищен от деспавна.
+   - В сетевую рассылку `SetWieldedItemIndex` внедрен запрет отправки пакета для предметов `ItemTypeEnum.Banner` в левую руку.
+
+2. **[DWDN_FieldArtilleryBehavior.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/DWDN_FieldArtilleryBehavior.cs)**:
+   - В `OnMissionTick` добавлен строгий шлюз: расчет движения сцепки прерывается (`continue`), если у тяглового коня нет живого всадника (`engine.HorseAgent.RiderAgent == null`).
+   - Внедрена жесткая математическая валидация координат: `float.IsNaN` / `float.IsInfinity` для `horsePos`, `horseFwd`, `targetPos` и `f.origin`. Попадание бесконечных или неопределенных величин в C++ Havok и `SetFrame` исключено на 100%.
+   - В методе `SpawnEngine` поиск несуществующей сбруи `mp_vlandia_horse_harness` заменен на валидные мультиплеерные ассеты: `mp_light_harness` (легкая сбруя) и `mp_chain_barding`.
+
+3. **[DWDN_SelectionMissionView.cs](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/scripts/DWDN_Script/Client/UI/DWDN_SelectionMissionView.cs)**:
+   - Добавлена проверка типа оффхенд-оружия: если `customEquip[offHandWeaponIndex].Item?.ItemType == ItemObject.ItemTypeEnum.Banner`, то `offHandWeaponIndex = EquipmentIndex.None` перед установкой `LeftWieldedItemIndex`. Знамя визуализируется за спиной манекена, предотвращая C++ рендер-краш.
+
+4. **[mpclassdivisions.xml](file:///E:/SteamLibrary/steamapps/common/Mount%20&%20Blade%20II%20Bannerlord/Modules/DWDN_TRY/ModuleData/mpclassdivisions.xml)**:
+   - Удален оторванный комментарий на строке 208.
+
+#### 3. Верификация
+- `dotnet build DWDN_Script.csproj` (Client Release): 0 ошибок, 23 предупреждения архитектуры.
+- `dotnet build DWDN_Script.Server.csproj` (Server Release): 0 ошибок, 0 предупреждений.
+- `MechanicsTester.exe --cli`: 30 из 30 тестов пройдены успешно (100% pass rate).
+- `sync_all.ps1`: Все исполняемые сборки и XML матрицы зеркалированы на `DaewdenM` (Dedicated Server).
+
+---
+
+### Сессия 2026-11-23 — Очистка и реорганизация GitHub-репозитория (`Havi-Dorgeir/DWDN_Module`)
+
+- **Очистка мусора:** удалены 4 резервных `SubModule*.xml` из корня, 7 копий XML из `ModuleData/`, `finnard_armer15_geo.tpac.ptemp`, `art_assets/lfs_test_image.png`, `steam_appid.txt` и дублирующиеся `bin/Win64_Shipping_Client/DWDN_Script.Server.{dll,pdb}`.
+- **`.gitignore`:** добавлены правила для `*.ptemp`, `*.bak`, `*.orig`, `*- Copy.*`, `* cop.*`, `SubModule_backup*.xml`, `steam_appid.txt`, `DWDN_config.txt`, `.vscode/`, `*.zip`, `release_dist/`.
+- **Служебные скрипты:** `ЗАПУСК_ТЕСТОВ_МЕХАНИК.bat` и `ТЕСТ_МЕХАНИК_CLI.bat` перенесены в `Tools/`; все `.bat` в `Tools/` переведены на относительные пути `%~dp0`; в `sync_all.ps1` синхронизация в `d:\banAImod\DWDN_TRY` сделана условной (`Test-Path`).
+- **Документация для ИИ и разработчиков:** длинные документы вынесены в `docs/` (`DOCUMENTATION.md`, `AI_MODDING_GUIDE.md`, `ENGINE.md`, `CHRONICLE.md`, `GITHUB_WORKFLOW.md`). В корне создан компактный `AGENTS.md` (базовая архитектура + ссылки на скиллы `rehan-remade/universal-modder` и `ShortJake/NativeHook` + карта `docs/`) и переработан `README.md`.
+- **GitHub Flow и автоматизация:** создана ветка `development`, добавлены `.github/CODEOWNERS`, `.github/workflows/branch-guard.yml` и `.github/workflows/release.yml` (автоматическая сборка `DWDN_TRY_<version>.zip` и публикация GitHub Release при обновлении `main`).

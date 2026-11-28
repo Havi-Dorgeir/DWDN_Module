@@ -132,6 +132,25 @@ namespace DWDN_Script.Common.Duchies
             sotnik.DefaultLoadout = sotnik.CreateDefaultLoadout(banreich.Id);
             banreich.Classes.Add(sotnik);
 
+            // 6.1 Хорунжий (Элитный пехотинец в доспехах Рюндаля) - ВРЕМЕННО ОТКЛЮЧЕН
+            /*
+            var khorunzhiy = new DWDN_ClassDefinition(
+                "mp_Khorunzhiy",
+                "Хорунжий",
+                "Элитный пехотинец в доспехах Рюндаля.",
+                "mp_Khorunzhiy_hero"
+            );
+            khorunzhiy.AllowedHelmets.AddRange(new[] { "baron_roondalt_vendelhelmet_1", "" });
+            khorunzhiy.AllowedBodyArmors.AddRange(new[] { "run_body1" });
+            khorunzhiy.AllowedCapes.AddRange(new[] { "Baron_rundal_cape", "" });
+            khorunzhiy.AllowedLegs.AddRange(new[] { "rundal_leg" });
+            khorunzhiy.AllowedGloves.AddRange(new[] { "rundal_gloves_second", "" });
+            khorunzhiy.AllowedWeaponsSlot0.AddRange(new[] { "baldur_warpick" });
+            khorunzhiy.AllowedWeaponsSlot1.AddRange(new[] { "rundal_shield", "" });
+            khorunzhiy.DefaultLoadout = khorunzhiy.CreateDefaultLoadout(banreich.Id);
+            banreich.Classes.Add(khorunzhiy);
+            */
+
             // 7. Знаменосец (Штандарт герцогства)
             var bannerman = new DWDN_ClassDefinition(
                 "mp_Bannerman",
@@ -208,8 +227,8 @@ namespace DWDN_Script.Common.Duchies
             artillerist.AllowedLegs.AddRange(new[] { "banobranyi_leg", "crossbowman_leggings", "officer_legs" });
             // Слот 0: Оружие ближнего боя на выбор (строго одно оружие)
             artillerist.AllowedWeaponsSlot0.AddRange(new[] { "dwdn_cleaver", "dwdn_falchion", "mp_vlandian_hammer", "mp_vlandian_short_sword" });
-            // Слот 1: Заявка на осадное орудие на выбор
-            artillerist.AllowedWeaponsSlot1.AddRange(new[] { "dwdn_order_mangonel", "dwdn_order_ballista" });
+            // Слот 1: Заявка на осадное орудие на выбор (или пустой слот - пеший бой без орудия)
+            artillerist.AllowedWeaponsSlot1.AddRange(new[] { "dwdn_order_mangonel", "dwdn_order_ballista", "" });
             // Слоты 2 и 3 намеренно не заполняются, чтобы не плодить пустые строки в интерфейсе
             artillerist.DefaultLoadout = artillerist.CreateDefaultLoadout(banreich.Id);
             banreich.Classes.Add(artillerist);

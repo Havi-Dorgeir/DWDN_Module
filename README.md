@@ -1,85 +1,90 @@
 # Daewden (DWDN) Multiplayer Module
-### Модуль фракции Даевден для Mount & Blade II: Bannerlord
 
-Репозиторий содержит исходные коды, конфигурации XML, интерфейсы Gauntlet и ресурсы сетевого модуля **Daewden (DWDN)**.
-
----
-
-## 📖 Документация и руководства
-
-В репозитории представлена полная техническая и архитектурная документация модуля и движка игры:
-
-1. **[docs/DOCUMENTATION.md](docs/DOCUMENTATION.md)** — практическое руководство по моддингу DWDN:
-   * **Архитектурная карта мода**: подробное описание назначения всех папок и файлов.
-   * **Пошаговое руководство**: как добавить новый класс и экипировку от XML (`mpcharacters.xml`, `mpclassdivisions.xml`) до C# регистрации (`DWDN_DuchyManager.cs`).
-   * **Сетевая синхронизация**: описание работы клиент-серверной архитектуры спавна и применения лодаутов.
-   * **Тактическая система Ауры Знаменосца (`DWDN_BannerAuraBehavior.cs`)**: описание балансных бонусов строя в радиусе 12 м, личной защиты Знаменосца и механики «Второго дыхания».
-   * **Комплекс визуальных GUI-студий моддинга (`Tools/`)**: описание работы `WeaponCalibrator`, `DuchyLoadoutStudio` и `ModValidator`.
-2. **[AGENTS.md](AGENTS.md)** — инженерный кодекс и технический справочник по внутренним системам DWDN (`AgentDrivenProperties`, `CraftingPiece` Z-оффсеты, кастомный Gauntlet UI, защита от крашей `0xC0000005`).
-3. **[docs/ENGINE.md](docs/ENGINE.md)** — полная энциклопедия реверс-инжиниринга ядра *Mount & Blade II: Bannerlord (v1.4.8)* (`Native`, `SandBoxCore`, `SandBox`, `Multiplayer`): C++/C# мост `DotNetObject`, двойной пайплайн XML (`project.mbproj` vs `MBObjectManager`), бинарный формат `.tpac` (`LZ4` + `METM`) и `.rdc`, лимит 64 костей скелета и сетевой протокол.
-4. **[docs/CHRONICLE.md](docs/CHRONICLE.md)** — полная хроника разработки, архитектурных решений, балансных правок и исправлений модуля.
-5. **[docs/PLAN.md](docs/PLAN.md)** — куда идёт мод: цели, этапы и решения автора.
-6. **[docs/STATUS.md](docs/STATUS.md)** — что сделано и проверено сейчас, что сломано.
-7. **[docs/BACKLOG.md](docs/BACKLOG.md)** — задачи без срока и ссылки на [Issues](https://github.com/Havi-Dorgeir/DWDN_Module/issues).
+Сетевой модуль фракции **Даевден (Daewden)** для *Mount & Blade II: Bannerlord* (клиент + выделенный сервер `.NET 8`, кастомный Gauntlet UI герцогств, полевая артиллерия, тактическая аура знаменосца, Admin Tools и набор визуальных инструментов моддинга).
 
 ---
 
-## 🧰 Автономные визуальные инструменты моддинга (`Tools/`)
+## Быстрый старт
 
-* **`Tools/WeaponCalibrator/`** — **Авто-Калибратор 3D Оружия**: парсит `.tpac` и `.fbx`, вычисляет точные габариты и стыки (`previous_piece_offset` / `next_piece_offset`), отображает 3D-вьюпорт и автоматически обновляет `crafting_pieces.xml`.
-* **`Tools/DuchyLoadoutStudio/`** — **Визуальный Конструктор Герцогств и Лодаутов**: интерактивный редактор классов с 3D-манекеном и кнопкой мгновенного применения в мод (`C# + XML + сборка клиентской и серверной DLL`).
-* **`Tools/ModValidator/`** — **Мгновенный Предпусковой Валидатор Мода**: за 0.25 сек проверяет 8 уровней целостности XML, C#, 3D-мешей в `.tpac` и `SHA-256` синхронизацию с выделенным сервером `DaewdenM`.
-* **`Tools/MechanicsTester/`** — **Тестовый полигон механик**: 28 тестов без запуска игры (сеть, лодауты, аура знаменосца, артиллерия, ABI, Admin Tools). Запуск: `dotnet run --project Tools\MechanicsTester\MechanicsTester.csproj -c Release -- --cli`.
+### 1. Сборка исходного кода
 
----
-
-## 🛠 Быстрый старт: Сборка исходного кода
-
-Модуль собирается из двух проектов:
-
-| Что | Проект | Платформа | Куда кладётся |
+| Сборка | Проект | Платформа | Выход |
 |---|---|---|---|
-| Клиент — `DWDN_Script.dll` | `ModuleData/scripts/DWDN_Script/DWDN_Script.csproj` | .NET Framework 4.7.2 | `bin/Win64_Shipping_Client` |
-| Сервер — `DWDN_Script.Server.dll` | `ModuleData/scripts/DWDN_Script.Server/DWDN_Script.Server.csproj` | **.NET 8** | `bin/Win64_Shipping_Server` и `bin/Linux64_Shipping_Server` |
-
-С Bannerlord **v1.5.7** выделенный сервер работает на .NET 8. Серверная DLL,
-собранная под .NET Framework, на нём не загружается, поэтому сервер собирается
-отдельным проектом и против библиотек **выделенного сервера** (Steam,
-«Mount & Blade II: Dedicated Server»), а не клиента.
+| Клиент (`DWDN_Script.dll`) | `ModuleData/scripts/DWDN_Script/DWDN_Script.csproj` | `.NET Framework 4.7.2` | `bin/Win64_Shipping_Client/` |
+| Сервер (`DWDN_Script.Server.dll`) | `ModuleData/scripts/DWDN_Script.Server/DWDN_Script.Server.csproj` | `.NET 8.0` | `bin/Win64_Shipping_Server/` и `bin/Linux64_Shipping_Server/` |
 
 ```powershell
-# Клиент (следом сам соберёт и сервер)
+# Сборка клиента (автоматически собирает и серверную DLL)
 dotnet build ModuleData/scripts/DWDN_Script/DWDN_Script.csproj -c Release
 
-# Только сервер
+# Сборка только выделенного сервера (.NET 8, Bannerlord v1.5.7+)
 dotnet build ModuleData/scripts/DWDN_Script.Server/DWDN_Script.Server.csproj -c Release
 ```
 
-Где лежит выделенный сервер, проект ищет сам — рядом с клиентом в той же
-библиотеке Steam (`steamapps/common/Mount & Blade II Dedicated Server`). Если он
-в другом месте, укажите путь: `-p:BannerlordServerDir="D:\...\Mount & Blade II Dedicated Server"`
-или переменной окружения `BANNERLORD_SERVER_DIR`.
+Путь к библиотекам выделенного сервера определяется автоматически из соседней папки Steam (`Mount & Blade II Dedicated Server`). При нестандартном расположении передайте `-p:BannerlordServerDir="D:\...\Mount & Blade II Dedicated Server"` или задайте переменную окружения `BANNERLORD_SERVER_DIR`.
+
+### 2. Проверка и синхронизация
+
+```powershell
+# Автономный прогон тестов механик (без запуска игры)
+dotnet run --project Tools/MechanicsTester/MechanicsTester.csproj -c Release -- --cli
+
+# Синхронизация DLL, XML и GUI с локальным Dedicated Server
+.\sync_all.ps1
+```
 
 ---
 
-## 🚀 Как выпустить
+## Модель веток и автоматические релизы
 
-1. Поднять `<Version value="vX.Y.Z"/>` в `SubModule.xml` и поставить такой же тег `vX.Y.Z`.
-2. Собрать клиент и сервер, прогнать полигон `Tools/MechanicsTester` (текущий результат — в [docs/STATUS.md](docs/STATUS.md)).
-3. Собрать архив для игры: `SubModule.xml`, `bin/`, `ModuleData/` без `scripts/`, `GUI/`, `Assets/`, `Shaders/`. Без `AssetSources/`, `Tools/`, документов и `.pdb`.
-4. Выложить архив на сайт Даевдена: стол урядника → «Лаунчер: моды и карты». Сайт проверит архив и отдаст каталог лаунчеру.
+```text
+feature/* или fix/*  ──(PR)──▶  development  ──(PR, только @Havi-Dorgeir)──▶  main  ──(GitHub Actions)──▶  GitHub Release (.zip)
+```
 
-Автоматизацию выпуска (`release.ps1` + GitHub Releases) описывает [#6](https://github.com/Havi-Dorgeir/DWDN_Module/issues/6). Собирать в GitHub Actions нельзя: библиотеки игры распространять нельзя, а без них проект не собирается, — выпуск собирается локально, GitHub его только хранит.
+- **`development`** — интеграционная ветка разработки (изменения вносятся через Pull Request).
+- **`main`** — стабильная релизная ветка (слияние только владельцем репозитория `@Havi-Dorgeir`).
+- **Авторелиз:** каждый push/merge в `main` запускает [`.github/workflows/release.yml`](.github/workflows/release.yml), который считывает `<Version value="vX.Y.Z"/>` из [`SubModule.xml`](SubModule.xml), собирает чистый игровой архив `DWDN_TRY_<version>.zip` (без `AssetSources/`, `Tools/`, `docs/`, исходников `scripts/` и `.pdb`) и автоматически публикует GitHub Release.
+
+Подробные правила работы с ветками и настройкой защиты описаны в [`docs/GITHUB_WORKFLOW.md`](docs/GITHUB_WORKFLOW.md).
+
+---
+
+## Документация
+
+Вся детальная документация структурирована и вынесена в отдельные файлы:
+
+| Файл | Назначение |
+|---|---|
+| [`AGENTS.md`](AGENTS.md) | Точка входа для ИИ-агентов: базовая архитектура, скиллы `universal-modder` / `NativeHook`, правила работы — и полный кодекс архитектора по внутренним системам DWDN (огнестрел, Gauntlet UI, Z-оффсеты, артиллерия, Admin Tools, защита от крашей), англ. |
+| [`docs/DOCUMENTATION.md`](docs/DOCUMENTATION.md) | Практическое руководство: добавление классов, экипировки, герцогств, сетевая синхронизация, аура знаменосца. |
+| [`docs/ENGINE.md`](docs/ENGINE.md) | Энциклопедия реверс-инжиниринга ядра Bannerlord (`DotNetObject`, `.tpac`/`.rdc`, XML-пайплайн, сетевой протокол). |
+| [`docs/CHRONICLE.md`](docs/CHRONICLE.md) | Хроника разработки, архитектурных решений, багфиксов и баланса. |
+| [`docs/GITHUB_WORKFLOW.md`](docs/GITHUB_WORKFLOW.md) | Регламент веток `development` / `main`, настройки Branch Protection / Rulesets и авторелизов. |
+| [`docs/PLAN.md`](docs/PLAN.md) | Куда идёт мод: цели, этапы и решения автора. |
+| [`docs/STATUS.md`](docs/STATUS.md) | Что сделано и проверено сейчас, что сломано. |
+| [`docs/BACKLOG.md`](docs/BACKLOG.md) | Задачи без срока и ссылки на [Issues](https://github.com/Havi-Dorgeir/DWDN_Module/issues). |
 
 ---
 
-## 📂 Структура репозитория
+## Инструменты моддинга (`Tools/`)
 
-* `ModuleData/` — XML-манифесты классов (`mpclassdivisions.xml`), персонажей (`mpcharacters.xml`), предметов (`mpitems/`), кастомного оружия (`crafting_pieces.xml`, `crafting_templates.xml`).
-* `ModuleData/scripts/DWDN_Script/` — Исходный C#-код мода (клиентский UI на Gauntlet, сетевые сообщения, серверные подсистемы экипировки).
-* `GUI/` — XML-разметка и ресурсы кастомного окна выбора классов и лодаутов.
-* `Assets/` — Материалы, текстуры и параметры ассетов юнитов.
-* `SubModule.xml` — Главный манифест мода для загрузчика TaleWorlds.
+Все лаунчеры `.bat` расположены внутри `Tools/` и работают по относительным путям:
+
+- **`Tools/MechanicsTester/`** — автономный полигон юнит- и интеграционных тестов механик DWDN (GUI + `--cli`).
+- **`Tools/ModValidator/`** — предпусковой валидатор XML, C#, 3D-мешей `.tpac` и SHA-256 синхронизации с сервером.
+- **`Tools/DuchyLoadoutStudio/`** — визуальный конструктор герцогств, классов и лодаутов с 3D-манекеном.
+- **`Tools/WeaponCalibrator/`** — 3D-калибратор стыков составного оружия (`crafting_pieces.xml`).
 
 ---
-*Разработано для сообщества Mount & Blade II Bannerlord.*
+
+## Структура репозитория
+
+- `SubModule.xml` — манифест модуля TaleWorlds.
+- `bin/` — собранные клиентские (`.NET 4.7.2`) и серверные (`.NET 8`) сборки.
+- `ModuleData/` — игровые XML-конфигурации и исходный код `scripts/`.
+- `GUI/` — Gauntlet XML-префабы и графические ресурсы интерфейса.
+- `Assets/` / `AssetSources/` — запечённые `.tpac` и исходные 3D/текстурные файлы.
+- `Shaders/` — скомпилированный кэш шейдеров модуля.
+- `Tools/` — утилиты разработки и тестирования.
+- `docs/` — техническая и архитектурная документация.
+- `.github/` — CI-проверки, `CODEOWNERS` и автоматическая публикация релизов.

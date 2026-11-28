@@ -110,40 +110,39 @@ namespace DWDN_Script.Server.Behaviors
                     var cls = duchy?.GetClass(selection.ClassId);
                     if (cls != null)
                     {
-                        var allHeroClasses = MultiplayerClassDivisions.GetMPHeroClasses();
-                        if (allHeroClasses != null)
+                        // Безопасный нативный индекс для спавна и синхронизации с культурой команды игрока
+                        BasicCultureObject peerCulture = missionPeer.Culture;
+                        if (peerCulture == null && missionPeer.Team != null)
                         {
-                            foreach (var hc in allHeroClasses)
+                            string cultStr = missionPeer.Team.Side == BattleSideEnum.Attacker
+                                ? MultiplayerOptions.OptionType.CultureTeam1.GetStrValue()
+                                : MultiplayerOptions.OptionType.CultureTeam2.GetStrValue();
+                            peerCulture = MBObjectManager.Instance?.GetObject<BasicCultureObject>(cultStr);
+                        }
+                        if (peerCulture != null)
+                        {
+                            var peerClasses = MultiplayerClassDivisions.GetMPHeroClasses(peerCulture);
+                            if (peerClasses != null)
                             {
-                                if (hc == null) continue;
-                                if (string.Equals(hc.StringId, cls.Id, StringComparison.OrdinalIgnoreCase) ||
-                                    string.Equals(hc.StringId, cls.TroopId, StringComparison.OrdinalIgnoreCase) ||
-                                    (hc.HeroCharacter != null && string.Equals(hc.HeroCharacter.StringId, cls.TroopId, StringComparison.OrdinalIgnoreCase)) ||
-                                    (hc.TroopCharacter != null && string.Equals(hc.TroopCharacter.StringId, cls.TroopId, StringComparison.OrdinalIgnoreCase)))
+                                var classList = System.Linq.Enumerable.ToList(peerClasses);
+                                if (classList.Count > 0)
                                 {
-                                    if (hc.Culture != null)
+                                    int safeNativeIdx = 0;
+                                    if (!string.IsNullOrEmpty(selection.HorseId))
                                     {
-                                        int idx = 0;
-                                        foreach (var cultClass in MultiplayerClassDivisions.GetMPHeroClasses(hc.Culture))
-                                        {
-                                            if (cultClass == hc)
-                                            {
-                                                int targetIdx = idx;
-                                                missionPeer.SelectedTroopIndex = targetIdx;
-                                                missionPeer.NextSelectedTroopIndex = targetIdx;
-                                                try
-                                                {
-                                                    GameNetwork.BeginBroadcastModuleEvent();
-                                                    GameNetwork.WriteMessage(new UpdateSelectedTroopIndex(peer, targetIdx));
-                                                    GameNetwork.EndBroadcastModuleEvent(GameNetwork.EventBroadcastFlags.ExcludeOtherTeamPlayers, peer);
-                                                }
-                                                catch {}
-                                                break;
-                                            }
-                                            idx++;
-                                        }
+                                        int cavIdx = classList.FindIndex(c => c != null && c.HeroCharacter != null && c.HeroCharacter.IsMounted);
+                                        if (cavIdx >= 0) safeNativeIdx = cavIdx;
                                     }
-                                    break;
+                                    safeNativeIdx = Math.Min(Math.Max(0, safeNativeIdx), classList.Count - 1);
+                                    missionPeer.SelectedTroopIndex = safeNativeIdx;
+                                    missionPeer.NextSelectedTroopIndex = safeNativeIdx;
+                                    try
+                                    {
+                                        GameNetwork.BeginBroadcastModuleEvent();
+                                        GameNetwork.WriteMessage(new UpdateSelectedTroopIndex(peer, safeNativeIdx));
+                                        GameNetwork.EndBroadcastModuleEvent(GameNetwork.EventBroadcastFlags.ExcludeOtherTeamPlayers, peer);
+                                    }
+                                    catch {}
                                 }
                             }
                         }
@@ -378,7 +377,8 @@ namespace DWDN_Script.Server.Behaviors
                 if (targetSelection != null)
                 {
                     // Если игрок выбрал пеший бой, но у агента по какой-то причине есть лошадь (например, спавн в warmup) - спешиваем и удаляем её
-                    if (string.IsNullOrEmpty(targetSelection.HorseId) && agent.MountAgent != null)
+                    // Защита: класс mp_Artillerist не спешивается, так как он использует тягловую лошадь артиллерийского орудия
+                    if (string.IsNullOrEmpty(targetSelection.HorseId) && agent.MountAgent != null && !string.Equals(targetSelection.ClassId, "mp_Artillerist", StringComparison.OrdinalIgnoreCase))
                     {
                         try
                         {
@@ -442,9 +442,13 @@ namespace DWDN_Script.Server.Behaviors
                         EquipmentIndex wieldedOffhand = agent.GetOffhandWieldedItemIndex();
                         if (wieldedOffhand != EquipmentIndex.None && !agent.Equipment[wieldedOffhand].IsEmpty)
                         {
-                            GameNetwork.BeginBroadcastModuleEvent();
-                            GameNetwork.WriteMessage(new SetWieldedItemIndex(agent.Index, true, true, true, wieldedOffhand, 0));
-                            GameNetwork.EndBroadcastModuleEvent(GameNetwork.EventBroadcastFlags.AddToMissionRecord, null);
+                            // Защита: не рассылаем SetWieldedItemIndex для знамени в левую руку, так как нативный MP протокол ожидает только щит/факел
+                            if (agent.Equipment[wieldedOffhand].Item?.ItemType != ItemObject.ItemTypeEnum.Banner)
+                            {
+                                GameNetwork.BeginBroadcastModuleEvent();
+                                GameNetwork.WriteMessage(new SetWieldedItemIndex(agent.Index, true, true, true, wieldedOffhand, 0));
+                                GameNetwork.EndBroadcastModuleEvent(GameNetwork.EventBroadcastFlags.AddToMissionRecord, null);
+                            }
                         }
                     }
 

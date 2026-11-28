@@ -64,9 +64,9 @@ namespace DWDN_Script.Client.UI
             }
             _lastHealth = mainAgent.Health;
 
-            // Находим ближайшее орудие по его дышлу (HitchPosition)
+            // Находим ближайшее орудие по его дышлу (HitchPosition) или по тягловому коню всадника
             DWDN_FieldArtilleryBehavior.EngineInstance closestEngine = null;
-            float closestDist = 3.6f;
+            float closestDist = 4.0f;
 
             try
             {
@@ -77,6 +77,14 @@ namespace DWDN_Script.Client.UI
                     {
                         var eng = activeEngines[i];
                         if (eng == null || eng.IsDestroyed) continue;
+
+                        // Если игрок сидит верхом на тягловом коне этого орудия — это точно целевое орудие возницы
+                        if (mainAgent.MountAgent != null && eng.HorseAgent == mainAgent.MountAgent)
+                        {
+                            closestEngine = eng;
+                            closestDist = 0f;
+                            break;
+                        }
 
                         float d = mainAgent.Position.Distance(eng.HitchPosition);
                         if (d < closestDist)
@@ -106,37 +114,59 @@ namespace DWDN_Script.Client.UI
             }
 
             Vec3 hitchPos = closestEngine.HitchPosition;
-
-            // Геометрическое разделение сторон:
-            // Дышло (HitchPosition) находится спереди орудия (+Frame.rotation.f).
-            // Позиция наводчика и экипажа находится сзади орудия (-Frame.rotation.f).
-            // Надпись и маркер должны отображаться ТОЛЬКО со стороны сцепки (спереди от орудия).
-            Vec2 engineFwd = closestEngine.Frame.rotation.f.AsVec2.Normalized();
-            if (engineFwd.LengthSquared < 0.01f) engineFwd = new Vec2(0f, 1f);
-
-            Vec2 toPlayer = (mainAgent.Position.AsVec2 - hitchPos.AsVec2);
-            float forwardOffset = Vec2.DotProduct(toPlayer, engineFwd);
-
-            // Если боец находится позади дышла (внутри лафета или на позиции наводчика) — скрываем сцепку
-            if (forwardOffset < -0.35f)
-            {
-                ResetInteraction();
-                return;
-            }
-
             var cam = MissionScreen?.CombatCamera;
             Vec3 camPos = cam != null ? cam.Position : mainAgent.GetEyeGlobalPosition();
             Vec3 toHitch = (hitchPos - camPos).NormalizedCopy();
 
-            // Вектор взгляда на дышло не должен быть направлен сзади наперед (со стороны наводчика в сторону выстрела)
-            if (Vec2.DotProduct(toHitch.AsVec2.Normalized(), engineFwd) > 0.35f)
+            // Проверяем, является ли игрок верховым возницей упряжи данного орудия
+            bool isDriver = (mainAgent.MountAgent != null && closestEngine.HorseAgent == mainAgent.MountAgent);
+
+            if (!isDriver)
             {
-                ResetInteraction();
-                return;
+                // Геометрическое разделение сторон (только для пеших бойцов и сторонних наблюдателей):
+                // Дышло (HitchPosition) находится спереди орудия (+Frame.rotation.f).
+                // Позиция наводчика и экипажа находится сзади орудия (-Frame.rotation.f).
+                // Надпись и маркер должны отображаться ТОЛЬКО со стороны сцепки (спереди от орудия).
+                Vec2 engineFwd = closestEngine.Frame.rotation.f.AsVec2.Normalized();
+                if (engineFwd.LengthSquared < 0.01f) engineFwd = new Vec2(0f, 1f);
+
+                Vec2 toPlayer = (mainAgent.Position.AsVec2 - hitchPos.AsVec2);
+                float forwardOffset = Vec2.DotProduct(toPlayer, engineFwd);
+
+                // Если боец находится позади дышла (внутри лафета или на позиции наводчика) — скрываем сцепку
+                if (forwardOffset < -0.35f)
+                {
+                    ResetInteraction();
+                    return;
+                }
+
+                // Вектор взгляда на дышло не должен быть направлен сзади наперед (со стороны наводчика в сторону выстрела)
+                if (Vec2.DotProduct(toHitch.AsVec2.Normalized(), engineFwd) > 0.35f)
+                {
+                    ResetInteraction();
+                    return;
+                }
+
+                // Проверка дистанции (до 2.5м пешком, до 3.5м верхом) и направления прицела
+                float maxInteractDist = (mainAgent.MountAgent != null) ? 3.5f : 2.5f;
+                if (closestDist > maxInteractDist)
+                {
+                    ResetPromptOnly();
+                    return;
+                }
+
+                Vec3 camDir = cam != null ? cam.Direction : mainAgent.LookDirection;
+                float dot = Vec3.DotProduct(camDir, toHitch);
+
+                if (dot < 0.88f) // ~28 градусов комфортный угол прицела
+                {
+                    ResetPromptOnly();
+                    return;
+                }
             }
 
-            // 1. 3D World-to-Screen проекция маркера дышла на экран
-            if (cam != null)
+            // 1. 3D World-to-Screen проекция маркера дышла на экран (для пеших)
+            if (!isDriver && cam != null)
             {
                 Vec3 vp = cam.WorldPointToViewPortPoint(ref hitchPos);
                 if (!float.IsNaN(vp.x) && !float.IsNaN(vp.y) && vp.z > 0.2f && vp.x >= 0f && vp.x <= 1f && vp.y >= 0f && vp.y <= 1f)
@@ -158,30 +188,14 @@ namespace DWDN_Script.Client.UI
                 _viewModel.IsMarkerVisible = false;
             }
 
-            // 2. Проверка дистанции (до 1.85м пешком, до 3.5м верхом) и направления прицела
-            float maxInteractDist = (mainAgent.MountAgent != null) ? 3.5f : 1.85f;
-            if (closestDist > maxInteractDist)
-            {
-                ResetPromptOnly();
-                return;
-            }
-
-            Vec3 camDir = cam != null ? cam.Direction : mainAgent.LookDirection;
-            float dot = Vec3.DotProduct(camDir, toHitch);
-
-            if (dot < 0.88f) // ~28 градусов комфортный угол прицела
-            {
-                ResetPromptOnly();
-                return;
-            }
-
-            // 3. Проверка прав: создатель орудия или класс артиллериста
+            // 2. Проверка прав: создатель орудия, возница, класс артиллериста или союзник по команде
             bool isOwner = !string.IsNullOrEmpty(closestEngine.OwnerPlayerId) &&
                            (closestEngine.OwnerPlayerId == (GameNetwork.MyPeer?.VirtualPlayer?.Id.ToString() ?? "") ||
                             closestEngine.OwnerPlayerId == GameNetwork.MyPeer?.UserName);
             bool isArtillerist = mainAgent.Character?.StringId?.IndexOf("artillerist", StringComparison.OrdinalIgnoreCase) >= 0;
+            bool isFriendly = !GameNetwork.IsMultiplayer || mainAgent.Team == null || mainAgent.Team.Side == closestEngine.TeamSide;
 
-            if (!isOwner && !isArtillerist)
+            if (!isOwner && !isArtillerist && !isDriver && !isFriendly)
             {
                 _viewModel.PromptText = "Управлять сцепкой может только артиллерийский расчет";
                 _viewModel.CanInteract = false;

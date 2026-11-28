@@ -7,7 +7,7 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="150" />
+			<skill id="Riding" value="140" />
 			<skill id="OneHanded" value="150" />
 			<skill id="TwoHanded" value="140" />
 			<skill id="Polearm" value="140" />
@@ -37,7 +37,7 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="150" />
+			<skill id="Riding" value="135" />
 			<skill id="OneHanded" value="140" />
 			<skill id="TwoHanded" value="130" />
 			<skill id="Polearm" value="140" />
@@ -55,7 +55,7 @@
 				<equipment slot="Leg" id="Item.bergen_legs" />
 				<equipment slot="Cape" id="Item.bergen_hood" />
 				<equipment slot="Gloves" id="Item.gothic_gloves" />
-				<equipment slot="Horse" id="Item.mp_vlandia_horse" />
+				<equipment slot="Horse" id="Item.mp_vlandia_horse_war" />
 				<equipment slot="HorseHarness" id="Item.mp_chain_barding" />
 			</EquipmentRoster>
 		</Equipments>
@@ -68,7 +68,7 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="150" />
+			<skill id="Riding" value="135" />
 			<skill id="OneHanded" value="140" />
 			<skill id="TwoHanded" value="120" />
 			<skill id="Polearm" value="150" />
@@ -85,7 +85,7 @@
 				<equipment slot="Leg" id="Item.Baron_Finard_gothiclegs" />
 				<equipment slot="Cape" id="Item.finard_cape" />
 				<equipment slot="Gloves" id="Item.Baron_Finard_gauntlet" />
-				<equipment slot="Horse" id="Item.mp_vlandia_horse" />
+				<equipment slot="Horse" id="Item.mp_vlandia_horse_war" />
 				<equipment slot="HorseHarness" id="Item.mp_chain_barding" />
 				<equipment slot="Item0" id="Item.mp_vlandia_cavalry_sword" />
 			</EquipmentRoster>
@@ -101,17 +101,17 @@
 		</face>
 		<skills>
 			<skill id="Riding" value="140" />
-			<skill id="OneHanded" value="90" />
-			<skill id="TwoHanded" value="60" />
-			<skill id="Polearm" value="130" />
+			<skill id="OneHanded" value="110" />
+			<skill id="TwoHanded" value="80" />
+			<skill id="Polearm" value="125" />
 			<skill id="Crossbow" value="20" />
 			<skill id="Bow" value="20" />
-			<skill id="Throwing" value="60" />
+			<skill id="Throwing" value="50" />
 		</skills>
 		<Equipments>
 			<EquipmentRoster>
-				<equipment slot="Horse" id="Item.mp_vlandia_horse" />
-				<equipment slot="HorseHarness" id="Item.mp_chain_barding" />
+				<equipment slot="Horse" id="Item.mp_vlandia_horse_faster" />
+				<equipment slot="HorseHarness" id="Item.mp_halfchain_barding" />
 				<equipment slot="Gloves" id="Item.plate_gauntlet" />
 				<equipment slot="Body" id="Item.plate_cav_cuirass" />
 				<equipment slot="Head" id="Item.bannreich_cav_helmet_visor" />
@@ -137,7 +137,7 @@
 			<skill id="Polearm" value="50" />
 			<skill id="Crossbow" value="20" />
 			<skill id="Bow" value="20" />
-			<skill id="Throwing" value="50" />
+			<skill id="Throwing" value="40" />
 		</skills>
 		<Equipments>
 			<EquipmentRoster>
@@ -165,12 +165,12 @@
 		</face>
 		<skills>
 			<skill id="Riding" value="40" />
-			<skill id="OneHanded" value="120" />
-			<skill id="TwoHanded" value="100" />
+			<skill id="OneHanded" value="125" />
+			<skill id="TwoHanded" value="110" />
 			<skill id="Polearm" value="100" />
 			<skill id="Crossbow" value="20" />
 			<skill id="Bow" value="20" />
-			<skill id="Throwing" value="70" />
+			<skill id="Throwing" value="60" />
 		</skills>
 		<Equipments>
 			<EquipmentRoster>
@@ -204,13 +204,13 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="50" />
+			<skill id="Riding" value="40" />
 			<skill id="OneHanded" value="140" />
 			<skill id="TwoHanded" value="120" />
 			<skill id="Polearm" value="120" />
 			<skill id="Crossbow" value="30" />
 			<skill id="Bow" value="30" />
-			<skill id="Throwing" value="80" />
+			<skill id="Throwing" value="70" />
 		</skills>
 		<Equipments>
 			<EquipmentRoster>
@@ -266,6 +266,34 @@
 		</Equipments>
 		<Resistances dismount="90" />
 	</NPCCharacter>
+	<!-- Khorunzhiy -->
+	<NPCCharacter id="mp_Khorunzhiy_hero" default_group="Infantry" level="25" name="{=hoinf1}Khorunzhiy" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="40" />
+			<skill id="OneHanded" value="130" />
+			<skill id="TwoHanded" value="110" />
+			<skill id="Polearm" value="120" />
+			<skill id="Crossbow" value="25" />
+			<skill id="Bow" value="25" />
+			<skill id="Throwing" value="60" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Head" id="Item.baron_roondalt_vendelhelmet_1" />
+				<equipment slot="Body" id="Item.run_body1" />
+				<equipment slot="Cape" id="Item.Baron_rundal_cape" />
+				<equipment slot="Leg" id="Item.rundal_leg" />
+				<equipment slot="Gloves" id="Item.rundal_gloves_second" />
+				<equipment slot="Item0" id="Item.baldur_warpick" />
+				<equipment slot="Item1" id="Item.rundal_shield" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
 	<!-- Knight -->
 	<NPCCharacter id="mp_Knight_hero" default_group="Cavalry" level="25" name="{=hoinf1}Knight" occupation="Soldier" culture="Culture.dwdn">
 		<face>
@@ -273,13 +301,13 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="150" />
-			<skill id="OneHanded" value="130" />
-			<skill id="TwoHanded" value="110" />
-			<skill id="Polearm" value="150" />
+			<skill id="Riding" value="130" />
+			<skill id="OneHanded" value="135" />
+			<skill id="TwoHanded" value="120" />
+			<skill id="Polearm" value="135" />
 			<skill id="Crossbow" value="20" />
 			<skill id="Bow" value="20" />
-			<skill id="Throwing" value="70" />
+			<skill id="Throwing" value="60" />
 		</skills>
 		<Equipments>
 			<EquipmentRoster>
@@ -319,13 +347,13 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="40" />
+			<skill id="Riding" value="30" />
 			<skill id="OneHanded" value="60" />
 			<skill id="TwoHanded" value="50" />
 			<skill id="Polearm" value="130" />
 			<skill id="Crossbow" value="20" />
 			<skill id="Bow" value="20" />
-			<skill id="Throwing" value="40" />
+			<skill id="Throwing" value="20" />
 		</skills>
 		<Equipments>
 			<EquipmentRoster>
@@ -345,13 +373,13 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="40" />
-			<skill id="OneHanded" value="80" />
-			<skill id="TwoHanded" value="60" />
+			<skill id="Riding" value="30" />
+			<skill id="OneHanded" value="85" />
+			<skill id="TwoHanded" value="65" />
 			<skill id="Polearm" value="80" />
 			<skill id="Crossbow" value="20" />
 			<skill id="Bow" value="20" />
-			<skill id="Throwing" value="60" />
+			<skill id="Throwing" value="50" />
 		</skills>
 		<Equipments>
 			<EquipmentRoster>
@@ -435,13 +463,13 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="30" />
+			<skill id="Riding" value="20" />
 			<skill id="OneHanded" value="60" />
-			<skill id="TwoHanded" value="40" />
+			<skill id="TwoHanded" value="30" />
 			<skill id="Polearm" value="40" />
-			<skill id="Crossbow" value="80" />
-			<skill id="Bow" value="110" />
-			<skill id="Throwing" value="100" />
+			<skill id="Crossbow" value="70" />
+			<skill id="Bow" value="120" />
+			<skill id="Throwing" value="40" />
 		</skills>
 		<Equipments>
 			<EquipmentRoster>
@@ -461,13 +489,13 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="30" />
-			<skill id="OneHanded" value="70" />
-			<skill id="TwoHanded" value="50" />
-			<skill id="Polearm" value="50" />
-			<skill id="Crossbow" value="120" />
-			<skill id="Bow" value="40" />
-			<skill id="Throwing" value="50" />
+			<skill id="Riding" value="20" />
+			<skill id="OneHanded" value="65" />
+			<skill id="TwoHanded" value="30" />
+			<skill id="Polearm" value="40" />
+			<skill id="Crossbow" value="125" />
+			<skill id="Bow" value="30" />
+			<skill id="Throwing" value="40" />
 		</skills>
 		<Equipments>
 			<EquipmentRoster>
@@ -485,7 +513,7 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="150" />
+			<skill id="Riding" value="140" />
 			<skill id="OneHanded" value="150" />
 			<skill id="TwoHanded" value="140" />
 			<skill id="Polearm" value="140" />
@@ -514,7 +542,7 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="150" />
+			<skill id="Riding" value="135" />
 			<skill id="OneHanded" value="140" />
 			<skill id="TwoHanded" value="130" />
 			<skill id="Polearm" value="140" />
@@ -532,7 +560,7 @@
 				<equipment slot="Leg" id="Item.bergen_legs" />
 				<equipment slot="Cape" id="Item.bergen_hood" />
 				<equipment slot="Gloves" id="Item.gothic_gloves" />
-				<equipment slot="Horse" id="Item.mp_vlandia_horse" />
+				<equipment slot="Horse" id="Item.mp_vlandia_horse_war" />
 				<equipment slot="HorseHarness" id="Item.mp_chain_barding" />
 			</EquipmentRoster>
 		</Equipments>
@@ -544,7 +572,7 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="150" />
+			<skill id="Riding" value="135" />
 			<skill id="OneHanded" value="140" />
 			<skill id="TwoHanded" value="120" />
 			<skill id="Polearm" value="150" />
@@ -561,7 +589,7 @@
 				<equipment slot="Leg" id="Item.Baron_Finard_gothiclegs" />
 				<equipment slot="Cape" id="Item.finard_cape" />
 				<equipment slot="Gloves" id="Item.Baron_Finard_gauntlet" />
-				<equipment slot="Horse" id="Item.mp_vlandia_horse" />
+				<equipment slot="Horse" id="Item.mp_vlandia_horse_war" />
 				<equipment slot="HorseHarness" id="Item.mp_chain_barding" />
 				<equipment slot="Item0" id="Item.mp_vlandia_cavalry_sword" />
 			</EquipmentRoster>
@@ -575,17 +603,17 @@
 		</face>
 		<skills>
 			<skill id="Riding" value="140" />
-			<skill id="OneHanded" value="90" />
-			<skill id="TwoHanded" value="60" />
-			<skill id="Polearm" value="130" />
+			<skill id="OneHanded" value="110" />
+			<skill id="TwoHanded" value="80" />
+			<skill id="Polearm" value="125" />
 			<skill id="Crossbow" value="20" />
 			<skill id="Bow" value="20" />
-			<skill id="Throwing" value="60" />
+			<skill id="Throwing" value="50" />
 		</skills>
 		<Equipments>
 			<EquipmentRoster>
-				<equipment slot="Horse" id="Item.mp_vlandia_horse" />
-				<equipment slot="HorseHarness" id="Item.mp_chain_barding" />
+				<equipment slot="Horse" id="Item.mp_vlandia_horse_faster" />
+				<equipment slot="HorseHarness" id="Item.mp_halfchain_barding" />
 				<equipment slot="Gloves" id="Item.plate_gauntlet" />
 				<equipment slot="Body" id="Item.plate_cav_cuirass" />
 				<equipment slot="Head" id="Item.bannreich_cav_helmet_visor" />
@@ -610,7 +638,7 @@
 			<skill id="Polearm" value="50" />
 			<skill id="Crossbow" value="20" />
 			<skill id="Bow" value="20" />
-			<skill id="Throwing" value="50" />
+			<skill id="Throwing" value="40" />
 		</skills>
 		<Equipments>
 			<EquipmentRoster>
@@ -637,12 +665,12 @@
 		</face>
 		<skills>
 			<skill id="Riding" value="40" />
-			<skill id="OneHanded" value="120" />
-			<skill id="TwoHanded" value="100" />
+			<skill id="OneHanded" value="125" />
+			<skill id="TwoHanded" value="110" />
 			<skill id="Polearm" value="100" />
 			<skill id="Crossbow" value="20" />
 			<skill id="Bow" value="20" />
-			<skill id="Throwing" value="70" />
+			<skill id="Throwing" value="60" />
 		</skills>
 		<Equipments>
 			<EquipmentRoster>
@@ -675,13 +703,13 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="50" />
+			<skill id="Riding" value="40" />
 			<skill id="OneHanded" value="140" />
 			<skill id="TwoHanded" value="120" />
 			<skill id="Polearm" value="120" />
 			<skill id="Crossbow" value="30" />
 			<skill id="Bow" value="30" />
-			<skill id="Throwing" value="80" />
+			<skill id="Throwing" value="70" />
 		</skills>
 		<Equipments>
 			<EquipmentRoster>
@@ -737,19 +765,47 @@
 		</Equipments>
 		<Resistances dismount="90" />
 	</NPCCharacter>
+	<!-- Khorunzhiy -->
+	<NPCCharacter id="mp_Khorunzhiy_troop" default_group="Infantry" level="25" name="{=hoinf1}Khorunzhiy" occupation="Soldier" culture="Culture.dwdn">
+		<face>
+			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
+			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
+		</face>
+		<skills>
+			<skill id="Riding" value="40" />
+			<skill id="OneHanded" value="130" />
+			<skill id="TwoHanded" value="110" />
+			<skill id="Polearm" value="120" />
+			<skill id="Crossbow" value="25" />
+			<skill id="Bow" value="25" />
+			<skill id="Throwing" value="60" />
+		</skills>
+		<Equipments>
+			<EquipmentRoster>
+				<equipment slot="Head" id="Item.baron_roondalt_vendelhelmet_1" />
+				<equipment slot="Body" id="Item.run_body1" />
+				<equipment slot="Cape" id="Item.Baron_rundal_cape" />
+				<equipment slot="Leg" id="Item.rundal_leg" />
+				<equipment slot="Gloves" id="Item.rundal_gloves_second" />
+				<equipment slot="Item0" id="Item.baldur_warpick" />
+				<equipment slot="Item1" id="Item.rundal_shield" />
+			</EquipmentRoster>
+		</Equipments>
+		<Resistances dismount="90" />
+	</NPCCharacter>
 	<NPCCharacter id="mp_Knight_troop" default_group="Cavalry" level="25" name="{=hoinf1}Knight" occupation="Soldier" culture="Culture.dwdn">
 		<face>
 			<BodyProperties version="4" age="61.23" weight="0.3963" build="0.3951" key="00000000010003000000000000067000000000000000000000000000000000000006660606000000000000000000000000000000000000000000000001180000" />
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="150" />
-			<skill id="OneHanded" value="130" />
-			<skill id="TwoHanded" value="110" />
-			<skill id="Polearm" value="150" />
+			<skill id="Riding" value="130" />
+			<skill id="OneHanded" value="135" />
+			<skill id="TwoHanded" value="120" />
+			<skill id="Polearm" value="135" />
 			<skill id="Crossbow" value="20" />
 			<skill id="Bow" value="20" />
-			<skill id="Throwing" value="70" />
+			<skill id="Throwing" value="60" />
 		</skills>
 		<Equipments>
 			<EquipmentRoster>
@@ -788,13 +844,13 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="40" />
+			<skill id="Riding" value="30" />
 			<skill id="OneHanded" value="60" />
 			<skill id="TwoHanded" value="50" />
 			<skill id="Polearm" value="130" />
 			<skill id="Crossbow" value="20" />
 			<skill id="Bow" value="20" />
-			<skill id="Throwing" value="40" />
+			<skill id="Throwing" value="20" />
 		</skills>
 		<Equipments>
 			<EquipmentRoster>
@@ -813,13 +869,13 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="40" />
-			<skill id="OneHanded" value="80" />
-			<skill id="TwoHanded" value="60" />
+			<skill id="Riding" value="30" />
+			<skill id="OneHanded" value="85" />
+			<skill id="TwoHanded" value="65" />
 			<skill id="Polearm" value="80" />
 			<skill id="Crossbow" value="20" />
 			<skill id="Bow" value="20" />
-			<skill id="Throwing" value="60" />
+			<skill id="Throwing" value="50" />
 		</skills>
 		<Equipments>
 			<EquipmentRoster>
@@ -901,13 +957,13 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="30" />
+			<skill id="Riding" value="20" />
 			<skill id="OneHanded" value="60" />
-			<skill id="TwoHanded" value="40" />
+			<skill id="TwoHanded" value="30" />
 			<skill id="Polearm" value="40" />
-			<skill id="Crossbow" value="80" />
-			<skill id="Bow" value="110" />
-			<skill id="Throwing" value="100" />
+			<skill id="Crossbow" value="70" />
+			<skill id="Bow" value="120" />
+			<skill id="Throwing" value="40" />
 		</skills>
 		<Equipments>
 			<EquipmentRoster>
@@ -926,13 +982,13 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="30" />
-			<skill id="OneHanded" value="70" />
-			<skill id="TwoHanded" value="50" />
-			<skill id="Polearm" value="50" />
-			<skill id="Crossbow" value="120" />
-			<skill id="Bow" value="40" />
-			<skill id="Throwing" value="50" />
+			<skill id="Riding" value="20" />
+			<skill id="OneHanded" value="65" />
+			<skill id="TwoHanded" value="30" />
+			<skill id="Polearm" value="40" />
+			<skill id="Crossbow" value="125" />
+			<skill id="Bow" value="30" />
+			<skill id="Throwing" value="40" />
 		</skills>
 		<Equipments>
 			<EquipmentRoster>
@@ -951,13 +1007,13 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="30" />
-			<skill id="OneHanded" value="85" />
-			<skill id="TwoHanded" value="95" />
-			<skill id="Polearm" value="80" />
-			<skill id="Crossbow" value="140" />
-			<skill id="Bow" value="40" />
-			<skill id="Throwing" value="70" />
+			<skill id="Riding" value="20" />
+			<skill id="OneHanded" value="70" />
+			<skill id="TwoHanded" value="60" />
+			<skill id="Polearm" value="40" />
+			<skill id="Crossbow" value="120" />
+			<skill id="Bow" value="30" />
+			<skill id="Throwing" value="50" />
 		</skills>
 		<Equipments>
 			<EquipmentRoster>
@@ -977,13 +1033,13 @@
 			<BodyPropertiesMax version="4" age="91.79" weight="0.6728" build="1" key="0005FC059A0034D0FFFFFFFF887AFFFFFFFEFFFB6FB7FFFFFFFFFFFFFFFFFFFF000FAFFA0FFFFFFF000000000000000000000000000000000000000001680141" />
 		</face>
 		<skills>
-			<skill id="Riding" value="30" />
-			<skill id="OneHanded" value="85" />
-			<skill id="TwoHanded" value="95" />
-			<skill id="Polearm" value="80" />
-			<skill id="Crossbow" value="140" />
-			<skill id="Bow" value="40" />
-			<skill id="Throwing" value="70" />
+			<skill id="Riding" value="20" />
+			<skill id="OneHanded" value="70" />
+			<skill id="TwoHanded" value="60" />
+			<skill id="Polearm" value="40" />
+			<skill id="Crossbow" value="120" />
+			<skill id="Bow" value="30" />
+			<skill id="Throwing" value="50" />
 		</skills>
 		<Equipments>
 			<EquipmentRoster>

@@ -93,23 +93,11 @@ namespace DWDN_Script
                         {
                             // Освобождаем ограничение скорости у коня при распряжке
                             HorseAgent.SetMaximumSpeedLimit(-1f, false);
-                            try { HorseAgent.SetIsAIPaused(false); } catch { }
                         }
                         else
                         {
-                            // На марше: если есть всадник — шаг (2.2 м/с), если нет — стоит смирно на месте (0.0001 м/с)
-                            if (HorseAgent.RiderAgent != null)
-                            {
-                                HorseAgent.SetMaximumSpeedLimit(2.2f, false);
-                                try { HorseAgent.SetIsAIPaused(false); } catch { }
-                            }
-                            else
-                            {
-                                HorseAgent.SetMaximumSpeedLimit(0.0001f, false);
-                                try { HorseAgent.SetIsAIPaused(true); } catch { }
-                                try { HorseAgent.DisableScriptedMovement(); } catch { }
-                                HorseAgent.MovementInputVector = Vec2.Zero;
-                            }
+                            // На марше конь движется строго шагом
+                            HorseAgent.SetMaximumSpeedLimit(2.2f, false);
                         }
                         HorseAgent.UpdateAgentProperties();
                     }
@@ -635,8 +623,8 @@ namespace DWDN_Script
                 ItemObject horseItem = MBObjectManager.Instance?.GetObject<ItemObject>("mp_vlandia_horse")
                                     ?? MBObjectManager.Instance?.GetObject<ItemObject>("sumpter_horse")
                                     ?? MBObjectManager.Instance?.GetObject<ItemObject>("mule");
-                ItemObject harnessItem = MBObjectManager.Instance?.GetObject<ItemObject>("mp_vlandia_horse_harness")
-                                      ?? MBObjectManager.Instance?.GetObject<ItemObject>("saddle_horse");
+                ItemObject harnessItem = MBObjectManager.Instance?.GetObject<ItemObject>("mp_light_harness")
+                                      ?? MBObjectManager.Instance?.GetObject<ItemObject>("mp_chain_barding");
 
                 Agent horseAgent = null;
                 try
@@ -651,11 +639,8 @@ namespace DWDN_Script
 
                     if (horseAgent != null)
                     {
-                        // При спавне конь стоит строго на месте в упряжи, пока на него не сядет артиллерист
-                        horseAgent.SetMaximumSpeedLimit(0.0001f, false);
-                        try { horseAgent.SetIsAIPaused(true); } catch { }
-                        try { horseAgent.DisableScriptedMovement(); } catch { }
-                        horseAgent.MovementInputVector = Vec2.Zero;
+                        // ЖЕСТКИЙ ЗАПРЕТ БЕГА И ГАЛОПА: ТОЛЬКО ШАГ
+                        horseAgent.SetMaximumSpeedLimit(2.2f, false);
                         horseAgent.UpdateAgentProperties();
                     }
                 }
@@ -822,23 +807,13 @@ namespace DWDN_Script
                 Agent horseAgent = null;
                 if (message.HorseAgentIndex >= 0)
                 {
-                    horseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.Index == message.HorseAgentIndex);
+                    horseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.IsMount && a.Index == message.HorseAgentIndex)
+                                 ?? Mission.Current?.Agents?.FirstOrDefault(a => a.IsMount);
                     if (horseAgent != null && horseAgent.IsActive())
                     {
                         try
                         {
-                            if (horseAgent.RiderAgent != null)
-                            {
-                                horseAgent.SetMaximumSpeedLimit(2.2f, false);
-                                try { horseAgent.SetIsAIPaused(false); } catch { }
-                            }
-                            else
-                            {
-                                horseAgent.SetMaximumSpeedLimit(0.0001f, false);
-                                try { horseAgent.SetIsAIPaused(true); } catch { }
-                                try { horseAgent.DisableScriptedMovement(); } catch { }
-                                horseAgent.MovementInputVector = Vec2.Zero;
-                            }
+                            horseAgent.SetMaximumSpeedLimit(2.2f, false);
                             horseAgent.UpdateAgentProperties();
                         }
                         catch { }
@@ -904,16 +879,22 @@ namespace DWDN_Script
                 var engine = _activeEngines.FirstOrDefault(e => e.Id == message.EngineId);
                 if (engine == null || engine.IsDestroyed) return false;
 
-                // 1. Проверка прав: создатель орудия или класс артиллериста
+                // 1. Проверка прав: создатель орудия, возница, класс артиллериста или союзник
                 bool isOwner = !string.IsNullOrEmpty(engine.OwnerPlayerId) &&
                                (engine.OwnerPlayerId == (peer.VirtualPlayer?.Id.ToString() ?? "") ||
                                 engine.OwnerPlayerId == peer.UserName);
                 bool isArtillerist = agent.Character?.StringId?.IndexOf("artillerist", StringComparison.OrdinalIgnoreCase) >= 0;
-                if (!isOwner && !isArtillerist) return false;
+                bool isDriver = (agent.MountAgent != null && engine.HorseAgent == agent.MountAgent);
+                bool isFriendly = !GameNetwork.IsMultiplayer || agent.Team == null || agent.Team.Side == engine.TeamSide;
 
-                // 2. Проверка дистанции бойца до дышла
-                float dist = agent.Position.Distance(engine.HitchPosition);
-                if (dist > 3.4f) return false;
+                if (!isOwner && !isArtillerist && !isDriver && !isFriendly) return false;
+
+                // 2. Проверка дистанции бойца до дышла (для возницы дистанция гарантирована)
+                if (!isDriver)
+                {
+                    float dist = agent.Position.Distance(engine.HitchPosition);
+                    if (dist > 3.8f) return false;
+                }
 
                 // 3. Выполнение сцепки или отцепки
                 if (message.Attach)
@@ -923,7 +904,7 @@ namespace DWDN_Script
                     Agent horseAgent = null;
                     if (message.HorseAgentIndex >= 0)
                     {
-                        horseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.Index == message.HorseAgentIndex);
+                        horseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.IsMount && a.Index == message.HorseAgentIndex);
                     }
                     if (horseAgent == null || !horseAgent.IsMount || !horseAgent.IsActive() || (horseAgent.RiderAgent != null && horseAgent.RiderAgent != agent) || IsHorseHitched(horseAgent))
                     {
@@ -1039,7 +1020,8 @@ namespace DWDN_Script
 
                 if (!message.IsCombatState && message.HorseAgentIndex >= 0)
                 {
-                    engine.HorseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.Index == message.HorseAgentIndex);
+                    engine.HorseAgent = Mission.Current?.Agents?.FirstOrDefault(a => a.IsMount && a.Index == message.HorseAgentIndex)
+                                        ?? Mission.Current?.Agents?.FirstOrDefault(a => a.IsMount);
                 }
 
                 engine.SavedAmmo = message.RemainingAmmo;
@@ -1099,7 +1081,6 @@ namespace DWDN_Script
                             try
                             {
                                 engine.HorseAgent.SetMaximumSpeedLimit(-1f, false);
-                                try { engine.HorseAgent.SetIsAIPaused(false); } catch { }
                                 engine.HorseAgent.UpdateAgentProperties();
                             }
                             catch { }
@@ -1122,7 +1103,6 @@ namespace DWDN_Script
                             try
                             {
                                 engine.HorseAgent.SetMaximumSpeedLimit(-1f, false);
-                                try { engine.HorseAgent.SetIsAIPaused(false); } catch { }
                                 engine.HorseAgent.UpdateAgentProperties();
                             }
                             catch { }
@@ -1138,33 +1118,23 @@ namespace DWDN_Script
                         {
                             if (engine.HorseAgent != null && engine.HorseAgent.IsActive())
                             {
-                                // Контроль поведения запряженного коня:
-                                // Без всадника — стоит смирно на месте и не блуждает
-                                // Со всадником — управляемо движется шагом (до 2.2 м/с)
+                                // Если у тягловой лошади нет всадника (артиллерист спешился или еще не сел), орудие не перемещается
                                 if (engine.HorseAgent.RiderAgent == null)
                                 {
-                                    if (engine.HorseAgent.GetCurrentSpeedLimit() > 0.01f)
-                                    {
-                                        engine.HorseAgent.SetMaximumSpeedLimit(0.0001f, false);
-                                        try { engine.HorseAgent.SetIsAIPaused(true); } catch { }
-                                        try { engine.HorseAgent.DisableScriptedMovement(); } catch { }
-                                        engine.HorseAgent.MovementInputVector = Vec2.Zero;
-                                        engine.HorseAgent.UpdateAgentProperties();
-                                    }
+                                    continue;
                                 }
-                                else
-                                {
-                                    if (engine.HorseAgent.GetCurrentSpeedLimit() < 1.0f)
-                                    {
-                                        engine.HorseAgent.SetMaximumSpeedLimit(2.2f, false);
-                                        try { engine.HorseAgent.SetIsAIPaused(false); } catch { }
-                                        engine.HorseAgent.UpdateAgentProperties();
-                                    }
-                                }
+
                                 // Обновляем позицию тележки/орудия за лошадью
                                 Vec3 horsePos = engine.HorseAgent.Position;
+                                if (float.IsNaN(horsePos.x) || float.IsInfinity(horsePos.x) ||
+                                    float.IsNaN(horsePos.y) || float.IsInfinity(horsePos.y) ||
+                                    float.IsNaN(horsePos.z) || float.IsInfinity(horsePos.z))
+                                {
+                                    continue;
+                                }
+
                                 Vec2 horseFwd = engine.HorseAgent.Frame.rotation.f.AsVec2.Normalized();
-                                if (horseFwd.LengthSquared < 0.01f) horseFwd = new Vec2(0f, 1f);
+                                if (horseFwd.LengthSquared < 0.01f || float.IsNaN(horseFwd.x) || float.IsInfinity(horseFwd.x)) horseFwd = new Vec2(0f, 1f);
 
                                 float hitchDistance = 3.6f;
                                 Vec3 targetPos = horsePos - new Vec3(horseFwd.x * hitchDistance, horseFwd.y * hitchDistance, 0f);
@@ -1182,7 +1152,7 @@ namespace DWDN_Script
                                         {
                                             Mission.Current.Scene.GetHeightAtPoint(targetPos.AsVec2, BodyFlags.CommonCollisionExcludeFlags, ref gz);
                                         }
-                                        if (Math.Abs(gz - horsePos.z) < 3.5f)
+                                        if (!float.IsNaN(gz) && !float.IsInfinity(gz) && Math.Abs(gz - horsePos.z) < 3.5f)
                                         {
                                             targetPos.z = gz;
                                         }
@@ -1190,12 +1160,27 @@ namespace DWDN_Script
                                 }
                                 catch { }
 
+                                if (float.IsNaN(targetPos.x) || float.IsInfinity(targetPos.x) ||
+                                    float.IsNaN(targetPos.y) || float.IsInfinity(targetPos.y) ||
+                                    float.IsNaN(targetPos.z) || float.IsInfinity(targetPos.z))
+                                {
+                                    continue;
+                                }
+
                                 Vec2 toHorse = (horsePos.AsVec2 - targetPos.AsVec2).Normalized();
-                                if (toHorse.LengthSquared < 0.01f) toHorse = horseFwd;
+                                if (toHorse.LengthSquared < 0.01f || float.IsNaN(toHorse.x) || float.IsInfinity(toHorse.x)) toHorse = horseFwd;
 
                                 MatrixFrame f = MatrixFrame.Identity;
                                 f.origin = targetPos;
                                 f.rotation.RotateAboutUp((float)Math.Atan2(toHorse.x, toHorse.y));
+
+                                // Защита от передачи невалидных координат в нативный движок C++ (предотвращает OOM 34GB)
+                                if (float.IsNaN(f.origin.x) || float.IsInfinity(f.origin.x) ||
+                                    float.IsNaN(f.origin.y) || float.IsInfinity(f.origin.y) ||
+                                    float.IsNaN(f.origin.z) || float.IsInfinity(f.origin.z))
+                                {
+                                    continue;
+                                }
 
                                 // Если дистанция изменилась, сдвигаем тележку и орудие
                                 if (engine.Position.DistanceSquared(targetPos) > 0.04f || Math.Abs(engine.Position.z - targetPos.z) > 0.05f)
@@ -1354,8 +1339,8 @@ namespace DWDN_Script
                 catch { }
             }
 
-            // Если не артиллерист и нет чертежей — спавнить ничего не нужно
-            if (!isArtillerist && !hasArtilleryBlueprint) return;
+            // Если нет чертежей осадного орудия — спавнить ничего не нужно (артиллерист воюет пешим)
+            if (!hasArtilleryBlueprint) return;
 
             EngineTypeSpec chosenSpec = wantsBallista ? GetSpecForType("ballista") : GetSpecForType("mangonel");
             if (chosenSpec == null) return;
@@ -1452,10 +1437,15 @@ namespace DWDN_Script
                     _spawnedAgentIndices.Add(agent.Index);
                 }
 
+                if (engine.HorseAgent != null && agent.MountAgent == null)
+                {
+                    try { agent.Mount(engine.HorseAgent); } catch { }
+                }
+
                 if (agent.IsPlayerControlled)
                 {
                     InformationManager.DisplayMessage(new InformationMessage(
-                        $"[DWDN Артиллерия] Ваш {chosenSpec.Name} запряжен и готов к движению! Садитесь на лошадь верхом. На позиции нажмите [F], чтобы отцепить коня.",
+                        $"[DWDN Артиллерия] Ваш {chosenSpec.Name} запряжен и готов к движению! На позиции нажмите [F], чтобы отцепить коня.",
                         Colors.Green
                     ));
                 }
