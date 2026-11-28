@@ -2895,3 +2895,21 @@ if (this._isInWeaponCameraMode)
   3. `SyncEnginesToPeer`: для поздно подключившихся клиентов после `SyncArtilleryDescendantsMessage` дополнительно отправляется `NetworkMessages.FromServer.SyncObjectHitpoints` с актуальным `HitPoint`.
   4. `OnMissionTick`: на клиенте при `engine.Destructable.IsDestroyed`, если сущность всё ещё в состоянии `clean` (утилизирована сервером без боевого разрушения на обломки), вызывается `FadeOut(0.5f, false)` для `RootEntity` и `CartEntity`.
 - **Верификация:** `DWDN_Script.csproj` (0 ошибок), `DWDN_Script.Server.csproj` (0 ошибок, 0 предупреждений), `MechanicsTester --cli` (30/30 PASSED).
+
+
+---
+
+### Сессия 2026-11-28 — Реалистичный белый пороховой дым и крупная симметричная огненная дульная вспышка ручницы (`DWDN_FirearmsBehavior.cs`)
+
+- **Проблемы исходной реализации:**
+  1. Ранее `DWDN_FirearmsBehavior.cs` спавнил только бурую каменную пыль (`psys_game_stone_dust_a`) и мелкие ненаправленные искры (`psys_game_sparkle_a`, `local_emit_dir="false"`, 5 частиц ~1 см), а `position + forward * 0.70f` выносил вспышку в воздух перед стволом (`position` уже соответствует `AmmoOffset` ручницы), причём `velocity.NormalizedCopy()` искажался разбросом `accuracy="18"`.
+  2. Подтверждено по логам `Win64_Shipping_Client` и `Win64_Shipping_wEditor`: в Bannerlord v1.5+ сырые `particle_systems_*.xml` из `project.mbproj` не подгружаются в рантайме (партиклы читаются только из бинарных `.tpac`, таких как `Native/AssetPackages/particles.tpac`).
+  3. Важная находка по `psys_burning_projectile_default_coll_small`: его эмиттер `impact_flames` в Native имеет `local_emit_dir="false"` и `emit_velocity_x = +10.0` (мировая ось `+X`), из-за чего огненный шар всегда уносило вбок от ствола.
+- **Реализация в `ModuleData/scripts/DWDN_Script/DWDN_FirearmsBehavior.cs` (строго клиентская, `!GameNetwork.IsDedicatedServer`, без сетевых пакетов и без новых `.tpac`):**
+  1. **Точная ось и позиция дула:** направление берётся из `shooterAgent.LookDirection` (синхронизируется по сети, не искажается разбросом), позиция — `position + forward * (0.08f + (IsMainAgent ? 0.14f : 0f))`, ориентация — правая ортонормированная матрица `BuildForwardAsUpBasis(forward)` (`+Z` строго вдоль ствола).
+  2. **Крупное симметричное дульное пламя (`vx = 0, vy = 0`):**
+     - **Процедурный 3D-факел (`Mesh.CreateMeshWithMaterial`)**: 8 радиальных языков пламени (`2.0–2.7 м`) + фронтальная 6-лучевая звезда (`0.60–0.82 м`), аддитивное свечение (`MBAlphaBlendMode.Add`, `TwoSided | DontCastShadow | NoModifyDepthBuffer | RequiresForwardRendering`), случайный `roll`, анимация роста/затухания за `0.16 с`.
+     - **5× `psys_game_blacksmith_flame`** (`prt_shd_fire_1`, `local_emit_dir="true"`, `vx=0, vy=0, vz=+0.35`, `0` дыма, масштаб `2.2..1.6x`, вдоль ствола `+0.06..+1.48 м`, `emissionRate=8.5x`) + **2× `invoker`** (`vx=0, vy=0`, `rate=150`, масштаб `2.1x`) + торможение времени огня с `0.065 с` (`0.45x`) против сноса ветром.
+     - **Мгновенные горячие искры** (`psys_game_metal_metal_coll`, `psys_game_sparkle_a`) + динамический **`PointLight`** (`radius=10 м`, `Intensity=300 -> 0` за `0.15 с`, лимит `MaxActiveFlashLights = 12`).
+  3. **Объёмный белый пороховой дым:** 28× `psys_smoke` (сдвинуты на `+0.80 м`, чтобы не закрывать пламя) + 12× `prt_steam_bath` (`+0.85 м`) с двухфазным аэродинамическим торможением (`SetRuntimeTimeMultiplier(0.08..0.11f)` с `0.24 с`) и безопасной очисткой `ResetSmokeStateOnly()` без `Remove(0)` в `OnClearScene`/`OnEndMission`/`OnRemoveBehavior`.
+- **Верификация:** `DWDN_Script.csproj` (0 ошибок, 0 предупреждений), `DWDN_Script.Server.csproj` (0 ошибок, 0 предупреждений), `MechanicsTester --cli` (30/30 PASSED), живая проверка в бою.
